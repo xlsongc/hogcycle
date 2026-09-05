@@ -1,0 +1,21 @@
+# python
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# node
+node_modules/
+.next/
+out/
+
+# derived data — 可从 silver 秒级重建,不入审计轨迹
+data/gold/
+*.duckdb
+*.duckdb.wal
+
+# misc
+.DS_Store
+site/

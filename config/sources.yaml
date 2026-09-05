@@ -1,0 +1,85 @@
+# Adding an indicator should be a config change, not a code change.
+#
+# tier follows the causal chain:
+#   capacity  能繁母猪 → (10-12m) → 商品猪出栏   真正的先行指标
+#   margin    盈亏，决定去化会不会持续
+#   noise     短期供需扰动，影响股价不影响周期
+#
+# lo/hi are tripwires for unit drift and upstream parser breaks, not
+# forecasts. Set them roughly 3x wider than any plausible move.
+
+indicators:
+  - id: hog_price_wai3
+    name_zh: 外三元生猪出栏均价
+    tier: noise
+    freq: daily
+    unit: CNY/kg
+    lo: 3.0
+    hi: 60.0
+    adapter: akshare
+    call: {fn: futures_hog_core, symbol: 外三元}
+    notes: >
+      玄田数据/中国养猪网口径。全国均价，不是加权。与农业农村部 500 县集贸市场
+      口径有系统性差异，不要混用在同一条曲线上。
+
+  - id: piglet_price
+    name_zh: 仔猪价格
+    tier: capacity
+    freq: daily
+    unit: CNY/kg
+    lo: 5.0
+    hi: 200.0
+    adapter: akshare
+    call: {fn: futures_hog_cost, symbol: 仔猪价格}
+    notes: >
+      补栏意愿的价格表达，是产能层里最灵敏的一个。注意源站按公斤报价，
+      而行业新闻常按元/头报 7kg 断奶仔猪 — 换算前先确认体重口径。
+
+  - id: sow_binary_price
+    name_zh: 二元母猪价格
+    tier: capacity
+    freq: daily
+    unit: CNY/kg
+    lo: 5.0
+    hi: 200.0
+    adapter: akshare
+    call: {fn: futures_hog_cost, symbol: 二元母猪价格}
+
+  - id: corn_price
+    name_zh: 玉米价格
+    tier: margin
+    freq: daily
+    unit: CNY/kg
+    lo: 0.5
+    hi: 10.0
+    adapter: akshare
+    call: {fn: futures_hog_cost, symbol: 玉米}
+
+  - id: hog_corn_ratio
+    name_zh: 猪粮比价
+    tier: margin
+    freq: weekly
+    unit: ratio
+    lo: 1.0
+    hi: 25.0
+    adapter: akshare
+    call: {fn: futures_hog_supply, symbol: 猪粮比价}
+    notes: 官方调控触发线 5:1（过度下跌一级预警）。
+
+  - id: sow_inventory
+    name_zh: 能繁母猪存栏
+    tier: capacity
+    freq: monthly
+    unit: 万头
+    lo: 1000.0
+    hi: 10000.0
+    adapter: akshare
+    call: {fn: futures_hog_supply, symbol: 生猪产能}
+    revises: true
+    notes: >
+      唯一会被回溯修订的序列，也是唯一真正的先行指标 —— 这两件事同时成立，
+      正是 bitemporal 存储存在的理由。
+      口径注意：季度末月份取国家统计局数，非季度末月份是用农业农村部定点监测
+      的环比变化率推算出来的，两者可信度不同。
+      正常保有量基准值本身也会调整（4100 → 3900 → 3750），做同比或缺口
+      计算时必须用当期基准，不能用今天的。
