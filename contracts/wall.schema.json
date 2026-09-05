@@ -1,0 +1,92 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/hogcycle/contracts/wall.schema.json",
+  "title": "WallContract",
+  "description": "The only interface between the Python pipeline and the frontend. Phase 1 delivers this as a build-time JSON file; a later HTTP API serves the identical shape at the same path, so the frontend does not change.",
+  "type": "object",
+  "required": ["generated_at", "window", "panels", "readings"],
+  "additionalProperties": false,
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "description": "The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date."
+    },
+    "window": {
+      "type": "object",
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "properties": {
+        "start": { "type": ["string", "null"] },
+        "end": { "type": ["string", "null"] }
+      }
+    },
+    "panels": {
+      "type": "array",
+      "description": "Ordered by the causal chain: capacity leads price by 10-12 months, margin decides whether a capacity move persists.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "tier", "unit", "points"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "noise"] },
+          "unit": { "type": "string" },
+          "freq": { "type": "string" },
+          "revises": {
+            "type": "boolean",
+            "description": "Whether upstream restates this series after the fact. True only for 能繁母猪存栏, which is also the only real leading indicator — the coincidence that justifies bitemporal storage."
+          },
+          "threshold": {
+            "type": ["object", "null"],
+            "description": "A reference line that means something in the domain, not chart decoration.",
+            "required": ["value", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "value": { "type": "number" },
+              "label": { "type": "string" }
+            }
+          },
+          "points": {
+            "type": "array",
+            "description": "Ascending by date. Each point keeps its own granularity: this series genuinely mixes annual, quarterly and monthly readings, and flattening them would claim they are equivalent measurements.",
+            "items": {
+              "type": "object",
+              "required": ["d", "v", "g"],
+              "additionalProperties": false,
+              "properties": {
+                "d": { "type": "string", "description": "Period END, ISO date." },
+                "v": { "type": ["number", "null"] },
+                "g": {
+                  "type": "string",
+                  "enum": ["D", "W", "M", "Q", "A"],
+                  "description": "daily / weekly / monthly / quarterly / annual"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "readings": {
+      "type": "array",
+      "description": "Latest value per series with its position in its own history. Context for a human judgement, never a verdict.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "tier", "unit", "value", "obs_date"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "noise"] },
+          "unit": { "type": "string" },
+          "value": { "type": ["number", "null"] },
+          "obs_date": { "type": "string" },
+          "granularity": { "type": "string" },
+          "percentile": { "type": ["integer", "null"] },
+          "n": { "type": "integer" }
+        }
+      }
+    }
+  }
+}
