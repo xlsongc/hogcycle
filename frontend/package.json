@@ -1,0 +1,24 @@
+{
+  "name": "hogcycle-frontend",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run types && next dev",
+    "build": "npm run types && next build",
+    "start": "next start",
+    "types": "node scripts/generate-types.mjs",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "16.3.4",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "echarts": "6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "typescript": "5.9.3"
+  }
+}

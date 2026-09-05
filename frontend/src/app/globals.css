@@ -1,0 +1,359 @@
+/* Departure Mono — SIL OFL, self-hosted (no CDN distribution exists).
+   The face has no CJK coverage, so the stack falls through to a system
+   Chinese sans. That split is deliberate rather than a compromise: numerals,
+   dates and axis ticks carry most of a data dashboard's visual texture, and
+   they are exactly what this font is for. Chinese prose stays legible. */
+@font-face {
+  font-family: "Departure Mono";
+  src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+
+  --surface-1: #fcfcfb;
+  --page: #f9f9f7;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+  --chip: rgba(11, 11, 11, 0.045);
+
+  /* Tier hues. Validated all-pairs in both modes with the dataviz palette
+     validator; a fourth categorical hue cannot clear the gate in a small-
+     multiples layout, so `noise` takes the de-emphasis grey instead — which
+     also happens to state the thesis: noise moves equities, not the cycle. */
+  --capacity: #2a78d6;
+  --margin: #eb6834;
+  --price: #1baf7a;
+  --noise: #898781;
+  --critical: #d03b3b;
+
+  --mono: "Departure Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --sans: "Departure Mono", -apple-system, "PingFang SC", "Microsoft YaHei",
+    system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+    --chip: rgba(255, 255, 255, 0.06);
+    --capacity: #3987e5;
+    --margin: #d95926;
+    --price: #199e70;
+    --noise: #898781;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --page: #0d0d0d;
+  --ink: #ffffff;
+  --ink-2: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+  --chip: rgba(255, 255, 255, 0.06);
+  --capacity: #3987e5;
+  --margin: #d95926;
+  --price: #199e70;
+  --noise: #898781;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  /* 13px, not Departure Mono's 11px grid: 11px Chinese is too small for the
+     caliber notes, which have to be read. Numerals that render in the pixel
+     face alone stay on exact 11/22 multiples — see .num and .tile-value. */
+  font: 13px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+}
+
+/* ---------- header ---------- */
+
+header h1 {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  margin: 0 0 8px;
+}
+
+header .sub {
+  color: var(--ink-2);
+  margin: 0 0 14px;
+  max-width: 62ch;
+}
+
+.chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--chip);
+  border-radius: 3px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.chip i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+}
+
+.arrow {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+/* ---------- reading tiles ---------- */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
+  gap: 9px;
+  margin: 22px 0;
+}
+
+.tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 11px 13px;
+  border-left: 2px solid var(--tier, var(--muted));
+  /* Grid items default to min-width:auto, so a long unbreakable note widens
+     its track past the minmax() minimum and the row overflows instead of
+     wrapping to fewer columns. */
+  min-width: 0;
+}
+
+.tile-label {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-bottom: 4px;
+}
+
+.tile-value {
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.tile-value small {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.tile-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.tile-note b {
+  color: var(--critical);
+  font-weight: 400;
+}
+
+/* ---------- chart wall ---------- */
+
+.wall {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.panel + .panel {
+  border-top: 1px solid var(--grid);
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px 0;
+}
+
+.panel-title {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.panel-unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.panel-tier {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--tier, var(--muted));
+  letter-spacing: 0.04em;
+}
+
+.panel-chart {
+  height: 104px;
+}
+
+.panel-chart.tall {
+  height: 124px;
+}
+
+/* ---------- controls, table, footer ---------- */
+
+.bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+button {
+  font: 11px var(--mono);
+  color: var(--ink-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+
+button:hover {
+  color: var(--ink);
+  border-color: var(--axis);
+}
+
+button[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: var(--axis);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.table-wrap {
+  margin-top: 12px;
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-1);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  padding: 5px 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-1);
+  color: var(--ink-2);
+  font-weight: 400;
+  border-bottom: 1px solid var(--grid);
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+tbody tr + tr td {
+  border-top: 1px solid var(--grid);
+}
+
+td {
+  color: var(--ink-2);
+}
+
+td:first-child {
+  color: var(--ink);
+}
+
+footer {
+  margin-top: 26px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+footer b {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+footer ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+footer li {
+  margin: 3px 0;
+}
+
+.panel-readout {
+  margin-left: 2px;
+}

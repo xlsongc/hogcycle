@@ -30,7 +30,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "noise"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise"] },
           "unit": { "type": "string" },
           "freq": { "type": "string" },
           "revises": {
@@ -78,7 +78,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "noise"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise"] },
           "unit": { "type": "string" },
           "value": { "type": ["number", "null"] },
           "obs_date": { "type": "string" },
