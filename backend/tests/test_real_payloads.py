@@ -22,6 +22,7 @@ import pytest
 from hogcycle.collectors.akshare import AkshareAdapter
 from hogcycle.contracts.validation import ValidationError, validate
 from hogcycle.registry.loader import load_registry
+from hogcycle.registry.spec import Extract, IndicatorSpec
 
 FIXTURES = Path(__file__).parent / "fixtures"
 CONFIG = Path(__file__).resolve().parents[2] / "config" / "sources.yaml"
@@ -53,46 +54,63 @@ def normalise(registry, indicator: str):
 
 
 # --------------------------------------------------------------------------
-# 能繁母猪存栏 — the series the whole project exists for
+# 能繁母猪存栏, as 玄田数据 served it — a source that no longer updates
 # --------------------------------------------------------------------------
+#
+# sow_inventory now collects from 农业农村部 (see test_moa_payloads.py); this
+# mirror froze at 2025年10月. The fixture and this test stay because the
+# pre-2021 annual history exists nowhere else and is replayed from bronze:
+# if this parse ever broke, that history would become unrebuildable, which is
+# precisely what bronze immutability is supposed to prevent.
 
-def test_sow_inventory_parses_from_a_wide_table(registry):
-    """The failure that motivated this rewrite: 5 columns, none named `value`."""
-    _spec, obs = normalise(registry, "sow_inventory")
+LEGACY_SOW = IndicatorSpec(
+    id="sow_inventory",
+    name_zh="能繁母猪存栏",
+    tier="capacity",
+    freq="monthly",
+    unit="万头",
+    lo=1000.0,
+    hi=10000.0,
+    adapter="akshare",
+    call={"fn": "futures_hog_supply", "symbol": "生猪产能"},
+    extract=Extract(period="周期", value="能繁母猪存栏"),
+    revises=True,
+)
+
+
+def test_frozen_玄田_snapshot_still_replays_from_bronze():
+    """The 2009-2020 annual history has no live source any more. It survives
+    only as a bronze snapshot, so this parse must keep working."""
+    obs = AkshareAdapter().normalise(
+        LEGACY_SOW, payload("sow_inventory"), snapshot_id="fixture", fetched_at=NOW
+    )
     assert len(obs) == 22
     assert {o.unit for o in obs} == {"万头"}
 
-
-def test_sow_inventory_keeps_three_granularities_apart(registry):
-    """Annual, quarter-end and month-end readings share one column upstream.
-    Flattening them would claim they are the same kind of measurement."""
-    _, obs = normalise(registry, "sow_inventory")
-    by_gran = {}
-    for o in obs:
-        by_gran.setdefault(o.granularity, []).append(o)
-
-    assert set(by_gran) == {"annual", "quarterly", "monthly"}
-    # 2009-2024 are annual figures, stamped at year end.
-    assert by_gran["annual"][0].obs_date == dt.date(2009, 12, 31)
-    # For this series granularity also encodes caliber: quarter-end rows come
-    # from 国家统计局, month rows are 农业农村部 定点监测 extrapolations.
-    assert dt.date(2025, 9, 30) in {o.obs_date for o in by_gran["quarterly"]}
-    assert dt.date(2025, 10, 31) in {o.obs_date for o in by_gran["monthly"]}
-
-
-def test_sow_inventory_values_survive_the_round_trip(registry):
-    _, obs = normalise(registry, "sow_inventory")
     known = {o.obs_date: o.value for o in obs}
     # The African swine fever collapse — capacity leading price by ~a year.
     assert known[dt.date(2017, 12, 31)] == 4226.0
     assert known[dt.date(2018, 12, 31)] == 3189.0
     assert known[dt.date(2019, 12, 31)] == 3080.0
+    # The last value this mirror ever published.
     assert known[dt.date(2025, 10, 31)] == 3990.0
+    assert validate(obs, unit=LEGACY_SOW.unit, lo=LEGACY_SOW.lo, hi=LEGACY_SOW.hi)
 
 
-def test_sow_inventory_passes_validation(registry):
-    spec, obs = normalise(registry, "sow_inventory")
-    assert validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
+def test_frozen_snapshot_keeps_three_granularities_apart():
+    """Annual, quarter-end and month-end readings shared one column upstream.
+    Flattening them would claim they are the same kind of measurement."""
+    obs = AkshareAdapter().normalise(
+        LEGACY_SOW, payload("sow_inventory"), snapshot_id="fixture", fetched_at=NOW
+    )
+    by_gran: dict[str, list] = {}
+    for o in obs:
+        by_gran.setdefault(o.granularity, []).append(o)
+
+    assert set(by_gran) == {"annual", "quarterly", "monthly"}
+    assert by_gran["annual"][0].obs_date == dt.date(2009, 12, 31)
+    assert dt.date(2025, 9, 30) in {o.obs_date for o in by_gran["quarterly"]}
+    assert dt.date(2025, 10, 31) in {o.obs_date for o in by_gran["monthly"]}
 
 
 # --------------------------------------------------------------------------
@@ -176,7 +194,7 @@ def test_zero_weight_is_missing_data_not_a_reading(registry):
 def test_wrong_column_name_fails_loudly_naming_what_it_saw(registry):
     """A silent zero-row collection is the failure mode this project cannot
     afford; the error has to say which columns were actually present."""
-    spec = registry["sow_inventory"]
+    spec = registry["carcass_price"]
     broken = {"columns": ["dt", "px"], "records": [{"dt": "2026-01", "px": 1}]}
     with pytest.raises(KeyError) as exc:
         AkshareAdapter().normalise(

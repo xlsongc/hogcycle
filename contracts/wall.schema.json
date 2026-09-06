@@ -83,6 +83,10 @@
           "id": { "type": "string" },
           "name": { "type": "string" },
           "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
+          "in_wall": {
+            "type": "boolean",
+            "description": "Whether this reading describes the current state of the physical cycle. False for equities (a claim on the cycle, not a measurement of it) and for retired calibers (history, whose last value is not a reading of today)."
+          },
           "unit": { "type": "string" },
           "value": { "type": ["number", "null"] },
           "obs_date": { "type": "string" },

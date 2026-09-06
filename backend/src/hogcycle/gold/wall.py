@@ -56,13 +56,26 @@ def _downsample(points: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [by_week[k] for k in sorted(by_week)]
 
 
+# A percentile is a claim about a distribution, and a short series has not got
+# one. 屠宰量 starts in 2025-07 with 13 monthly points, all inside a single
+# year: "历史第 42 分位" over that would read as cycle context while actually
+# describing last winter. Two years is the shortest span that can contain a
+# full seasonal turn, so below it the tile shows the level and says nothing
+# about position.
+MIN_HISTORY_FOR_PERCENTILE = 24
+
+
 def percentile(values: list[float], target: float) -> int | None:
-    """Where `target` sits in the series' own history, 0-100."""
+    """Where `target` sits in the series' own history, 0-100, or None when the
+    series is too short for that to mean anything."""
     xs = sorted(v for v in values if v is not None)
-    if len(xs) < 2:
+    if len(xs) < MIN_HISTORY_FOR_PERCENTILE:
         return None
     below = sum(1 for v in xs if v < target)
-    return round(100 * below / (len(xs) - 1))
+    # Callers here always pass a value drawn from `xs`, which caps `below` at
+    # n-1. The clamp is for anyone who does not: a percentile of 104 is not a
+    # rounding artefact to explain away, it is a number that cannot exist.
+    return min(100, round(100 * below / (len(xs) - 1)))
 
 
 def build_wall(
@@ -104,6 +117,11 @@ def build_wall(
                 for r in rows
             ]
         )
+        # A retired caliber is history, not a current reading. It stays
+        # available in the overlay — comparing 规模以上 against 全口径 屠宰量
+        # is a legitimate thing to want — but it is kept off the wall, whose
+        # tiles are read as "where we are now".
+        in_wall = spec.tier in WALL_TIERS and not spec.retired
         panels.append(
             {
                 "id": spec.id,
@@ -112,7 +130,7 @@ def build_wall(
                 "unit": spec.unit,
                 "freq": spec.freq,
                 "revises": spec.revises,
-                "in_wall": spec.tier in WALL_TIERS,
+                "in_wall": in_wall,
                 "threshold": THRESHOLDS.get(spec.id),
                 "points": points,
             }
@@ -126,6 +144,7 @@ def build_wall(
                     "id": spec.id,
                     "name": spec.name_zh,
                     "tier": spec.tier,
+                    "in_wall": in_wall,
                     "unit": spec.unit,
                     "value": latest["value"],
                     "obs_date": latest["obs_date"].isoformat(),

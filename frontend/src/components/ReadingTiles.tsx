@@ -9,10 +9,12 @@ import { fmt } from "@/charts/base/theme";
  * one, and a confident label would be read as more than it is.
  */
 export function ReadingTiles({ readings }: { readings: Reading[] }) {
-  // Equities are deliberately absent: these tiles read the state of the
-  // physical cycle, and a share price is a claim on that cycle rather than a
-  // measurement of it. They live in the overlay instead.
-  const cycle = readings.filter((r) => r.tier !== "equity");
+  // `in_wall` is the backend's own answer to "does this describe the cycle
+  // right now?", so the tiles ask it rather than re-deriving the rule here.
+  // It excludes equities — a share price is a claim on the cycle, not a
+  // measurement of it — and retired calibers, whose final value is history
+  // and would read as a current level on a tile.
+  const cycle = readings.filter((r) => r.in_wall !== false);
   return (
     <section className="tiles">
       {cycle.map((r) => (

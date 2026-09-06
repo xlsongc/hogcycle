@@ -27,20 +27,84 @@ indicators:
     unit: 万头
     lo: 1000.0
     hi: 10000.0
-    adapter: akshare
-    call: {fn: futures_hog_supply, symbol: 生猪产能}
-    extract: {period: 周期, value: 能繁母猪存栏}
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 能繁母猪存栏}
     revises: true
+    # 公开口径 2025 年底由月频转季频：季度末印出后要等下一个季度才有新值，
+    # 最新 obs_date 会合法地老化到 110 天以上。按 monthly 的 100 天默认阈值
+    # 会在每年 10 月中旬误报，所以这里显式放宽 —— 而不是把默认值调松。
+    max_age_days: 150
     notes: >
       唯一会被回溯修订的序列，也是唯一真正的先行指标 —— 这两件事同时成立，
       正是 bitemporal 存储存在的理由。
-      这张表是宽表（能繁母猪存栏/猪肉产量/生猪存栏/生猪出栏），且「周期」列
-      混着三种粒度：2009-2024 为年度值，2025 起为季度末与月度值。粒度逐行
-      记录，不可拉成一条平滑曲线冒充等价测量。
-      口径：季度末月份取国家统计局数，非季度末月份是用农业农村部定点监测的
-      环比变化率推算出来的 —— 对本序列，granularity 恰好编码了口径。
-      正常保有量基准值本身也会调整（4100 → 3900 → 3750），做同比或缺口
-      计算时必须用当期基准，不能用今天的。
+      2026-09 从 akshare 换源到农业农村部。原路径的上游是玄田数据这个第三方
+      镜像，2025年10月起停更却继续供应旧数据，采集器每天照报 ok，序列静默
+      冻结了 11 个月。详见 docs/adr/0013。
+      现源为农业农村部、发改委、商务部、海关总署、国家统计局联合发布的
+      《生猪产品数据》，每月一期 XLSX。粒度逐行记录，不可拉成一条平滑曲线
+      冒充等价测量：
+        2009-2020 年度值 —— 仍是玄田快照，保存在 bronze，不再有活源
+        2021-12 至 2025-10 月频 —— 非季度末月份由农业农村部定点监测的环比
+                                   变化率，以统计局季度末数为基数推算
+        2026 起 季频 —— 公开口径改为只发季度末的统计局数
+      对本序列，granularity 恰好编码了口径。
+      正常保有量基准值本身也会调整（4100 → 3900 → 3750，末次调整见
+      《生猪产能综合调控实施方案（2026年修订）》），做同比或缺口计算时必须用
+      当期基准，不能用今天的。每期发布都写明「相当于正常保有量的 X%」，所以
+      当期基准是可以从原文反推的 —— 但那是 gold 层的事，silver 只存原值。
+
+  - id: hog_inventory
+    name_zh: 生猪存栏
+    tier: capacity
+    freq: quarterly
+    unit: 万头
+    lo: 10000.0
+    hi: 100000.0
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 生猪存栏}
+    revises: true
+    max_age_days: 150
+    notes: >
+      总栏舍占用，不是先行指标 —— 它把 10-12 个月前的母猪决策和眼前的压栏
+      行为混在一起。放在 capacity 层是因为它和能繁母猪同源同表、同为统计局
+      季度调查监测数，读的时候要清楚：领先性来自母猪那条线，不是这条。
+
+  - id: slaughter
+    name_zh: 定点屠宰量（全口径）
+    tier: capacity
+    freq: monthly
+    unit: 万头
+    lo: 100.0
+    hi: 20000.0
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 生猪定点屠宰企业屠宰量}
+    notes: >
+      月频出栏的近似 —— 产能兑现为供给的那一步，也是这套数据里唯一月频的
+      供给侧实测量。2025年7月起的新口径，覆盖全国生猪定点屠宰企业。
+      与 slaughter_above_scale 是两个指标而不是一条线：2025年7月覆盖面
+      扩大，绝对值随之跳升，接在一起会凭空造出一次「供给暴增」。官方自己的
+      同比环比也按可比口径另算。
+
+  - id: slaughter_above_scale
+    name_zh: 定点屠宰量（规模以上）
+    tier: capacity
+    freq: monthly
+    unit: 万头
+    lo: 100.0
+    hi: 20000.0
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 规模以上生猪定点屠宰企业屠宰量}
+    # 2025年7月起上游不再发布这个口径。序列到此为止 —— 它是完成了，不是冻住
+    # 了，所以「采不到」是预期而非故障：不报错、不算陈旧、不上图表墙。
+    retired: true
+    notes: >
+      2025年6月及以前的旧口径，只覆盖规模以上企业，因此系统性低于全口径。
+      保留它是因为它提供 2021-12 至 2025-06 的月频供给史；不可与 slaughter
+      接成一条曲线。
 
   - id: piglet_price
     name_zh: 仔猪价格
@@ -61,13 +125,20 @@ indicators:
   - id: sow_binary_price
     name_zh: 二元母猪价格
     tier: capacity
-    freq: weekly
+    freq: monthly
     unit: CNY/kg
     lo: 5.0
     hi: 200.0
-    adapter: akshare
-    call: {fn: futures_hog_cost, symbol: 二元母猪价格}
-    notes: 后备产能的价格表达；序列稀疏，非严格等间隔。
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 全国二元母猪销售价格}
+    notes: >
+      后备产能的价格表达。发改委价格监测中心数据，覆盖全国生猪主产区的定点
+      采报单位。
+      2026-09 由 akshare（玄田镜像）换到农业农村部联合发布。两边同期数值逐位
+      相同 —— 玄田一直转的就是这套发改委数，但它落后一个月，而陈旧度守卫上线
+      当天就把这条也点了出来。原 freq 标为 weekly 是错的：源头给的是月末日期，
+      月频。历史行仍保留在 silver，粒度按当时解析结果记为 weekly。
 
   # ---------- margin：决定去化会不会持续 ----------
 
@@ -148,7 +219,7 @@ indicators:
       而言在测量自身分辨率之内。
 
   - id: meat_price_index
-    name_zh: 肉类价格指数
+    name_zh: 肉类价格指数（已封存）
     tier: price
     freq: monthly
     unit: index
@@ -156,7 +227,32 @@ indicators:
     hi: 400.0
     adapter: akshare
     call: {fn: futures_hog_supply, symbol: 肉类价格指数}
-    notes: 月频，约 8.7 年。跨肉类的相对价格背景，用于判断猪肉是独立行情还是普涨。
+    # 玄田这张表和「生猪产能」同时死在 2025年10月：上游最后一行就是
+    # 2025-10-01，不是我们采不到。陈旧度守卫上线第一次运行就报了它 340 天。
+    # 标为封存是为了不让 CI 天天飘红 —— 但这是「我们够得着的源不再发布」，
+    # 不是「口径正式关闭」，所以它保留在叠放里，随时可以复活。
+    # 替代品见 pork_retail_price：农业农村部联合发布的月频零售价，是原始来源
+    # 而不是镜像。
+    retired: true
+    notes: >
+      2017-01 至 2025-10 的跨肉类相对价格背景，用于判断猪肉是独立行情还是普涨。
+      玄田镜像 2025年10月停更，无替代口径的指数源；若上游恢复，去掉 retired
+      即可继续采。
+
+  - id: pork_retail_price
+    name_zh: 猪肉零售价（36城精瘦肉）
+    tier: price
+    freq: monthly
+    unit: CNY/kg
+    lo: 5.0
+    hi: 200.0
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 36个大中城市猪肉（精瘦肉）零售价格}
+    notes: >
+      消费端价格，发改委在 36 个大中城市有代表性的超市和农贸市场采集。
+      这是第四套口径，与玄田全国均价、行情宝平台成交、农业农村部集贸市场
+      都不同 —— 它在零售端，天然高于出场价，不可与任何一条并成一条曲线。
 
   # ---------- noise：短期扰动 ----------
 

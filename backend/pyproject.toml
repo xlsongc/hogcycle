@@ -6,9 +6,11 @@ requires-python = ">=3.11"
 dependencies = [
     "akshare>=1.18",
     "duckdb>=1.0",
+    "openpyxl>=3.1",  # the 农业农村部 joint release ships as .xlsx
     "pyarrow>=16",
     "pyyaml>=6",
     "pytz",  # duckdb needs it to hand TIMESTAMPTZ back to Python
+    "requests>=2.31",  # the moa adapter fetches static .gov.cn pages directly
 ]
 
 [project.optional-dependencies]

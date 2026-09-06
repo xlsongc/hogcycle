@@ -19,3 +19,6 @@ data/gold/
 # misc
 .DS_Store
 site/
+
+# TypeScript incremental build cache
+frontend/tsconfig.tsbuildinfo

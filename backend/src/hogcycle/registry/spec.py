@@ -62,6 +62,17 @@ class IndicatorSpec:
     accept: tuple[str, ...] | None = None
     revises: bool = False
     zero_is_null: bool = False
+    # Staleness limit in days, when the series' real publication cadence
+    # differs from its declared `freq` — 能繁母猪存栏 is a monthly series whose
+    # public cadence went quarterly at the end of 2025. Default: see
+    # staleness.DEFAULT_MAX_AGE_DAYS.
+    max_age_days: int | None = None
+    # Upstream has stopped publishing this series and never will again, because
+    # a survey's caliber changed and the old caliber was closed rather than
+    # revised. The history stays — it is the only record of that caliber — but
+    # absence stops being an error: it is neither a failed collection nor a
+    # stale one, and it does not belong on a wall that reads as current.
+    retired: bool = False
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -77,6 +88,8 @@ class IndicatorSpec:
             unknown = set(self.accept) - set(GRANULARITIES)
             if unknown:
                 raise ValueError(f"{self.id}: unknown granularity in accept: {unknown}")
+        if self.max_age_days is not None and self.max_age_days < 1:
+            raise ValueError(f"{self.id}: max_age_days must be >= 1")
 
     @property
     def call_key(self) -> str:

@@ -51,6 +51,16 @@ with zero HTTP requests.
 - **A silently empty collection is worse than a failed one.** Missing columns,
   unparseable labels and out-of-range values all abort the batch loudly.
   Never widen a range or add a fallback to make an error go away.
+- **A series that stops advancing is a failure too.** This one has already
+  bitten: `sow_inventory` came from a third-party mirror that froze in
+  2025年10月 and went on serving its last payload, so every run reported
+  `ok, 0 rows` — indistinguishable from a healthy quiet day — for eleven
+  months. `hogcycle status --fail-on-stale` is the guard. When a series is
+  genuinely finished because upstream closed a caliber, mark it `retired` in
+  config; do not silence the guard by loosening a threshold.
+- **Prefer the primary source to a mirror.** A convenient wrapper around
+  someone else's copy of a government release inherits their outages and
+  their abandonment, and tells you about neither.
 - **Every adapter needs a real payload fixture.** All five inherited tests
   passed while the two most important indicators could not be collected at
   all, because every test fed itself a synthetic `date`/`value` frame.
@@ -92,7 +102,9 @@ it serves the identical shape at the same path, and no frontend code changes.
 ```bash
 # backend (from repo root, with .venv active)
 hogcycle collect                     # all indicators; one failure does not abort the rest
-hogcycle status                      # coverage and latest obs_date per series
+hogcycle collect --months-back 60    # backfill 农业农村部 editions (default 6)
+hogcycle status                      # coverage, latest obs_date, and age per series
+hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
 hogcycle revisions --indicator sow_inventory
 hogcycle export                      # gold → frontend/src/data/wall.json
 hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
@@ -123,3 +135,4 @@ so you do not have to re-derive them.
 | 0010 | dbt confined to gold (deferred) |
 | 0011 | Equities live outside the causal wall |
 | 0012 | The overlay normalises rather than adding an axis |
+| 0013 | 能繁母猪存栏 moves to the primary source; staleness is a failure |

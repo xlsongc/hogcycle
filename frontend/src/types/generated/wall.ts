@@ -50,6 +50,8 @@ export interface Reading {
   id: string;
   name: string;
   tier: "capacity" | "margin" | "price" | "noise" | "equity";
+  /** Whether this reading describes the current state of the physical cycle. False for equities (a claim on the cycle, not a measurement of it) and for retired calibers (history, whose last value is not a reading of today). */
+  in_wall?: boolean;
   unit: string;
   value: number | null;
   obs_date: string;

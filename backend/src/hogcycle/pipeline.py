@@ -75,23 +75,35 @@ def collect_one(
 
 def collect_all(
     registry: Registry,
-    adapter: Adapter,
+    adapters: dict[str, Adapter],
     bronze: BronzeStore,
     silver: SilverStore,
     *,
     now: dt.datetime | None = None,
 ) -> list[Result]:
     """One bad source must not abort the run — collect everything, report at
-    the end. Indicators sharing an upstream call fetch it once."""
+    the end. Indicators sharing an upstream call fetch it once.
+
+    `adapters` is keyed by `spec.adapter`. Sources do not share a failure
+    mode: 玄田 going stale must not stop 农业农村部 from collecting, which is
+    the whole reason the leading indicator moved off a single mirror.
+    """
     now = now or dt.datetime.now(dt.UTC)
     cache: dict[str, Any] = {}
     results: list[Result] = []
 
     for spec in registry:
+        adapter = adapters.get(spec.adapter)
+        if adapter is None:
+            msg = f"no adapter named {spec.adapter!r}; known: {sorted(adapters)}"
+            log.error("%s: %s", spec.id, msg)
+            results.append(Result(spec.id, False, 0, False, msg))
+            continue
+
         payload = cache.get(spec.call_key)
         if payload is None:
             try:
-                payload = with_retry(lambda s=spec: adapter.fetch(s))
+                payload = with_retry(lambda a=adapter, s=spec: a.fetch(s))
                 cache[spec.call_key] = payload
             except RuntimeError as exc:
                 log.error("%s: %s", spec.id, exc)

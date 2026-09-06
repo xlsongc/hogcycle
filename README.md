@@ -98,18 +98,33 @@ cd frontend && npm install && npm run dev
 
 ## Data sources and caveats
 
-Phase 1 runs entirely through `akshare`, which wraps 玄田数据/中国养猪网 and
-行情宝 — JSON endpoints rather than scraped HTML, which is why no scraper lives
-here. This project stays polite by fetching once daily and by sharing one call
-between indicators that read different columns of the same table.
+Prices and equities run through `akshare`, which wraps 玄田数据/中国养猪网 and
+行情宝 — JSON endpoints rather than scraped HTML. Capacity comes straight from
+the publisher: the 农业农村部 生猪专题 月度数据, a joint release by 农业农村部、
+发改委、商务部、海关总署 and 国家统计局, one XLSX per month. This project stays
+polite by fetching once daily, by sharing one call between indicators that read
+different columns of the same table, and by re-reading only a short trailing
+window of published editions.
+
+That split was learned the hard way. 能繁母猪存栏 used to come through akshare
+too, whose upstream was a *mirror* of the same government release — and the
+mirror froze in 2025年10月 while continuing to serve its last rows, so the
+collector reported success every morning for eleven months. `hogcycle status
+--fail-on-stale` now treats a series that has stopped advancing as a failure.
+See [ADR-0013](docs/adr/0013-sow-inventory-moves-to-the-primary-source.md).
 
 Traps, all encoded in `sources.yaml`:
 
-- **能繁母猪 mixes three granularities in one column.** 2009-2024 are annual;
-  2025 onward is quarter-end and month-end. Quarter-end months come from
-  国家统计局; other months are extrapolated from 农业农村部 定点监测
-  month-on-month rates. Different reliability, same column — so every row
-  carries its own `granularity`.
+- **能繁母猪 mixes three granularities in one column.** 2009-2020 are annual
+  (a frozen 玄田 snapshot, replayed from bronze — no live source has them);
+  2021-12 → 2025-10 is month-end; 2026 onward is quarter-end only, because the
+  public cadence changed. Quarter-end figures are 国家统计局 survey data; the
+  monthly ones were extrapolated from 农业农村部 定点监测 month-on-month rates.
+  Different reliability, same column — so every row carries its own
+  `granularity`, and for this series granularity also encodes caliber.
+- **屠宰量 changed caliber in 2025-07** (规模以上 → all 定点屠宰企业) and the
+  level stepped up with it. Two indicators, never one line; the closed one is
+  marked `retired`, so its absence is expected rather than a daily failure.
 - **正常保有量 is a moving baseline** (4100 → 3900 → 3750 万头). Any gap or
   ratio must use the baseline in force at the time, not today's.
 - **Three hog-price calibers exist** (玄田 全国均价, 行情宝 平台成交, and

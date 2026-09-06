@@ -1,10 +1,16 @@
 """Adapter over akshare. The only module that knows akshare exists.
 
-akshare already wraps every source this dashboard needs, and upstream is a
-JSON endpoint rather than scraped HTML — so writing our own scrapers would be
+akshare wraps most of the sources this dashboard needs behind JSON endpoints
+rather than scraped HTML, so writing our own scrapers for those would be
 redundant work with a worse failure surface. What akshare does *not* give you
 is retries, provenance, validation, or any memory that yesterday's number was
 different. That gap is this project.
+
+It does not wrap *every* source, and the exception was expensive. akshare's
+only route to 能繁母猪存栏 was a third-party mirror that froze in 2025年10月
+and kept serving stale rows for eleven months; that series now comes from the
+primary publisher through `collectors/moa.py`. Convenience is a reason to use
+a wrapper, never a reason to accept whose copy it reads. See docs/adr/0013.
 
 Keeping it behind the Adapter protocol also keeps the blast radius small:
 akshare renames columns between releases, and when it does, only this file

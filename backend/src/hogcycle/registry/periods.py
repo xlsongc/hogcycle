@@ -10,6 +10,9 @@ single column:
     2018年第01周          ISO-ish week (白条肉 uses this)
     2026-08-31           a plain date
 
+and, from the 农业农村部 joint release, the same two period kinds spelled
+differently again — 2026年2季度末, 2025年10月末, 2026年6月份.
+
 So granularity is a property of the **row**, not of the indicator, and the
 parser has to report it. Anything that flattens these into one column of
 dates is claiming an annual figure and a monthly figure are the same kind of
@@ -34,7 +37,11 @@ from typing import Any
 _CN_DIGITS = "一二三四"
 
 _RE_YEAR = re.compile(r"^(\d{4})\s*年?$")
-_RE_MONTH = re.compile(r"^(\d{4})\s*年\s*(\d{1,2})\s*月$")
+# 末 and 份 are the 农业农村部 joint release's own suffixes — 2025年10月末 is a
+# stock at month end, 2026年6月份 a flow over the month. Both resolve to the
+# same date under the period-end convention; only the indicator says which
+# kind of quantity it is, so the suffix carries no extra meaning here.
+_RE_MONTH = re.compile(r"^(\d{4})\s*年\s*(\d{1,2})\s*月\s*[末份]?$")
 _RE_QUARTER = re.compile(
     rf"^(\d{{4}})\s*年\s*第?\s*([{_CN_DIGITS}1-4])\s*季度\s*[（(]?\s*末?\s*[）)]?$"
 )

@@ -29,7 +29,6 @@ jobs:
       - run: pip install -e "./backend[dev]"
       - run: cd backend && pytest -q
       - run: hogcycle collect
-      - run: hogcycle status
       - name: Commit changed series
         run: |
           git config user.name  "hogcycle-bot"
@@ -40,3 +39,10 @@ jobs:
           # Another run may have landed while this one collected.
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push
+
+      # Deliberately after the commit: a stale series is an alarm about the
+      # source, not a reason to throw away the data this run did collect.
+      # Failing here turns the eleven-month silent freeze that motivated
+      # docs/adr/0013 into a red run on the first day it would recur.
+      - name: Fail if any series has stopped advancing
+        run: hogcycle status --fail-on-stale
