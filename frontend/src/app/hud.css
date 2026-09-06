@@ -1,0 +1,431 @@
+/* The instrument header and the pixel pig.
+   The reading tiles it shares tokens with are in tiles.css; both were
+   split out of globals.css to stay under the 500-line ceiling. */
+
+:root {
+  /* The readout is a physical object sitting on the page, so it keeps its own
+     colours in both themes rather than inverting with the surface — a dark
+     LCD that turns white in light mode stops looking like a display and
+     starts looking like a bug. */
+  --lcd-bg: #14140f;
+  --lcd-ink: #f2efe2;
+  --lcd-ghost: rgba(242, 239, 226, 0.075);
+  --lcd-rim: rgba(255, 255, 255, 0.05);
+
+  --pig-ink: var(--ink-2);
+  --pig-shade: var(--muted);
+  --pig-bg: var(--surface-1);
+
+  --gauge-off: rgba(11, 11, 11, 0.11);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --gauge-off: rgba(255, 255, 255, 0.13);
+  }
+}
+
+:root[data-theme="dark"] {
+  --gauge-off: rgba(255, 255, 255, 0.13);
+}
+
+/* ---------- instrument header ---------- */
+
+.hud {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 13px 15px 0;
+  margin: 0 0 22px;
+}
+
+.hud-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.hud-stamp {
+  display: flex;
+  flex-direction: column;
+  color: var(--muted);
+  min-width: 11ch;
+}
+
+.hud-stamp.right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hud-stamp b {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.hud-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+/* The rule of vertical strokes flanking the title in the reference. A
+   gradient rather than characters so it stretches to whatever is left. */
+.ticks {
+  flex: 1;
+  height: 9px;
+  min-width: 24px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--axis) 0 1px,
+    transparent 1px 11px
+  );
+}
+
+/* minmax(0, …) rather than 1fr: a grid track's automatic minimum is its
+   content, so a long note in the right column widens the track and pushes the
+   row past the wrapper instead of wrapping. Same trap as the tile grid. */
+.hud-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 9ch minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  padding: 16px 0 4px;
+}
+
+.hud-col {
+  min-width: 0;
+}
+
+/* ---------- bracketed group ---------- */
+
+.hud-group + .hud-group {
+  margin-top: 16px;
+}
+
+.hud-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+}
+
+/* ┌── LABEL ──┐ : the flanking rules carry a short downward tick at the far
+   end, which is what makes it read as a bracket rather than a divider. */
+.hud-group h3::before,
+.hud-group h3::after {
+  content: "";
+  flex: 1;
+  height: 5px;
+  border-top: 1px solid var(--axis);
+}
+
+.hud-group h3::before {
+  border-left: 1px solid var(--axis);
+}
+
+.hud-group h3::after {
+  border-right: 1px solid var(--axis);
+}
+
+/* ---------- gauges ---------- */
+
+/* The track is capped rather than fluid: a gauge is a fixed-size instrument,
+   and a bar stretched across a wide column stops reading as one. */
+.gauge {
+  display: grid;
+  grid-template-columns: minmax(0, 232px) auto;
+  justify-content: start;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 4px;
+}
+
+.gauge + .gauge {
+  margin-top: 9px;
+}
+
+.gauge-label {
+  grid-column: 1 / -1;
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+
+.gauge-track {
+  display: flex;
+  gap: 2px;
+  height: 9px;
+}
+
+/* The unlit track needs enough presence to read as an empty gauge rather than
+   as nothing at all — several of these series sit in their 1st-5th
+   percentile, and "almost entirely unlit" is the reading. */
+.gauge-track i {
+  flex: 1;
+  background: var(--gauge-off);
+}
+
+.gauge-track i.on {
+  background: var(--tier, var(--muted));
+}
+
+.gauge-value {
+  color: var(--ink);
+  text-align: right;
+  min-width: 6ch;
+}
+
+.hud-kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 300px;
+  color: var(--muted);
+}
+
+.hud-kv b {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+.hud-hint {
+  margin: 0;
+  max-width: 34ch;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.hud-hint b {
+  color: var(--ink-2);
+  font-weight: 400;
+}
+
+/* ---------- centre: the pig ---------- */
+
+.hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  /* Gives the Y rotation somewhere to happen. Without it the sprite merely
+     squashes horizontally instead of turning. */
+  perspective: 520px;
+}
+
+.hud-frame::before,
+.hud-frame::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 11px;
+  border-top: 1px solid var(--axis);
+  border-bottom: 1px solid var(--axis);
+}
+
+.hud-frame::before {
+  left: 0;
+  border-left: 1px solid var(--axis);
+}
+
+.hud-frame::after {
+  right: 0;
+  border-right: 1px solid var(--axis);
+}
+
+.pig-turn {
+  animation: pig-turn 26s steps(18, end) infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes pig-turn {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pig-turn {
+    animation: none;
+  }
+}
+
+.hud-readout {
+  border: 1px solid var(--axis);
+  padding: 6px 10px;
+  min-width: 15ch;
+  display: grid;
+  gap: 2px;
+}
+
+.hud-readout div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hud-readout span {
+  color: var(--muted);
+}
+
+.hud-readout b {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.hud-tag {
+  color: var(--muted);
+  background: var(--chip);
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+
+/* ---------- vertical scale ---------- */
+
+.scale {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 9ch;
+}
+
+.scale-head {
+  display: flex;
+  flex-direction: column;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.scale-unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--axis);
+}
+
+/* Ticks are placed by value, not stacked in rows, so the marker lands where
+   the reading actually falls relative to the threshold. */
+.scale-plot {
+  position: relative;
+  height: 188px;
+  width: 100%;
+  border-left: 1px solid var(--axis);
+}
+
+.scale-tick,
+.scale-now {
+  position: absolute;
+  left: 6px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.scale-tick {
+  color: var(--axis);
+}
+
+/* Flush right, opposite the tick labels. The current value sits within a few
+   tenths of the 5:1 line — which is the reading worth having — so the two
+   labels would otherwise land on top of each other exactly when it matters. */
+.scale-now {
+  color: var(--ink);
+  left: auto;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.scale-now b {
+  font-weight: 400;
+  font-size: 9px;
+  color: var(--capacity);
+}
+
+.scale-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed var(--critical);
+  opacity: 0.75;
+}
+
+.scale-note {
+  color: var(--critical);
+  white-space: nowrap;
+}
+
+/* ---------- footer plate ---------- */
+
+.hud-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  border-top: 1px solid var(--grid);
+  margin-top: 10px;
+  padding: 9px 0 11px;
+  color: var(--ink-2);
+}
+
+.hud-foot i {
+  font-style: normal;
+  color: var(--muted);
+  margin-right: 7px;
+}
+
+/* ---------- narrow screens ---------- */
+
+/* Above the wrapper's own 1000px max — the four-column panel needs roughly
+   860px of content box, which a 1000px window does not give once padding is
+   taken out. */
+@media (max-width: 1060px) {
+  .hud-body {
+    grid-template-columns: minmax(0, 1fr) auto 9ch;
+    gap: 18px;
+  }
+
+  .hud-body > .hud-col:last-child {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 18px;
+    border-top: 1px solid var(--grid);
+    padding-top: 14px;
+  }
+
+  .hud-body > .hud-col:last-child .hud-group + .hud-group {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .hud-title span {
+    display: none;
+  }
+
+  .hud-body {
+    grid-template-columns: 1fr;
+  }
+}

@@ -94,6 +94,18 @@ it serves the identical shape at the same path, and no frontend code changes.
   the code does not.
 - Python: `ruff check` must be clean. Type hints everywhere.
 - TypeScript: `strict`. No `any`.
+- **Two pixel grids, and text has to pick one.** Departure Mono is drawn on
+  11px, zpix on 12px; at any other size a pixel face is resampled and goes
+  soft. Numerals-only elements take `.num` (11px); anything containing Chinese
+  inherits the body's 12px. `--mono`/`--sans` list Departure Mono first so
+  Latin resolves there and CJK falls through to zpix.
+- **The CJK font is subset to what the app renders.** Add UI copy or an
+  indicator whose name uses a new character and it will fall back to a system
+  face mid-sentence. Re-cut with `frontend/scripts/subset-cjk-font.sh`.
+  zpix is *not* an open licence — see `frontend/src/fonts/Zpix-NOTICE.md`.
+- **Nothing in the header is invented.** It looks like an instrument panel,
+  which is exactly why every gauge has to be filled from the contract: a
+  decorative bar next to real ones makes the reader trust neither.
 - Errors name what they saw. `no value column 能繁母猪存栏 in ['周期', ...]`
   beats `KeyError`.
 

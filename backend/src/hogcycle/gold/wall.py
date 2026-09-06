@@ -65,6 +65,37 @@ def _downsample(points: list[dict[str, Any]]) -> list[dict[str, Any]]:
 MIN_HISTORY_FOR_PERCENTILE = 24
 
 
+# How far an observation may sit from the one-year mark and still count as
+# "the same period last year". A quarterly series lands within a few days of
+# 365; a monthly one within ~15. Beyond 45 the comparison is between different
+# seasons, and for a series with this much seasonality that is not a year-on-
+# year change, it is a different question.
+YOY_TOLERANCE_DAYS = 45
+
+
+def year_on_year(
+    rows: list[dict[str, Any]], latest: dict[str, Any]
+) -> float | None:
+    """Percent change against the reading closest to one year earlier.
+
+    Computed here rather than in the frontend because it is a derivation over
+    the series, and the contract is the boundary: the page renders numbers, it
+    does not work them out. Returns None rather than guessing when no
+    observation sits near the anniversary — a series that only starts this
+    year has no year-on-year, and saying so is the honest answer.
+    """
+    if latest["value"] in (None, 0):
+        return None
+    target = latest["obs_date"] - dt.timedelta(days=365)
+    prior = [r for r in rows if r["value"] and r["obs_date"] < latest["obs_date"]]
+    if not prior:
+        return None
+    best = min(prior, key=lambda r: abs((r["obs_date"] - target).days))
+    if abs((best["obs_date"] - target).days) > YOY_TOLERANCE_DAYS:
+        return None
+    return round((latest["value"] / best["value"] - 1) * 100, 1)
+
+
 def percentile(values: list[float], target: float) -> int | None:
     """Where `target` sits in the series' own history, 0-100, or None when the
     series is too short for that to mean anything."""
@@ -152,6 +183,7 @@ def build_wall(
                     "percentile": percentile(values, latest["value"])
                     if latest["value"] is not None
                     else None,
+                    "yoy": year_on_year(rows, latest),
                     "n": len(rows),
                 }
             )

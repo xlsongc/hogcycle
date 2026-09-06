@@ -1,0 +1,119 @@
+/* The reading tiles, styled as recessed LCD readouts.
+   Display tokens (--lcd-*) are declared in hud.css, which loads first. */
+
+/* ---------- LCD reading tiles ---------- */
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--tier, var(--muted));
+  border-radius: 4px;
+  padding: 9px 10px 10px;
+  min-width: 0;
+}
+
+/* Two lines' worth whether or not the name needs them, so every screen in a
+   row sits at the same height. Readouts that step up and down across a panel
+   look like a rendering fault rather than a set of instruments. */
+.tile-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 2.9em;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin-bottom: 7px;
+}
+
+.tile-yoy {
+  font-family: var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The readout proper: a recessed display module. */
+.tile-screen {
+  position: relative;
+  background: var(--lcd-bg);
+  border-radius: 2px;
+  padding: 8px 10px 7px;
+  box-shadow:
+    inset 0 0 0 1px var(--lcd-rim),
+    inset 0 2px 5px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+/* Faint horizontal banding, as on a backlit segment panel. */
+.tile-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.028) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+.tile-digits {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  color: var(--lcd-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+/* Every segment lit, sitting behind the real value — the giveaway that a
+   readout is a physical display and not just large type. Tabular figures
+   make it register exactly. */
+.tile-ghost {
+  position: absolute;
+  inset: 0;
+  color: var(--lcd-ghost);
+  pointer-events: none;
+}
+
+.tile-unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: rgba(242, 239, 226, 0.45);
+  margin-left: 6px;
+}
+
+.tile-bar {
+  display: flex;
+  gap: 2px;
+  height: 4px;
+  margin-top: 8px;
+}
+
+.tile-bar i {
+  flex: 1;
+  background: rgba(242, 239, 226, 0.13);
+}
+
+.tile-bar i.on {
+  background: var(--tier, var(--muted));
+}
+
+.tile-note {
+  color: var(--muted);
+  /* Pushed to the bottom so the notes align too, however tall the label ran. */
+  margin-top: auto;
+  padding-top: 7px;
+  line-height: 1.5;
+}
+
+.tile-note b {
+  color: var(--critical);
+  font-weight: 400;
+}
+

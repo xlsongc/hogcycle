@@ -2,6 +2,7 @@ import wall from "@/data/wall.json";
 import type { WallContract } from "@/types/generated/wall";
 import { ReadingTiles } from "@/components/ReadingTiles";
 import { Dashboard } from "@/components/Dashboard";
+import { Hud } from "@/components/hud/Hud";
 
 // The contract is the only thing crossing the boundary. It is imported at
 // build time now and will be fetched from an API later; the shape, and so
@@ -11,6 +12,8 @@ const data = wall as WallContract;
 export default function Page() {
   return (
     <main className="wrap">
+      <Hud data={data} />
+
       <header>
         <h1>猪周期图表墙</h1>
         <p className="sub">

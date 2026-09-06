@@ -37,9 +37,15 @@
   --slot-7: #4a3aa7;
   --slot-8: #e34948;
 
-  --mono: var(--font-departure), ui-monospace, "SF Mono", Menlo, monospace;
-  --sans: var(--font-departure), -apple-system, "PingFang SC", "Microsoft YaHei",
-    system-ui, sans-serif;
+  /* Departure Mono is listed first in both stacks and zpix second, so the
+     browser resolves per glyph: Latin and numerals land on Departure Mono,
+     which has no CJK coverage, and Chinese falls through to zpix. One pixel
+     lattice across the whole page, without either face having to cover a
+     script it was not drawn for. */
+  --mono: var(--font-departure), var(--font-zpix), ui-monospace, "SF Mono", Menlo,
+    monospace;
+  --sans: var(--font-departure), var(--font-zpix), -apple-system, "PingFang SC",
+    "Microsoft YaHei", system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -102,11 +108,16 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  /* 13px, not Departure Mono's 11px grid: 11px Chinese is too small for the
-     caliber notes, which have to be read. Numerals that render in the pixel
-     face alone stay on exact 11/22 multiples — see .num and .tile-value. */
-  font: 13px/1.6 var(--sans);
-  -webkit-font-smoothing: antialiased;
+  /* 12px is zpix's native design size. A pixel face rendered at a non-integer
+     multiple of its grid gets resampled and goes soft, which defeats the
+     point of using one — so the body size is dictated by the font, not the
+     other way round. Departure Mono's own 11px grid keeps working here
+     because 11 and 22 are still used explicitly for numerals (.num). */
+  font: 12px/1.75 var(--sans);
+  /* Pixel faces are drawn as on/off pixels; antialiasing greys their edges
+     and undoes the lattice. */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
 }
 
 .num {

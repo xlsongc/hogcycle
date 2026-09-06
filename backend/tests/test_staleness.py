@@ -157,3 +157,42 @@ def test_a_single_flaky_series_is_not_an_outage():
     reg = load_registry(Path(__file__).resolve().parents[2] / "config" / "sources.yaml")
     results = [_result(s.id, ok=(s.id != "sow_inventory")) for s in reg]
     assert _source_outages(reg, results) == {}
+
+
+# --------------------------------------------------------------------------
+# Year-on-year, which the header puts next to the headline number
+# --------------------------------------------------------------------------
+
+def _row(d: dt.date, v: float | None):
+    return {"obs_date": d, "value": v, "granularity": "quarterly", "unit": "万头"}
+
+
+def test_yoy_matches_the_figure_the_source_publishes_itself():
+    """统计局 reported 2026Q2 能繁母猪存栏 at 3780, down 6.5% year on year.
+    Deriving it from our own series has to land on the same number, or the
+    series is not what it claims to be."""
+    from hogcycle.gold.wall import year_on_year
+
+    rows = [_row(dt.date(2025, 6, 30), 4043.0), _row(dt.date(2026, 6, 30), 3780.0)]
+    assert year_on_year(rows, rows[-1]) == -6.5
+
+
+def test_yoy_is_none_when_nothing_sits_near_the_anniversary():
+    """A series that began this year has no year-on-year, and inventing one
+    from the oldest point available would compare across seasons."""
+    from hogcycle.gold.wall import year_on_year
+
+    rows = [_row(dt.date(2026, 3, 31), 100.0), _row(dt.date(2026, 6, 30), 120.0)]
+    assert year_on_year(rows, rows[-1]) is None
+
+
+def test_yoy_ignores_later_observations():
+    """Rebuilding the wall as it stood on a past date must not reach forward."""
+    from hogcycle.gold.wall import year_on_year
+
+    rows = [
+        _row(dt.date(2025, 6, 30), 4043.0),
+        _row(dt.date(2026, 6, 30), 3780.0),
+        _row(dt.date(2026, 9, 30), 3600.0),
+    ]
+    assert year_on_year(rows, rows[1]) == -6.5

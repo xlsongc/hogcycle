@@ -92,6 +92,10 @@
           "obs_date": { "type": "string" },
           "granularity": { "type": "string" },
           "percentile": { "type": ["integer", "null"] },
+          "yoy": {
+            "type": ["number", "null"],
+            "description": "Percent change against the observation nearest one year earlier, or null when none sits near the anniversary. Null is a real answer: a series that began this year has no year-on-year."
+          },
           "n": { "type": "integer" }
         }
       }

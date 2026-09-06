@@ -57,5 +57,7 @@ export interface Reading {
   obs_date: string;
   granularity?: string;
   percentile?: number | null;
+  /** Percent change against the observation nearest one year earlier, or null when none sits near the anniversary. Null is a real answer: a series that began this year has no year-on-year. */
+  yoy?: number | null;
   n?: number;
 }
