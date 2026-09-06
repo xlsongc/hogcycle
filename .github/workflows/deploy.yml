@@ -30,7 +30,11 @@ jobs:
       # gold is derived and gitignored, so the contract is rebuilt from silver
       # at deploy time rather than committed.
       - run: hogcycle export
-      - run: cd frontend && npm ci && npm run build
+      - run: cd frontend && npm ci
+      - run: cd frontend && npm run build
+        env:
+          # Project Pages live at /<repo>/; without this every asset 404s.
+          NEXT_PUBLIC_BASE_PATH: /hogcycle
       - uses: actions/upload-pages-artifact@v3
         with: { path: frontend/out }
 

@@ -26,6 +26,13 @@ export function tierColor(tier: Tier): string {
   return cssVar(`--${tier}`, "#2a78d6");
 }
 
+/** next/font generates a hashed family name, so the literal "Departure Mono"
+ *  resolves to nothing inside a canvas. Read the variable the loader sets. */
+export function monoFont(): string {
+  const v = cssVar("--font-departure", "");
+  return v ? `${v}, monospace` : "ui-monospace, monospace";
+}
+
 export const TIER_LABEL: Record<Tier, string> = {
   capacity: "产能",
   margin: "利润",
@@ -143,7 +150,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
       axisLabel: {
         show: showAxisLabels,
         color: muted,
-        fontFamily: "Departure Mono, monospace",
+        fontFamily: monoFont(),
         fontSize: 11,
       },
       splitLine: { show: false },
@@ -161,7 +168,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
       splitLine: { lineStyle: { color: grid } },
       axisLabel: {
         color: muted,
-        fontFamily: "Departure Mono, monospace",
+        fontFamily: monoFont(),
         fontSize: 11,
         formatter: (v: number) => fmt(v, panel.unit),
       },
@@ -187,7 +194,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
                 formatter: panel.threshold.label,
                 color: critical,
                 fontSize: 11,
-                fontFamily: "Departure Mono, monospace",
+                fontFamily: monoFont(),
                 position: "insideEndTop",
               },
             }
@@ -203,7 +210,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
             distance: 8,
             color: ink,
             fontSize: 11,
-            fontFamily: "Departure Mono, monospace",
+            fontFamily: monoFont(),
             formatter: (p: { value?: unknown }) =>
               fmt(typeof p.value === "number" ? p.value : null, panel.unit),
           },

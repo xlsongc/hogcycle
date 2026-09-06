@@ -35,7 +35,7 @@ import {
 import { CanvasRenderer } from "echarts/renderers";
 
 import type { Panel } from "@/types/generated/wall";
-import { cssVar, fmt, slotColor } from "./base/theme";
+import { cssVar, fmt, monoFont, slotColor } from "./base/theme";
 
 echarts.use([
   LineChart,
@@ -171,7 +171,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             icon: "roundRect",
             itemWidth: 12,
             itemHeight: 2,
-            textStyle: { color: muted, fontSize: 11, fontFamily: "Departure Mono, monospace" },
+            textStyle: { color: muted, fontSize: 11, fontFamily: monoFont() },
             formatter: (name: string) => {
               const v = finals.get(name);
               return v == null ? name : `${name}  ${fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""))}`;
@@ -181,7 +181,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: 11, fontFamily: "Departure Mono, monospace" },
+            textStyle: { color: ink, fontSize: 11, fontFamily: monoFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             valueFormatter: (v: unknown) =>
               typeof v === "number" ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? "")) : "—",
@@ -192,7 +192,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             max,
             axisLine: { lineStyle: { color: grid } },
             axisTick: { show: false },
-            axisLabel: { color: muted, fontSize: 11, fontFamily: "Departure Mono, monospace" },
+            axisLabel: { color: muted, fontSize: 11, fontFamily: monoFont() },
           },
           yAxis: {
             type: log ? "log" : "value",
@@ -203,7 +203,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             axisLabel: {
               color: muted,
               fontSize: 11,
-              fontFamily: "Departure Mono, monospace",
+              fontFamily: monoFont(),
               formatter: (v: number) => fmt(v, indexed ? "index" : (chosen[0]?.unit ?? "")),
             },
           },

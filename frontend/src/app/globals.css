@@ -1,15 +1,8 @@
-/* Departure Mono — SIL OFL, self-hosted (no CDN distribution exists).
+/* Departure Mono — SIL OFL, self-hosted via next/font (see app/layout.tsx).
    The face has no CJK coverage, so the stack falls through to a system
    Chinese sans. That split is deliberate rather than a compromise: numerals,
    dates and axis ticks carry most of a data dashboard's visual texture, and
    they are exactly what this font is for. Chinese prose stays legible. */
-@font-face {
-  font-family: "Departure Mono";
-  src: url("/fonts/DepartureMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
 
 :root {
   color-scheme: light;
@@ -44,8 +37,8 @@
   --slot-7: #4a3aa7;
   --slot-8: #e34948;
 
-  --mono: "Departure Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --sans: "Departure Mono", -apple-system, "PingFang SC", "Microsoft YaHei",
+  --mono: var(--font-departure), ui-monospace, "SF Mono", Menlo, monospace;
+  --sans: var(--font-departure), -apple-system, "PingFang SC", "Microsoft YaHei",
     system-ui, sans-serif;
 }
 
