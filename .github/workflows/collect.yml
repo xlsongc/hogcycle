@@ -28,8 +28,12 @@ jobs:
           cache: pip
       - run: pip install -e "./backend[dev]"
       - run: cd backend && pytest -q
+      # Exits non-zero only when a whole source is unreachable, never for a
+      # single flaky series. The steps below run either way: a bad source is
+      # a reason to go red, not a reason to throw away what did collect.
       - run: hogcycle collect
       - name: Commit changed series
+        if: always()
         run: |
           git config user.name  "hogcycle-bot"
           git config user.email "bot@users.noreply.github.com"
@@ -45,4 +49,5 @@ jobs:
       # Failing here turns the eleven-month silent freeze that motivated
       # docs/adr/0013 into a red run on the first day it would recur.
       - name: Fail if any series has stopped advancing
+        if: always()
         run: hogcycle status --fail-on-stale

@@ -116,3 +116,44 @@ def test_a_short_series_gets_no_percentile():
     assert percentile(long, long[-1]) == 100
     # A target above everything is still a percentage, not 104.
     assert percentile(long, 1e9) == 100
+
+
+# --------------------------------------------------------------------------
+# A whole source going dark is not "partial success"
+# --------------------------------------------------------------------------
+
+def _result(indicator: str, ok: bool):
+    from hogcycle.pipeline import Result
+
+    return Result(indicator, ok, 0, False, None if ok else "upstream failed")
+
+
+def test_one_source_going_dark_is_detected_even_when_most_series_are_fine():
+    """The real case: 6 of 20 indicators failed on a GitHub runner and the run
+    went green, because 14 others succeeded. Those 6 were every moa series —
+    the project's leading indicator among them — and the source was simply
+    unreachable from that IP."""
+    from pathlib import Path
+
+    from hogcycle.cli.main import _source_outages
+    from hogcycle.registry.loader import load_registry
+
+    reg = load_registry(Path(__file__).resolve().parents[2] / "config" / "sources.yaml")
+    results = [
+        _result(s.id, ok=(s.adapter != "moa")) for s in reg
+    ]
+    outages = _source_outages(reg, results)
+    assert set(outages) == {"moa"}
+    assert "sow_inventory" in outages["moa"]
+
+
+def test_a_single_flaky_series_is_not_an_outage():
+    """One endpoint misbehaving must not go red, or the alarm gets muted."""
+    from pathlib import Path
+
+    from hogcycle.cli.main import _source_outages
+    from hogcycle.registry.loader import load_registry
+
+    reg = load_registry(Path(__file__).resolve().parents[2] / "config" / "sources.yaml")
+    results = [_result(s.id, ok=(s.id != "sow_inventory")) for s in reg]
+    assert _source_outages(reg, results) == {}

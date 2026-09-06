@@ -50,6 +50,27 @@ def _parser() -> argparse.ArgumentParser:
     return p
 
 
+def _source_outages(registry: Registry, results: list) -> dict[str, list[str]]:
+    """Adapters for which *every* indicator failed, mapped to those ids.
+
+    Grouping by adapter rather than counting failures overall is what makes
+    the distinction useful: 6 of 20 failing is unremarkable noise unless those
+    6 are all of one source, in which case it is that source going dark.
+    """
+    by_adapter: dict[str, list] = {}
+    for r in results:
+        try:
+            adapter = registry[r.indicator].adapter
+        except KeyError:  # pragma: no cover - registry is the source of results
+            continue
+        by_adapter.setdefault(adapter, []).append(r)
+    return {
+        adapter: [r.indicator for r in rs]
+        for adapter, rs in by_adapter.items()
+        if rs and all(not r.ok for r in rs)
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(message)s")
@@ -72,8 +93,22 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{mark} {r.indicator:<20} {r.rows_written:>5} row(s)  {r.error or ''}")
         failed = [r for r in results if not r.ok]
         print(f"\n{len(results) - len(failed)}/{len(results)} ok")
-        # Partial success is still success; the point is to know which part.
-        return 1 if results and len(failed) == len(results) else 0
+
+        # Partial success is still success — one flaky endpoint must not cost
+        # a day of everything else. But a *whole source* failing is a
+        # different event, and treating it as partial success is how a green
+        # run hides a dead upstream. That is the mistake this project already
+        # made once; it is not going to make it silently twice.
+        outages = _source_outages(registry, results)
+        if outages:
+            for adapter, ids in sorted(outages.items()):
+                print(
+                    f"\nSOURCE OUTAGE: every indicator on adapter {adapter!r} "
+                    f"failed ({', '.join(ids)}). This is not a flaky series — "
+                    "the source itself is unreachable from here."
+                )
+            return 1
+        return 0
 
     if args.command == "status":
         rows = {r["indicator"]: r for r in silver.coverage()}

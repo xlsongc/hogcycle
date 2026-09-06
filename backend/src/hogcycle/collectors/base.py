@@ -44,4 +44,10 @@ def with_retry(
             last = exc
             if i < attempts - 1:
                 time.sleep(base_delay * (2**i))
-    raise RuntimeError(f"upstream failed after {attempts} attempts") from last
+    # Carry the reason forward. `__cause__` is set for a traceback, but the
+    # CLI and the workflow log only ever print str(exc) — and "upstream failed
+    # after 3 attempts" cannot distinguish a flaky endpoint from a host that
+    # blocks datacenter IPs outright.
+    raise RuntimeError(
+        f"upstream failed after {attempts} attempts: {type(last).__name__}: {last}"
+    ) from last
