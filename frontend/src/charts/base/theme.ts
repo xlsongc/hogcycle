@@ -31,6 +31,7 @@ export const TIER_LABEL: Record<Tier, string> = {
   margin: "利润",
   price: "价格",
   noise: "噪音",
+  equity: "股票",
 };
 
 export const GRANULARITY_LABEL: Record<string, string> = {
@@ -240,4 +241,32 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
         : []),
     ],
   };
+}
+
+/**
+ * Categorical slots for the overlay chart.
+ *
+ * The wall is small multiples — an all-pairs form, which caps at three hues.
+ * The overlay is a multi-line chart, an *adjacent* form, where the validated
+ * eight-slot order is legal with a legend. Same palette, different gate.
+ *
+ * Slots are allocated when a series is added and released when it is removed,
+ * so de-selecting one line never repaints the others: colour follows the
+ * indicator, not its position in the current selection.
+ */
+export const OVERLAY_SLOTS = [
+  "--slot-1",
+  "--slot-2",
+  "--slot-3",
+  "--slot-4",
+  "--slot-5",
+  "--slot-6",
+  "--slot-7",
+  "--slot-8",
+] as const;
+
+export const MAX_OVERLAY_SERIES = OVERLAY_SLOTS.length;
+
+export function slotColor(index: number): string {
+  return cssVar(OVERLAY_SLOTS[index % MAX_OVERLAY_SERIES] ?? "--slot-1", "#2a78d6");
 }

@@ -30,9 +30,13 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
           "unit": { "type": "string" },
           "freq": { "type": "string" },
+          "in_wall": {
+            "type": "boolean",
+            "description": "Whether this series belongs in the causal-chain wall. False for equities: a share price is a claim on the cycle, not a link in it, so it lives in the overlay instead."
+          },
           "revises": {
             "type": "boolean",
             "description": "Whether upstream restates this series after the fact. True only for 能繁母猪存栏, which is also the only real leading indicator — the coincidence that justifies bitemporal storage."
@@ -78,7 +82,7 @@
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
           "unit": { "type": "string" },
           "value": { "type": ["number", "null"] },
           "obs_date": { "type": "string" },

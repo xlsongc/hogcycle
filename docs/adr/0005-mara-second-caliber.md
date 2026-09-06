@@ -1,6 +1,6 @@
 # 5. 农业农村部 500县 as an independent second caliber
 
-Date: 2026-09-05 · Status: Accepted (not yet implemented — phase 2)
+Date: 2026-09-05 · Status: Accepted (phase 2) · Spike resolved 2026-09-06
 
 ## Context
 
@@ -31,6 +31,15 @@ Add it as a second caliber in phase 2, with its own adapter.
   will be brittle. Bronze immutability (0002) is what makes that acceptable.
 - Backfill is ~520 archive pages for 10 years, unlike akshare where one call
   returns full history. This cost asymmetry is why it is its own phase.
-- Unresolved: `zdscxx.moa.gov.cn:8080/nyb/pc/search.jsp` is titled 数据查询 and
-  mentions 导出. If it is a real structured query endpoint it would replace
-  prose parsing entirely. **Spike this before writing the parser.**
+- **Spike resolved, negatively.** `search.jsp` does expose a real JSON API
+  (`/nyb/getHotWordResult`, `/getHotWordDimension`, `/getHotWordData`,
+  `/downlaodData`), but the page carries an image captcha
+  (`verificationImageUrl` plus code inputs) and `getHotWordData` returns
+  验证码无效 without it. Defeating a captcha is off the table, so the
+  structured endpoint cannot back an automated collector.
+
+  Prose parsing of the weekly bulletins is therefore the only path, and the
+  ~520-page backfill is a firm cost rather than a worst case. Those bulletins
+  are ordinary published pages — reading them is not what the captcha guards.
+  This confirms rather than changes the phasing: the cost structure is nothing
+  like akshare's, so it stays its own phase.

@@ -1,9 +1,7 @@
 import wall from "@/data/wall.json";
 import type { WallContract } from "@/types/generated/wall";
-import { ChartWall } from "@/charts/ChartWall";
 import { ReadingTiles } from "@/components/ReadingTiles";
-import { TableView } from "@/components/TableView";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Dashboard } from "@/components/Dashboard";
 
 // The contract is the only thing crossing the boundary. It is imported at
 // build time now and will be fetched from an API later; the shape, and so
@@ -11,15 +9,12 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 const data = wall as WallContract;
 
 export default function Page() {
-  const min = data.window.start ?? data.panels[0]?.points[0]?.d ?? "2015-01-01";
-  const max = data.window.end ?? new Date().toISOString().slice(0, 10);
-
   return (
     <main className="wrap">
       <header>
         <h1>猪周期图表墙</h1>
         <p className="sub">
-          十个指标，一条共享时间轴。悬停任意日期，整条因果链同时读数。
+          十六个序列，一条共享时间轴：上半部是因果链图表墙，下半部可自选叠放。
           本页只做计算与对齐，<strong>不做阶段判定</strong>——可用历史约三轮周期，
           任何自动判定规则都会被自己的样本拟合。
         </p>
@@ -48,16 +43,7 @@ export default function Page() {
 
       <ReadingTiles readings={data.readings} />
 
-      <ChartWall panels={data.panels} min={min} max={max} />
-
-      <TableView panels={data.panels} />
-
-      <div className="bar">
-        <ThemeToggle />
-        <span className="hint">
-          知识时点 {data.generated_at.slice(0, 10)} · 数据窗口 {min} → {max}
-        </span>
-      </div>
+      <Dashboard data={data} />
 
       <footer>
         <b>口径与局限</b>

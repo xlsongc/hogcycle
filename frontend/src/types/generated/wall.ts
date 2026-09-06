@@ -20,9 +20,11 @@ export interface Window {
 export interface Panel {
   id: string;
   name: string;
-  tier: "capacity" | "margin" | "price" | "noise";
+  tier: "capacity" | "margin" | "price" | "noise" | "equity";
   unit: string;
   freq?: string;
+  /** Whether this series belongs in the causal-chain wall. False for equities: a share price is a claim on the cycle, not a link in it, so it lives in the overlay instead. */
+  in_wall?: boolean;
   /** Whether upstream restates this series after the fact. True only for 能繁母猪存栏, which is also the only real leading indicator — the coincidence that justifies bitemporal storage. */
   revises?: boolean;
   /** A reference line that means something in the domain, not chart decoration. */
@@ -47,7 +49,7 @@ export interface Point {
 export interface Reading {
   id: string;
   name: string;
-  tier: "capacity" | "margin" | "price" | "noise";
+  tier: "capacity" | "margin" | "price" | "noise" | "equity";
   unit: string;
   value: number | null;
   obs_date: string;

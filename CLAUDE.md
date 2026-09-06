@@ -33,6 +33,10 @@ with zero HTTP requests.
 
 ## Hard rules
 
+- **No dual axis, ever.** Two y-scales on one plot align arbitrarily and
+  invent a correlation the data does not contain. Mixed units go to small
+  multiples, or get indexed to a common base on one axis. The overlay enforces
+  this by construction (ADR-0012) — do not add an escape hatch.
 - **Never mix calibers on one line.** 玄田 全国均价, 行情宝 平台成交价, and
   农业农村部 500县集贸市场 are three different measurements of "the hog price".
   Plotting them as one series is the single easiest way to produce a
@@ -117,3 +121,5 @@ so you do not have to re-derive them.
 | 0008 | Granularity is a property of the row |
 | 0009 | DuckDB is the engine, parquet is the record |
 | 0010 | dbt confined to gold (deferred) |
+| 0011 | Equities live outside the causal wall |
+| 0012 | The overlay normalises rather than adding an axis |

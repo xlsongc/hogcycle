@@ -21,7 +21,13 @@ from typing import Any
 from ..registry.spec import Registry
 from ..storage.silver import SilverStore
 
-TIER_ORDER = ("capacity", "margin", "price", "noise")
+TIER_ORDER = ("capacity", "margin", "price", "noise", "equity")
+
+# The causal wall shows the physical cycle. A share price is a claim on that
+# cycle rather than a link in it, so equities stay out of the wall by default
+# and live in the overlay, where the question they answer — does the market
+# lead or lag 能繁母猪 — is one an overlay can actually put to the reader.
+WALL_TIERS = frozenset({"capacity", "margin", "price", "noise"})
 
 # Reference lines that mean something in the domain, not chart decoration.
 THRESHOLDS: dict[str, dict[str, Any]] = {
@@ -29,6 +35,25 @@ THRESHOLDS: dict[str, dict[str, Any]] = {
 }
 
 _G = {"daily": "D", "weekly": "W", "monthly": "M", "quarterly": "Q", "annual": "A"}
+
+
+# Above this, a daily series is thinned to one point per ISO week. Two
+# reasons, and both are real: over a 11.7-year window daily stock noise says
+# nothing about where the cycle sits, and six daily equity series would add
+# ~500 KB to a contract that a static page loads in full. silver keeps every
+# day — thinning is a presentation choice, so it belongs here and nowhere
+# upstream of here.
+DOWNSAMPLE_ABOVE = 1000
+
+
+def _downsample(points: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    if len(points) <= DOWNSAMPLE_ABOVE:
+        return points
+    by_week: dict[tuple[int, int], dict[str, Any]] = {}
+    for p in points:
+        y, w, _ = dt.date.fromisoformat(p["d"]).isocalendar()
+        by_week[(y, w)] = p  # last observation of the week wins
+    return [by_week[k] for k in sorted(by_week)]
 
 
 def percentile(values: list[float], target: float) -> int | None:
@@ -69,14 +94,16 @@ def build_wall(
         if not rows:
             continue
 
-        points = [
-            {
-                "d": r["obs_date"].isoformat(),
-                "v": r["value"],
-                "g": _G.get(r["granularity"], "?"),
-            }
-            for r in rows
-        ]
+        points = _downsample(
+            [
+                {
+                    "d": r["obs_date"].isoformat(),
+                    "v": r["value"],
+                    "g": _G.get(r["granularity"], "?"),
+                }
+                for r in rows
+            ]
+        )
         panels.append(
             {
                 "id": spec.id,
@@ -85,6 +112,7 @@ def build_wall(
                 "unit": spec.unit,
                 "freq": spec.freq,
                 "revises": spec.revises,
+                "in_wall": spec.tier in WALL_TIERS,
                 "threshold": THRESHOLDS.get(spec.id),
                 "points": points,
             }

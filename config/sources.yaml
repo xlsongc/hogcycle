@@ -177,3 +177,98 @@ indicators:
       上行=惜售压栏（推迟供给），下行=恐慌出栏（提前供给）—— 判断短期拐点的
       关键，但不改变周期本身。
       2015 年 10 月之前该列以 0 表示「未采集」而非空值，故 zero_is_null。
+
+  # ---------- equity：对周期的索取权，不是周期本身 ----------
+  #
+  # 股价不是因果链上的一环，是对这条链的定价，所以默认不进因果链图表墙
+  # （in_wall=false），归宿是叠放图 —— 那里才回答它真正有信息量的问题：
+  # 相对能繁母猪，市场是领先还是滞后。
+  #
+  # 用新浪而非东方财富：push2his.eastmoney.com 对密集请求会限流到「空响应」，
+  # 且恢复缓慢。新浪是不同主机，故障模式独立。
+  #
+  # 存日频全保真（silver 是记录层），展示层降采样成周频 —— 见 gold/wall.py。
+  #
+  # 后复权（hfq）：不复权会在分红除权处出现假跳空，长周期比较必须复权。
+  # 但各数据商的复权基准不同（同一天牧原：新浪 882.87 / 东财 845.81），
+  # 所以复权序列绝不可跨源混用，换源等于换一条序列。
+  # lo/hi 放得极宽 —— 后复权价格会随时间无界增长（牧原 2015 年 44 → 2026 年 846），
+  # 绊线只用于抓解析崩坏，不是价格预期。
+
+  - id: eq_muyuan
+    name_zh: 牧原股份
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sz002714",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 行业绝对龙头，自繁自养一体化，与猪价和产能的关系最直接。
+
+  - id: eq_wens
+    name_zh: 温氏股份
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sz300498",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 公司+农户模式，与自繁自养对同一周期的反应差异本身就有信息。
+
+  - id: eq_newhope
+    name_zh: 新希望
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sz000876",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 饲料+养殖多元化，猪周期敞口被其他业务稀释，弹性小于纯养殖标的。
+
+  - id: eq_shennong
+    name_zh: 神农集团
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sh605296",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 2020 年底上市，序列短于其余各家，起点晚不是采集缺失。
+
+  - id: eq_juxing
+    name_zh: 巨星农牧
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sh603477",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 中小市值弹性标的，周期底部弹性通常大于龙头。原为皮革业务，后转型养殖。
+
+  - id: eq_huatong
+    name_zh: 华统股份
+    tier: equity
+    freq: daily
+    unit: CNY
+    lo: 1.0
+    hi: 100000.0
+    adapter: akshare
+    call: {fn: stock_zh_a_daily, symbol: "sz002840",
+           start_date: "20150101", end_date: "20991231", adjust: hfq}
+    extract: {value: close}
+    notes: 屠宰+养殖一体，屠宰端使其对猪价的敞口方向与纯养殖标的不完全一致。

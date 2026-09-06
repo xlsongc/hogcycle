@@ -9,9 +9,13 @@ import { fmt } from "@/charts/base/theme";
  * one, and a confident label would be read as more than it is.
  */
 export function ReadingTiles({ readings }: { readings: Reading[] }) {
+  // Equities are deliberately absent: these tiles read the state of the
+  // physical cycle, and a share price is a claim on that cycle rather than a
+  // measurement of it. They live in the overlay instead.
+  const cycle = readings.filter((r) => r.tier !== "equity");
   return (
     <section className="tiles">
-      {readings.map((r) => (
+      {cycle.map((r) => (
         <div
           key={r.id}
           className="tile"

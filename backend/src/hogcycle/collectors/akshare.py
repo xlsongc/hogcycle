@@ -20,11 +20,27 @@ series the whole project exists for — silently failed to collect.
 from __future__ import annotations
 
 import datetime as dt
+import time
 from typing import Any
 
 from ..contracts.schema import Observation
 from ..registry.periods import parse_period
 from ..registry.spec import IndicatorSpec
+
+# 东方财富 (the stock endpoint) drops connections after a few rapid requests;
+# 玄田 tolerates a burst but there is no reason to lean on that. One shared
+# floor between upstream calls keeps a 16-indicator run under half a minute
+# and keeps us a polite client of a free service.
+_MIN_INTERVAL_S = 1.5
+_last_call = 0.0
+
+
+def _throttle() -> None:
+    global _last_call
+    wait = _MIN_INTERVAL_S - (time.monotonic() - _last_call)
+    if wait > 0:
+        time.sleep(wait)
+    _last_call = time.monotonic()
 
 
 def _column(payload: dict[str, Any], name: str, role: str, spec: IndicatorSpec) -> str:
@@ -43,8 +59,9 @@ class AkshareAdapter:
     def fetch(self, spec: IndicatorSpec) -> Any:
         import akshare as ak
 
-        call = dict(spec.call)
+        call = {k: str(v) if isinstance(v, int) else v for k, v in spec.call.items()}
         fn = getattr(ak, call.pop("fn"))
+        _throttle()
         df = fn(**call)
         # Serialise immediately: bronze stores JSON, not a pickled DataFrame,
         # so a snapshot stays readable when pandas moves on.

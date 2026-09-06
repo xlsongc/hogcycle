@@ -18,14 +18,19 @@ from typing import Any, Literal
 
 from ..contracts.schema import GRANULARITIES
 
-Tier = Literal["capacity", "margin", "price", "noise"]
+Tier = Literal["capacity", "margin", "price", "noise", "equity"]
 
 # The causal chain, in order:
 #   capacity  能繁母猪、仔猪价 → (10-12m) → 出栏     the real leading indicator
 #   margin    price - cost；decides whether a capacity move persists
 #   price     the outcome being predicted, not a driver
 #   noise     short-run supply disturbance; moves equities, not the cycle
-TIERS: tuple[str, ...] = ("capacity", "margin", "price", "noise")
+#
+# equity sits outside that chain on purpose. A share price is not a link in
+# the physical cycle, it is a claim on it — so it stays out of the causal
+# wall (`in_wall` is False) and lives in the overlay, where the question it
+# actually answers is whether the market leads or lags 能繁母猪.
+TIERS: tuple[str, ...] = ("capacity", "margin", "price", "noise", "equity")
 
 
 @dataclass(frozen=True, slots=True)
