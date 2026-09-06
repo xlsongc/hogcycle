@@ -58,6 +58,15 @@ def collect_one(
         obs = adapter.normalise(
             spec, payload, snapshot_id=snap.snapshot_id, fetched_at=now
         )
+        if not obs and spec.retired:
+            # `validate` rejects an empty batch, and rightly so — a silently
+            # empty collection is the failure this project fears most. But a
+            # retired series is empty *by definition*: upstream closed the
+            # caliber, and the daily window no longer reaches an edition that
+            # carries it. Letting that abort would paint the run red every
+            # single day, which is precisely how a real red gets ignored.
+            log.info("%s: retired — upstream no longer publishes this caliber", spec.id)
+            return Result(spec.id, True, 0, snap.is_new)
         obs = validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
         written = silver.append_changes(obs)
 

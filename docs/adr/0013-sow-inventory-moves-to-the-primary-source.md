@@ -126,6 +126,22 @@ have stopped). Both suppress the alarm; only the second is worth revisiting.
   pipeline dispatches on `spec.adapter`. ADR-0003's *pure/impure split* stands
   and the new adapter follows it. Its claim that akshare wraps every source
   this project needs does not.
-- One risk stays open: `www.moa.gov.cn` is reachable from a residential NL IP,
-  but whether GitHub's Azure runners reach it is unverified. `data.stats.gov.cn`
-  proves .gov.cn hosts do block by IP range. The daily workflow settles it.
+- **GitHub runners do reach `www.moa.gov.cn`** — settled by running `collect`
+  on one. But the first attempt returned 14/20 with every moa indicator
+  failing, which looked exactly like the IP block `data.stats.gov.cn` really
+  does apply; a re-run gave 19/20. It was transient, and two fixes came out of
+  the false alarm:
+  - `with_retry` now carries the underlying error into its message. "upstream
+    failed after 3 attempts" cannot tell a timeout from a WAF block, and the
+    difference is the whole diagnosis.
+  - `collect` exits non-zero when *every* indicator of one adapter fails.
+    Partial success is right for one flaky series and wrong for a whole
+    source: 14/20 went green while the leading indicator was not collected at
+    all. Same shape as the bug this ADR is about. The commit and staleness
+    steps run with `if: always()`, so going red never discards what did
+    collect.
+- The runner also caught a bug the local backfill had hidden: a `retired`
+  series returns no rows, and `validate` rejects an empty batch by design. On
+  a 60-month window the old caliber was still in range so it passed locally;
+  on the default 6-month window it failed. `collect_one` now exempts retired
+  specs from the empty-batch check — and only those.

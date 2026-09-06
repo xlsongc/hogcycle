@@ -173,3 +173,58 @@ def test_months_ending_walks_back_across_a_year_boundary():
 def test_window_must_be_positive():
     with pytest.raises(ValueError, match="months_back"):
         MoaAdapter(months_back=0)
+
+
+def test_a_retired_series_survives_the_whole_pipeline(registry, payload, tmp_path):
+    """The unit test above only proved `normalise` returns []. The runner then
+    failed on the very next step: `validate` rejects an empty batch, so a
+    retired series went red on a default 6-month window while passing locally
+    on a 60-month backfill. Cover the path end to end this time."""
+    from hogcycle.pipeline import collect_one
+    from hogcycle.storage.bronze import BronzeStore
+    from hogcycle.storage.silver import SilverStore
+
+    class Fixed:
+        def fetch(self, spec):
+            # Only the most recent edition — the window a daily run actually sees.
+            return {"editions": [payload["editions"][-1]], "skipped": []}
+
+        def normalise(self, spec, p, *, snapshot_id, fetched_at):
+            return MoaAdapter().normalise(
+                spec, p, snapshot_id=snapshot_id, fetched_at=fetched_at
+            )
+
+    result = collect_one(
+        registry["slaughter_above_scale"],
+        Fixed(),
+        BronzeStore(tmp_path / "bronze"),
+        SilverStore(tmp_path / "silver"),
+        now=NOW,
+    )
+    assert result.ok, result.error
+    assert result.rows_written == 0
+
+
+def test_a_live_series_returning_nothing_still_aborts(registry, payload, tmp_path):
+    """The exemption is for `retired` only. An empty batch anywhere else is
+    still the loudest failure this project has."""
+    from hogcycle.pipeline import collect_one
+    from hogcycle.storage.bronze import BronzeStore
+    from hogcycle.storage.silver import SilverStore
+
+    class Empty:
+        def fetch(self, spec):
+            return {"editions": [{"ym": "202607", "rows": [["x"]]}], "skipped": []}
+
+        def normalise(self, spec, p, *, snapshot_id, fetched_at):
+            return []
+
+    result = collect_one(
+        registry["sow_inventory"],
+        Empty(),
+        BronzeStore(tmp_path / "bronze"),
+        SilverStore(tmp_path / "silver"),
+        now=NOW,
+    )
+    assert not result.ok
+    assert "empty batch" in (result.error or "")
