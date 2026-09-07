@@ -1,0 +1,110 @@
+/* Section headings and every control that scopes what the charts show:
+   the range filter, the overlay's series picker, and the overlay card.
+   Split out of globals.css to stay under the 500-line ceiling. */
+
+h2.section {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  margin: 30px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--grid);
+}
+
+.section-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 12px;
+  max-width: 76ch;
+}
+
+.filters {
+  margin: 0 0 20px;
+}
+
+.filter-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+select {
+  font: 11px var(--mono);
+  color: var(--ink-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 5px 8px;
+}
+
+button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.picker-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.picker-tier {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  width: 3.4em;
+  flex: none;
+  letter-spacing: 0.04em;
+}
+
+button.pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 11.5px var(--sans);
+  padding: 4px 10px;
+}
+
+button.pick[aria-pressed="true"] {
+  background: var(--chip);
+  color: var(--ink);
+}
+
+.pick-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--axis);
+  flex: none;
+}
+
+.overlay-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 14px 4px;
+}
+
+.overlay-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.overlay-chart {
+  height: 340px;
+}

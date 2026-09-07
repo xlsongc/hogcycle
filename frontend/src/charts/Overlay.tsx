@@ -33,6 +33,8 @@ import {
   MarkLineComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 import type { Panel } from "@/types/generated/wall";
 import { cssVar, fmt, monoFont, slotColor } from "./base/theme";
@@ -57,6 +59,7 @@ type Props = {
   min: string;
   max: string;
   lag: LagSpec | null;
+  locale: Locale;
 };
 
 /** Shifts a date forward by whole months, clamping to the month's length. */
@@ -70,7 +73,8 @@ function shiftMonths(iso: string, months: number): string {
   return `${ny}-${String(nm).padStart(2, "0")}-${String(Math.min(d, last)).padStart(2, "0")}`;
 }
 
-export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
+export function Overlay({ panels, selected, slots, min, max, lag, locale }: Props) {
+  const t = dict(locale);
   const host = useRef<HTMLDivElement>(null);
 
   const chosen = useMemo(
@@ -106,8 +110,8 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
 
   const log = indexed && spread > 10;
   const unitLabel = indexed
-    ? `指数（起点=100${log ? "，对数轴" : ""}）`
-    : (chosen[0]?.unit ?? "");
+    ? t.overlay.indexAxis(log)
+    : unitOf(chosen[0]?.unit ?? "", locale);
 
   useEffect(() => {
     const el = host.current;
@@ -139,7 +143,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
         const color = slotColor(slots.get(panel.id) ?? 0);
         return {
           type: "line" as const,
-          name: panel.name + (shift ? ` (前移${shift}月)` : ""),
+          name: nameOf(panel, locale) + (shift ? t.overlay.shifted(shift) : ""),
           data,
           showSymbol: false,
           connectNulls: false,
@@ -174,7 +178,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             textStyle: { color: muted, fontSize: 11, fontFamily: monoFont() },
             formatter: (name: string) => {
               const v = finals.get(name);
-              return v == null ? name : `${name}  ${fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""))}`;
+              return v == null ? name : `${name}  ${fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale)}`;
             },
           },
           tooltip: {
@@ -184,7 +188,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
             textStyle: { color: ink, fontSize: 11, fontFamily: monoFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             valueFormatter: (v: unknown) =>
-              typeof v === "number" ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? "")) : "—",
+              typeof v === "number" ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale) : "—",
           },
           xAxis: {
             type: "time",
@@ -204,7 +208,7 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
               color: muted,
               fontSize: 11,
               fontFamily: monoFont(),
-              formatter: (v: number) => fmt(v, indexed ? "index" : (chosen[0]?.unit ?? "")),
+              formatter: (v: number) => fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale),
             },
           },
           series: [
@@ -246,24 +250,21 @@ export function Overlay({ panels, selected, slots, min, max, lag }: Props) {
       window.removeEventListener("hogcycle:theme", render);
       chart.dispose();
     };
-  }, [chosen, slots, min, max, lag, indexed, log]);
+  }, [chosen, slots, min, max, lag, indexed, log, locale, t]);
 
   return (
     <div className="overlay-card">
       <div className="overlay-head">
         <span className="panel-unit">{unitLabel}</span>
         {indexed && (
-          <span className="hint">
-            所选序列单位不一致，已全部指数化到窗口起点 —— 比较的是相对涨跌，不是水平
-            {log ? "。跨度超过 10 倍，已切换对数轴，使等百分比涨幅占等高" : ""}
-          </span>
+          <span className="hint">{t.overlay.indexedNote(log)}</span>
         )}
       </div>
       <div
         ref={host}
         className="overlay-chart"
         role="img"
-        aria-label={`叠放图，${chosen.length} 条序列，${indexed ? "指数化" : "原值"}`}
+        aria-label={t.overlay.label(chosen.length, indexed)}
       />
     </div>
   );

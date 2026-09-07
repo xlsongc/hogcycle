@@ -8,6 +8,8 @@
 
 import type { EChartsOption } from "echarts";
 import type { Panel } from "@/types/generated/wall";
+import { NUMBER_LOCALE, labelOf, nameOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 export type Tier = Panel["tier"];
 
@@ -33,27 +35,19 @@ export function monoFont(): string {
   return v ? `${v}, monospace` : "ui-monospace, monospace";
 }
 
-export const TIER_LABEL: Record<Tier, string> = {
-  capacity: "产能",
-  margin: "利润",
-  price: "价格",
-  noise: "噪音",
-  equity: "股票",
-};
-
-export const GRANULARITY_LABEL: Record<string, string> = {
-  D: "日",
-  W: "周",
-  M: "月",
-  Q: "季",
-  A: "年",
-};
-
-/** Formats a value the way its unit wants to be read. */
-export function fmt(value: number | null | undefined, unit: string): string {
+/** Formats a value the way its unit wants to be read.
+ *
+ *  The digit count keys on the raw unit string, never on a localised label:
+ *  the unit is part of the caliber and stays exactly as the source writes it.
+ *  Only the grouping follows the locale. */
+export function fmt(
+  value: number | null | undefined,
+  unit: string,
+  locale: Locale = "en"
+): string {
   if (value == null) return "—";
   const digits = unit === "万头" || unit === "CNY/tonne" ? 0 : unit === "kg" ? 1 : 2;
-  return value.toLocaleString("zh-CN", {
+  return value.toLocaleString(NUMBER_LOCALE[locale], {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
@@ -64,6 +58,7 @@ type BaseArgs = {
   min: string;
   max: string;
   showAxisLabels: boolean;
+  locale: Locale;
 };
 
 /**
@@ -116,7 +111,10 @@ function niceUnit(x: number): number {
  * 元/公斤 and a bare ratio on one time axis. Overlaying them on two y-scales
  * would invent a correlation the data does not contain.
  */
-export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): EChartsOption {
+export function panelOption(
+  { panel, min, max, showAxisLabels, locale }: BaseArgs
+): EChartsOption {
+  const name = nameOf(panel, locale);
   const color = tierColor(panel.tier);
   const ink = cssVar("--ink", "#0b0b0b");
   const muted = cssVar("--muted", "#898781");
@@ -170,13 +168,13 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
         color: muted,
         fontFamily: monoFont(),
         fontSize: 11,
-        formatter: (v: number) => fmt(v, panel.unit),
+        formatter: (v: number) => fmt(v, panel.unit, locale),
       },
     },
     series: [
       {
         type: "line",
-        name: panel.name,
+        name,
         data,
         showSymbol: false,
         symbolSize: 8,
@@ -191,7 +189,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
               data: [{ yAxis: panel.threshold.value }],
               lineStyle: { color: critical, width: 1, type: [4, 3] },
               label: {
-                formatter: panel.threshold.label,
+                formatter: labelOf(panel.threshold, locale),
                 color: critical,
                 fontSize: 11,
                 fontFamily: monoFont(),
@@ -212,7 +210,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
             fontSize: 11,
             fontFamily: monoFont(),
             formatter: (p: { value?: unknown }) =>
-              fmt(typeof p.value === "number" ? p.value : null, panel.unit),
+              fmt(typeof p.value === "number" ? p.value : null, panel.unit, locale),
           },
           // The one label worth drawing on the chart itself: the latest value.
           // A number beside every point would be unreadable, and the axis plus
@@ -220,7 +218,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
           data: endpoint
             ? [
                 {
-                  name: panel.name,
+                  name,
                   coord: [endpoint.d, endpoint.v] as [string, number],
                   value: endpoint.v,
                 },
@@ -234,7 +232,7 @@ export function panelOption({ panel, min, max, showAxisLabels }: BaseArgs): ECha
         ? [
             {
               type: "scatter" as const,
-              name: `${panel.name} (粗粒度)`,
+              name: `${name} (${dict(locale).chart.coarse})`,
               silent: true,
               symbolSize: 7,
               data: sparse.map((p) => [p.d, p.v] as [string, number | null]),

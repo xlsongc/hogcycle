@@ -24,7 +24,9 @@ import {
 import { CanvasRenderer } from "echarts/renderers";
 
 import type { Panel } from "@/types/generated/wall";
-import { GRANULARITY_LABEL, TIER_LABEL, fmt, panelOption, tierColor } from "./base/theme";
+import { fmt, panelOption, tierColor } from "./base/theme";
+import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 echarts.use([
   LineChart,
@@ -63,9 +65,10 @@ type Props = {
   panels: Panel[];
   min: string;
   max: string;
+  locale: Locale;
 };
 
-export function ChartWall({ panels, min, max }: Props) {
+export function ChartWall({ panels, min, max, locale }: Props) {
   return (
     <div className="wall">
       {panels.map((panel, i) => (
@@ -74,6 +77,7 @@ export function ChartWall({ panels, min, max }: Props) {
           panel={panel}
           min={min}
           max={max}
+          locale={locale}
           showAxisLabels={i === panels.length - 1}
         />
       ))}
@@ -86,12 +90,16 @@ function PanelChart({
   min,
   max,
   showAxisLabels,
+  locale,
 }: {
   panel: Panel;
   min: string;
   max: string;
   showAxisLabels: boolean;
+  locale: Locale;
 }) {
+  const t = dict(locale);
+  const name = nameOf(panel, locale);
   const host = useRef<HTMLDivElement>(null);
   const [probe, setProbe] = useState<Probe>(null);
 
@@ -101,7 +109,8 @@ function PanelChart({
 
     const chart = echarts.init(el, null, { renderer: "canvas" });
     chart.group = GROUP;
-    const render = () => chart.setOption(panelOption({ panel, min, max, showAxisLabels }));
+    const render = () =>
+      chart.setOption(panelOption({ panel, min, max, showAxisLabels, locale }));
     render();
     // connect() is idempotent per group, so a per-panel call on mount is safe.
     echarts.connect(GROUP);
@@ -145,7 +154,7 @@ function PanelChart({
       window.removeEventListener("hogcycle:theme", render);
       chart.dispose();
     };
-  }, [panel, min, max, showAxisLabels]);
+  }, [panel, min, max, showAxisLabels, locale]);
 
   const latest = [...panel.points].reverse().find((p) => p.v != null);
   const shown: Readout | null = probe
@@ -157,28 +166,36 @@ function PanelChart({
   return (
     <div className="panel" style={{ ["--tier" as string]: tierColor(panel.tier) }}>
       <div className="panel-head">
-        <span className="panel-title">{panel.name}</span>
-        <span className="panel-unit">{panel.unit}</span>
+        <span className="panel-title">{name}</span>
+        <span className="panel-unit">{unitOf(panel.unit, locale)}</span>
         <span className="num panel-readout">
           {shown ? (
             <>
-              <span style={{ color: "var(--ink)" }}>{fmt(shown.v, panel.unit)}</span>
+              <span style={{ color: "var(--ink)" }}>
+                {fmt(shown.v, panel.unit, locale)}
+              </span>
               <span style={{ color: "var(--muted)", marginLeft: 6 }}>
                 {shown.d}
-                {GRANULARITY_LABEL[shown.g] ? ` · ${GRANULARITY_LABEL[shown.g]}` : ""}
+                {t.granularity[shown.g as keyof typeof t.granularity]
+                  ? ` · ${t.granularity[shown.g as keyof typeof t.granularity]}`
+                  : ""}
               </span>
             </>
           ) : (
-            <span style={{ color: "var(--muted)" }}>此期间无数据</span>
+            <span style={{ color: "var(--muted)" }}>{t.chart.noData}</span>
           )}
         </span>
-        <span className="panel-tier">{TIER_LABEL[panel.tier]}</span>
+        <span className="panel-tier">{t.tier[panel.tier]}</span>
       </div>
       <div
         ref={host}
         className={showAxisLabels ? "panel-chart tall" : "panel-chart"}
         role="img"
-        aria-label={`${panel.name}，单位 ${panel.unit}，共 ${panel.points.length} 个观测点`}
+        aria-label={t.chart.panelLabel(
+          name,
+          unitOf(panel.unit, locale),
+          panel.points.length
+        )}
       />
     </div>
   );

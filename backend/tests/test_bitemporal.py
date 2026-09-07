@@ -25,6 +25,7 @@ UTC = dt.UTC
 SPEC = IndicatorSpec(
     id="sow_inventory",
     name_zh="能繁母猪存栏",
+    name_en="sow inventory",
     tier="capacity",
     freq="monthly",
     unit="万头",

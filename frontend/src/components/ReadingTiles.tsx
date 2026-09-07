@@ -1,6 +1,8 @@
 import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { litSegments } from "@/lib/segments";
+import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 /**
  * Current level per series, styled as a physical readout.
@@ -17,7 +19,14 @@ import { litSegments } from "@/lib/segments";
 
 const SEGMENTS = 14;
 
-export function ReadingTiles({ readings }: { readings: Reading[] }) {
+export function ReadingTiles({
+  readings,
+  locale,
+}: {
+  readings: Reading[];
+  locale: Locale;
+}) {
+  const t = dict(locale);
   // `in_wall` is the backend's own answer to "does this describe the cycle
   // right now?", so the tiles ask it rather than re-deriving the rule here.
   // It excludes equities — a share price is a claim on the cycle, not a
@@ -28,7 +37,7 @@ export function ReadingTiles({ readings }: { readings: Reading[] }) {
   return (
     <section className="tiles">
       {cycle.map((r) => {
-        const text = fmt(r.value, r.unit);
+        const text = fmt(r.value, r.unit, locale);
         const lit = litSegments(r.percentile, SEGMENTS);
 
         return (
@@ -38,10 +47,10 @@ export function ReadingTiles({ readings }: { readings: Reading[] }) {
             style={{ ["--tier" as string]: `var(--${r.tier})` }}
           >
             <div className="tile-label">
-              <span>{r.name}</span>
+              <span>{nameOf(r, locale)}</span>
               {r.yoy != null && (
                 <span className="tile-yoy">
-                  同比 {r.yoy > 0 ? "+" : ""}
+                  {t.tiles.yoy} {r.yoy > 0 ? "+" : ""}
                   {r.yoy}%
                 </span>
               )}
@@ -55,15 +64,15 @@ export function ReadingTiles({ readings }: { readings: Reading[] }) {
                   {text.replace(/\d/g, "8")}
                 </span>
                 {text}
-                <span className="tile-unit">{r.unit}</span>
+                <span className="tile-unit">{unitOf(r.unit, locale)}</span>
               </div>
               <div
                 className="tile-bar"
                 role="img"
                 aria-label={
                   r.percentile == null
-                    ? "历史分位：样本不足"
-                    : `历史第 ${r.percentile} 分位`
+                    ? t.tiles.noPercentile
+                    : t.tiles.percentile(r.percentile)
                 }
               >
                 {Array.from({ length: SEGMENTS }, (_, i) => (
@@ -72,7 +81,7 @@ export function ReadingTiles({ readings }: { readings: Reading[] }) {
               </div>
             </div>
 
-            <div className="tile-note">{note(r)}</div>
+            <div className="tile-note">{note(r, locale)}</div>
           </div>
         );
       })}
@@ -80,21 +89,22 @@ export function ReadingTiles({ readings }: { readings: Reading[] }) {
   );
 }
 
-function note(r: Reading) {
-  const where = r.percentile == null ? null : <>历史第 {r.percentile} 分位</>;
+function note(r: Reading, locale: Locale) {
+  const t = dict(locale).tiles;
+  const where = r.percentile == null ? null : t.percentileNote(r.percentile);
 
   if (r.id === "hog_corn_ratio" && r.value != null && r.value < 5) {
-    return (
-      <>
-        <b>低于 5:1 盈亏线</b> · 养殖亏损中
-      </>
-    );
+    return t.belowBreakeven;
   }
   if (r.id === "sow_inventory") {
     // 正常保有量 is a moving baseline (4100 → 3900 → 3750). A gap computed
     // against today's target would misstate every past period, so the tile
     // shows the level and says why it stops there.
-    return <>{r.obs_date} · 基准为移动值，故不计缺口</>;
+    return (
+      <>
+        {r.obs_date} · {t.movingBaseline}
+      </>
+    );
   }
   return (
     <>

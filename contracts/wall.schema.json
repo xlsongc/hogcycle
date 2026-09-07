@@ -25,11 +25,15 @@
       "description": "Ordered by the causal chain: capacity leads price by 10-12 months, margin decides whether a capacity move persists.",
       "items": {
         "type": "object",
-        "required": ["id", "name", "tier", "unit", "points"],
+        "required": ["id", "name_zh", "name_en", "tier", "unit", "points"],
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
-          "name": { "type": "string" },
+          "name_zh": {
+            "type": "string",
+            "description": "The indicator's name in Chinese, as the registry defines it. Both names are carried because the caliber lives in the name — \u5b9a\u70b9\u5c60\u5bb0\u91cf\uff08\u5168\u53e3\u5f84\uff09 and \u5b9a\u70b9\u5c60\u5bb0\u91cf\uff08\u89c4\u6a21\u4ee5\u4e0a\uff09 are two different measurements, and a frontend-side lookup table would be free to drift from that distinction."
+          },
+          "name_en": { "type": "string" },
           "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
           "unit": { "type": "string" },
           "freq": { "type": "string" },
@@ -44,11 +48,12 @@
           "threshold": {
             "type": ["object", "null"],
             "description": "A reference line that means something in the domain, not chart decoration.",
-            "required": ["value", "label"],
+            "required": ["value", "label_zh", "label_en"],
             "additionalProperties": false,
             "properties": {
               "value": { "type": "number" },
-              "label": { "type": "string" }
+              "label_zh": { "type": "string" },
+              "label_en": { "type": "string" }
             }
           },
           "points": {
@@ -77,11 +82,12 @@
       "description": "Latest value per series with its position in its own history. Context for a human judgement, never a verdict.",
       "items": {
         "type": "object",
-        "required": ["id", "name", "tier", "unit", "value", "obs_date"],
+        "required": ["id", "name_zh", "name_en", "tier", "unit", "value", "obs_date"],
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
-          "name": { "type": "string" },
+          "name_zh": { "type": "string" },
+          "name_en": { "type": "string" },
           "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
           "in_wall": {
             "type": "boolean",

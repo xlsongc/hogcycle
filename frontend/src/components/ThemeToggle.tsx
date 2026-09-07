@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 type Mode = "system" | "light" | "dark";
-const LABEL: Record<Mode, string> = { system: "跟随系统", light: "浅色", dark: "深色" };
 
 /** The charts read their colours from CSS custom properties, so switching the
  *  stamp on <html> is enough; the event tells mounted charts to re-read them. */
-export function ThemeToggle() {
+export function ThemeToggle({ locale }: { locale: Locale }) {
+  const t = dict(locale).theme;
   const [mode, setMode] = useState<Mode>("system");
 
   useEffect(() => {
@@ -19,8 +21,8 @@ export function ThemeToggle() {
 
   const next: Record<Mode, Mode> = { system: "light", light: "dark", dark: "system" };
   return (
-    <button onClick={() => setMode(next[mode])} title="切换主题">
-      {LABEL[mode]}
+    <button onClick={() => setMode(next[mode])} title={t.switch}>
+      {t[mode]}
     </button>
   );
 }

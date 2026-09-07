@@ -19,6 +19,8 @@ import { Bar, Group, Scale } from "./Gauge";
 import { Clock } from "./Clock";
 import { PixelPig } from "./PixelPig";
 import { fmt } from "@/charts/base/theme";
+import { labelOf, nameOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 /** The series each bracketed group shows, in causal order. Ids rather than a
  *  tier filter: the header is a hand-picked instrument panel, not an
@@ -34,7 +36,8 @@ function pick(readings: Reading[], ids: string[]): Reading[] {
     .filter((r): r is Reading => !!r);
 }
 
-export function Hud({ data }: { data: WallContract }) {
+export function Hud({ data, locale }: { data: WallContract; locale: Locale }) {
+  const t = dict(locale).hud;
   const left = pick(data.readings, LEFT);
   const right = pick(data.readings, RIGHT);
   const hero = data.readings.find((r) => r.id === HERO);
@@ -45,43 +48,48 @@ export function Hud({ data }: { data: WallContract }) {
     ratioPanel?.points.map((p) => p.v).filter((v): v is number => v != null) ?? [];
   const ratioMin = ratioValues.length ? Math.min(...ratioValues) : 4;
   const ratioMax = ratioValues.length ? Math.max(...ratioValues) : 10;
+  // Both the scale's title and its reference line come from the contract, so
+  // the panel cannot drift from the series it claims to be showing.
+  const ratioThreshold = ratioPanel?.threshold
+    ? { value: ratioPanel.threshold.value, label: labelOf(ratioPanel.threshold, locale) }
+    : null;
 
   return (
-    <section className="hud" aria-label="监测面板">
+    <section className="hud" aria-label={t.panel}>
       <div className="hud-top">
         <div className="hud-stamp">
-          <span>知识时点</span>
+          <span>{t.knownAt}</span>
           <b className="num">{data.generated_at.slice(0, 10)}</b>
         </div>
         <div className="hud-title" aria-hidden="true">
           <i className="ticks" />
-          <span>猪 周 期 监 测</span>
+          <span>{t.title}</span>
           <i className="ticks" />
         </div>
         <div className="hud-stamp right">
-          <span>本地时刻</span>
+          <span>{t.local}</span>
           <Clock />
         </div>
       </div>
 
       <div className="hud-body">
         <div className="hud-col">
-          <Group label="产能">
+          <Group label={t.capacity}>
             {left.map((r) => (
-              <Bar key={r.id} reading={r} />
+              <Bar key={r.id} reading={r} locale={locale} />
             ))}
           </Group>
-          <Group label="覆盖">
+          <Group label={t.coverage}>
             <div className="hud-kv">
-              <span>起</span>
+              <span>{t.from}</span>
               <b className="num">{data.window.start ?? "—"}</b>
             </div>
             <div className="hud-kv">
-              <span>止</span>
+              <span>{t.to}</span>
               <b className="num">{data.window.end ?? "—"}</b>
             </div>
             <div className="hud-kv">
-              <span>序列</span>
+              <span>{t.series}</span>
               <b className="num">{String(data.panels.length).padStart(3, "0")}</b>
             </div>
           </Group>
@@ -93,15 +101,15 @@ export function Hud({ data }: { data: WallContract }) {
             {hero && (
               <div className="hud-readout" aria-hidden="true">
                 <div>
-                  <span>存栏</span>
-                  <b className="num">{fmt(hero.value, hero.unit)}</b>
+                  <span>{t.level}</span>
+                  <b className="num">{fmt(hero.value, hero.unit, locale)}</b>
                 </div>
                 <div>
-                  <span>同比</span>
+                  <span>{t.yoy}</span>
                   <b className="num">{hero.yoy == null ? "—" : `${hero.yoy > 0 ? "+" : ""}${hero.yoy}%`}</b>
                 </div>
                 <div>
-                  <span>分位</span>
+                  <span>{t.pctl}</span>
                   <b className="num">
                     {hero.percentile == null
                       ? "—"
@@ -113,7 +121,7 @@ export function Hud({ data }: { data: WallContract }) {
           </div>
           {hero && (
             <div className="hud-tag">
-              {hero.name} · {hero.obs_date}
+              {nameOf(hero, locale)} · {hero.obs_date}
             </div>
           )}
         </div>
@@ -123,39 +131,41 @@ export function Hud({ data }: { data: WallContract }) {
             min={ratioMin}
             max={ratioMax}
             value={ratio.value}
-            label="猪粮比价"
+            label={nameOf(ratio, locale)}
             unit="RATIO"
-            threshold={{ value: 5, label: "5:1 盈亏线" }}
+            threshold={ratioThreshold}
+            locale={locale}
           />
         )}
 
         <div className="hud-col">
-          <Group label="价格">
+          <Group label={t.price}>
             {right.map((r) => (
-              <Bar key={r.id} reading={r} />
+              <Bar key={r.id} reading={r} locale={locale} />
             ))}
           </Group>
-          <Group label="读法">
-            <p className="hud-hint">
-              条形填充为该序列<b>自身历史分位</b>，不是绝对水平；样本不足者留空。
-              本面板只读数，不判定。
-            </p>
+          <Group label={t.howToRead}>
+            <p className="hud-hint">{t.hint}</p>
           </Group>
         </div>
       </div>
 
       <div className="hud-foot">
         <span>
-          <i>数据源</i>农业农村部五部委联合发布 · akshare
+          <i>{t.footSource}</i>
+          {t.footSourceValue}
         </span>
         <span>
-          <i>口径</i>见页脚
+          <i>{t.footCaliber}</i>
+          {t.footCaliberValue}
         </span>
         <span>
-          <i>采集</i>每日 <span className="num">09:00 CST</span>
+          <i>{t.footCollected}</i>
+          {t.footCollectedValue}
         </span>
         <span>
-          <i>判定</i>留给读者
+          <i>{t.footVerdict}</i>
+          {t.footVerdictValue}
         </span>
       </div>
     </section>

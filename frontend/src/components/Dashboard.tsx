@@ -18,19 +18,23 @@ import { SeriesPicker } from "./SeriesPicker";
 import { TableView } from "./TableView";
 import { ThemeToggle } from "./ThemeToggle";
 import { MAX_OVERLAY_SERIES } from "@/charts/base/theme";
+import { nameOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
+/** Keys, not labels: the label is copy and lives in the dictionary. */
 const RANGES = [
-  { key: "all", label: "全部", years: null },
-  { key: "8y", label: "近 8 年", years: 8 },
-  { key: "3y", label: "近 3 年", years: 3 },
-  { key: "1y", label: "近 1 年", years: 1 },
+  { key: "all", years: null },
+  { key: "8y", years: 8 },
+  { key: "3y", years: 3 },
+  { key: "1y", years: 1 },
 ] as const;
 
 // Opens on the project's own thesis rather than an empty chart: capacity
 // against the price it is supposed to lead.
 const DEFAULT_SELECTION = ["sow_inventory", "hog_price_index", "eq_muyuan"];
 
-export function Dashboard({ data }: { data: WallContract }) {
+export function Dashboard({ data, locale }: { data: WallContract; locale: Locale }) {
+  const t = dict(locale).dashboard;
   const [rangeKey, setRangeKey] = useState<string>("all");
   const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTION);
   const [slots, setSlots] = useState<Map<string, number>>(
@@ -81,47 +85,41 @@ export function Dashboard({ data }: { data: WallContract }) {
   return (
     <>
       <div className="bar filters">
-        <span className="filter-label">时间窗口</span>
+        <span className="filter-label">{t.window}</span>
         {RANGES.map((r) => (
           <button
             key={r.key}
             aria-pressed={rangeKey === r.key}
             onClick={() => setRangeKey(r.key)}
           >
-            {r.label}
+            {t.ranges[r.key]}
           </button>
         ))}
         <span className="hint">
           {min} → {max}
-          {full ? "" : " · 同时作用于下方全部图表"}
+          {full ? "" : t.appliesBelow}
         </span>
       </div>
 
-      <h2 className="section">因果链图表墙</h2>
-      <p className="section-note">
-        物理周期本身，按 产能 → 价格 → 利润 的因果顺序排列。每格自带纵轴与单位 ——
-        这不是双轴图，是小倍数，也是把 万头、元/公斤 和纯比值放上同一条时间轴的唯一诚实做法。
-      </p>
-      <ChartWall panels={wallPanels} min={min} max={max} />
+      <h2 className="section">{t.wallHeading}</h2>
+      <p className="section-note">{t.wallNote}</p>
+      <ChartWall panels={wallPanels} min={min} max={max} locale={locale} />
 
-      <h2 className="section">自选叠放</h2>
-      <p className="section-note">
-        任选序列压在一条时间轴上。单位一致时画原值；单位混杂时全部指数化到窗口起点，
-        因为把不同量纲塞进两条纵轴会凭空造出数据里没有的相关性。股票只出现在这里 ——
-        股价是对周期的索取权，不是周期的一环。
-      </p>
+      <h2 className="section">{t.overlayHeading}</h2>
+      <p className="section-note">{t.overlayNote}</p>
 
       <SeriesPicker
         panels={data.panels}
         selected={selected}
         slots={slots}
         onToggle={toggle}
+        locale={locale}
       />
 
       <div className="bar">
-        <span className="filter-label">滞后位移</span>
+        <span className="filter-label">{t.lag}</span>
         <button aria-pressed={!lagId} onClick={() => setLagId("")}>
-          不位移
+          {t.noLag}
         </button>
         {selected.map((id) => (
           <button
@@ -132,29 +130,28 @@ export function Dashboard({ data }: { data: WallContract }) {
               if (!lagMonths) setLagMonths(12);
             }}
           >
-            {data.panels.find((p) => p.id === id)?.name ?? id}
+            {(() => {
+              const p = data.panels.find((x) => x.id === id);
+              return p ? nameOf(p, locale) : id;
+            })()}
           </button>
         ))}
         {lagId && (
           <>
-            <span className="filter-label">前移</span>
+            <span className="filter-label">{t.shiftForward}</span>
             {[6, 10, 12, 18].map((m) => (
               <button
                 key={m}
                 aria-pressed={lagMonths === m}
                 onClick={() => setLagMonths(m)}
               >
-                {m} 月
+                {t.months(m)}
               </button>
             ))}
           </>
         )}
       </div>
-      <p className="section-note">
-        把某条序列整体前移，检验领先关系。能繁母猪前移 10–12 个月压到猪价上 ——
-        生物学把这个滞后钉死了（妊娠 114 天 + 育肥 6 个月），所以对齐得上不是巧合。
-        这也是判断「产能信号当时能不能叫出拐点」的第一张图。
-      </p>
+      <p className="section-note">{t.lagNote}</p>
 
       <Overlay
         panels={data.panels}
@@ -163,14 +160,15 @@ export function Dashboard({ data }: { data: WallContract }) {
         min={min}
         max={max}
         lag={lag}
+        locale={locale}
       />
 
-      <TableView panels={wallPanels} />
+      <TableView panels={wallPanels} locale={locale} />
 
       <div className="bar">
-        <ThemeToggle />
+        <ThemeToggle locale={locale} />
         <span className="hint">
-          知识时点 {data.generated_at.slice(0, 10)} · 数据窗口 {dataStart} → {dataEnd}
+          {t.stamp(data.generated_at.slice(0, 10), dataStart, dataEnd)}
         </span>
       </div>
     </>

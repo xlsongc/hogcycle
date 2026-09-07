@@ -19,7 +19,9 @@ export interface Window {
 
 export interface Panel {
   id: string;
-  name: string;
+  /** The indicator's name in Chinese, as the registry defines it. Both names are carried because the caliber lives in the name — 定点屠宰量（全口径） and 定点屠宰量（规模以上） are two different measurements, and a frontend-side lookup table would be free to drift from that distinction. */
+  name_zh: string;
+  name_en: string;
   tier: "capacity" | "margin" | "price" | "noise" | "equity";
   unit: string;
   freq?: string;
@@ -35,7 +37,8 @@ export interface Panel {
 
 export interface Threshold {
   value: number;
-  label: string;
+  label_zh: string;
+  label_en: string;
 }
 
 export interface Point {
@@ -48,7 +51,8 @@ export interface Point {
 
 export interface Reading {
   id: string;
-  name: string;
+  name_zh: string;
+  name_en: string;
   tier: "capacity" | "margin" | "price" | "noise" | "equity";
   /** Whether this reading describes the current state of the physical cycle. False for equities (a claim on the cycle, not a measurement of it) and for retired calibers (history, whose last value is not a reading of today). */
   in_wall?: boolean;

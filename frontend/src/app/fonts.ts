@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-import "./hud.css";
-import "./tiles.css";
+/**
+ * The two pixel faces, loaded once and shared by both root layouts.
+ *
+ * Loaded through next/font rather than a CSS @font-face: an absolute
+ * url("/fonts/...") inside CSS is not rewritten by basePath, so on a project
+ * Pages site it would 404 and the whole page would fall back to a system
+ * face. next/font also fingerprints and self-hosts the file.
+ */
 
-// Loaded through next/font rather than a CSS @font-face: an absolute
-// url("/fonts/...") inside CSS is not rewritten by basePath, so on a project
-// Pages site it would 404 and the whole page would fall back to a system
-// face. next/font also fingerprints and self-hosts the file.
-const departureMono = localFont({
+import localFont from "next/font/local";
+
+export const departureMono = localFont({
   src: "../fonts/DepartureMono-Regular.woff2",
   variable: "--font-departure",
   display: "swap",
@@ -27,23 +28,14 @@ const departureMono = localFont({
 // to 29 KB. A character outside that set falls back to a system face — very
 // visible next to pixel type — so re-cut it with
 // `frontend/scripts/subset-cjk-font.sh` after adding UI copy or an indicator
-// whose name uses a new character.
-const zpix = localFont({
+// whose name uses a new character. Both language pages load it: the English
+// page still renders Chinese in the language toggle and in a handful of
+// caliber terms that have no English equivalent worth inventing.
+export const zpix = localFont({
   src: "../fonts/Zpix-Subset.woff2",
   variable: "--font-zpix",
   display: "swap",
   weight: "400",
 });
 
-export const metadata: Metadata = {
-  title: "猪周期图表墙",
-  description: "把猪周期的因果链放在一条共享时间轴上，供人判断，不代人判断。",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="zh-CN" className={`${departureMono.variable} ${zpix.variable}`}>
-      <body>{children}</body>
-    </html>
-  );
-}
+export const fontVars = `${departureMono.variable} ${zpix.variable}`;

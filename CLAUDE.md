@@ -83,6 +83,15 @@ are generated from that same schema — never hand-written.
 Phase 1 delivers that document as a build-time file. When an HTTP API arrives
 it serves the identical shape at the same path, and no frontend code changes.
 
+**Indicator names are contract data, in both languages.** `name_zh`/`name_en`
+on every panel and reading, `label_zh`/`label_en` on every threshold, both
+required. The caliber lives in the name — 定点屠宰量（全口径） and
+定点屠宰量（规模以上） are different measurements — so a translation table on
+the frontend would be free to drift from a distinction the backend enforces.
+Units are the exception: `unit` stays in the source's own form because `fmt()`
+keys on it, and only its *display* is localised (`unitOf`). Never rescale a
+value to suit a unit label.
+
 ## Code style
 
 - **Modular design. One module, one job.** If you cannot say what a file does
@@ -94,11 +103,19 @@ it serves the identical shape at the same path, and no frontend code changes.
   the code does not.
 - Python: `ruff check` must be clean. Type hints everywhere.
 - TypeScript: `strict`. No `any`.
-- **Two pixel grids, and text has to pick one.** Departure Mono is drawn on
+- **Two pixel grids, and each page picks one.** Departure Mono is drawn on
   11px, zpix on 12px; at any other size a pixel face is resampled and goes
-  soft. Numerals-only elements take `.num` (11px); anything containing Chinese
-  inherits the body's 12px. `--mono`/`--sans` list Departure Mono first so
-  Latin resolves there and CJK falls through to zpix.
+  soft. The `--type` token carries the current page's grid: 12px by default,
+  11px under `html:lang(en)`, because the English page is entirely Latin.
+  Prose sizes read `var(--type)` rather than hard-coding one language's
+  number; numerals-only elements take `.num` (11px) in both.
+  `--mono`/`--sans` list Departure Mono first so Latin resolves there and CJK
+  falls through to zpix.
+
+- **UI copy lives in `frontend/src/i18n/`, never inline in a component.**
+  `en.tsx` is the reference shape and `zh.tsx` is typed `Dict = typeof en`, so
+  a missing translation is a compile error instead of an English sentence in a
+  Chinese paragraph. Add copy to both, or neither.
 - **The CJK font is subset to what the app renders.** Add UI copy or an
   indicator whose name uses a new character and it will fall back to a system
   face mid-sentence. Re-cut with `frontend/scripts/subset-cjk-font.sh`.
@@ -148,3 +165,4 @@ so you do not have to re-derive them.
 | 0011 | Equities live outside the causal wall |
 | 0012 | The overlay normalises rather than adding an axis |
 | 0013 | 能繁母猪存栏 moves to the primary source; staleness is a failure |
+| 0014 | Two prerendered languages; names travel in the contract |

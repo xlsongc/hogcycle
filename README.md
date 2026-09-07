@@ -1,13 +1,18 @@
 # hogcycle
 
-A bitemporal data warehouse and dashboard for the China hog cycle (猪周期).
+**English** · [中文](README.zh-CN.md)
+
+A bitemporal data warehouse and dashboard for the China hog cycle.
+
+Live: **https://xlsongc.github.io/hogcycle/** (English) ·
+[中文](https://xlsongc.github.io/hogcycle/zh/)
 
 ## Why this exists
 
-`akshare` already returns most series this project needs in one line each.
-So the interesting problem is not fetching — it is that a plain fetch gives you
-**today's version of history**, and the single most important indicator in the
-cycle (能繁母猪存栏) is revised after the fact.
+`akshare` already returns most of the series this project needs in one line
+each. So the interesting problem is not fetching — it is that a plain fetch
+gives you **today's version of history**, and the single most important
+indicator in the cycle, breeding sow inventory, is revised after the fact.
 
 That makes the obvious question unanswerable:
 
@@ -56,15 +61,17 @@ backend/src/hogcycle/
   cli/
 
 frontend/src/
+  app/(en)/ app/(zh)/       one prerendered root layout per language
   charts/                   ECharts panels + the connected wall
-  components/               tiles, table view, theme
+  components/               instrument header, tiles, table view, toggles
+  i18n/                     every string the UI renders, in both languages
   types/generated/          generated from contracts/ — never hand-written
 ```
 
-Modules are split by **data source and responsibility, not by technical layer**.
-Each source has its own failure mode, cadence and 口径; all of that ugliness is
-confined between bronze and silver. The gold layer never learns which website a
-number came from.
+Modules are split by **data source and responsibility, not by technical
+layer**. Each source has its own failure mode, cadence and caliber; all of that
+ugliness is confined between bronze and silver. The gold layer never learns
+which website a number came from.
 
 ## Layer rules
 
@@ -78,8 +85,8 @@ top of it. `append_changes()` writes only values that actually moved.
 
 **gold** — pure derivation, rebuildable in seconds, therefore gitignored. It
 computes and aligns; it does not judge. No rule here emits "we are in the
-deleveraging phase" — with roughly three cycles of usable history, any such rule
-is fitted to its own sample.
+deleveraging phase" — with roughly three cycles of usable history, any such
+rule is fitted to its own sample.
 
 ## Usage
 
@@ -88,7 +95,9 @@ pip install -e "./backend[dev]"
 cd backend && pytest -q
 
 hogcycle collect              # all indicators; one failure does not abort the rest
-hogcycle status               # coverage and latest obs_date per series
+hogcycle collect --months-back 60    # backfill ministry editions (default 6)
+hogcycle status               # coverage, latest obs_date and age per series
+hogcycle status --fail-on-stale      # exit 1 if a series has stopped advancing
 hogcycle revisions --indicator sow_inventory
 hogcycle export               # gold -> frontend/src/data/wall.json
 hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
@@ -96,50 +105,66 @@ hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
 cd frontend && npm install && npm run dev
 ```
 
+## The site
+
+Two languages, each **prerendered as its own page** — English at `/`, Chinese
+at `/zh/`. The switch is a link rather than a toggle, so each version has a URL
+that can be shared and indexed and a correct `lang` attribute in the markup it
+serves. Indicator names travel in the contract in both languages, because the
+caliber lives in the name and a lookup table on the frontend would be free to
+drift from it. See [ADR-0014](docs/adr/0014-the-site-speaks-two-languages.md).
+
 ## Data sources and caveats
 
-Prices and equities run through `akshare`, which wraps 玄田数据/中国养猪网 and
-行情宝 — JSON endpoints rather than scraped HTML. Capacity comes straight from
-the publisher: the 农业农村部 生猪专题 月度数据, a joint release by 农业农村部、
-发改委、商务部、海关总署 and 国家统计局, one XLSX per month. This project stays
-polite by fetching once daily, by sharing one call between indicators that read
-different columns of the same table, and by re-reading only a short trailing
-window of published editions.
+Prices and equities run through `akshare`, which wraps Xuantian Data /
+Zhongguo Yangzhu Wang and Hangqingbao — JSON endpoints rather than scraped
+HTML. Capacity comes straight from the publisher: the Ministry of Agriculture
+and Rural Affairs' monthly hog-industry release, issued jointly with the NDRC,
+MOFCOM, the General Administration of Customs and the National Bureau of
+Statistics, one XLSX per month. This project stays polite by fetching once
+daily, by sharing one call between indicators that read different columns of
+the same table, and by re-reading only a short trailing window of editions.
 
-That split was learned the hard way. 能繁母猪存栏 used to come through akshare
-too, whose upstream was a *mirror* of the same government release — and the
-mirror froze in 2025年10月 while continuing to serve its last rows, so the
-collector reported success every morning for eleven months. `hogcycle status
---fail-on-stale` now treats a series that has stopped advancing as a failure.
-See [ADR-0013](docs/adr/0013-sow-inventory-moves-to-the-primary-source.md).
+That split was learned the hard way. Breeding sow inventory used to come
+through akshare too, whose upstream was a *mirror* of the same government
+release — and the mirror froze in October 2025 while continuing to serve its
+last rows, so the collector reported success every morning for eleven months.
+`hogcycle status --fail-on-stale` now treats a series that has stopped
+advancing as a failure. See
+[ADR-0013](docs/adr/0013-sow-inventory-moves-to-the-primary-source.md).
 
 Traps, all encoded in `sources.yaml`:
 
-- **能繁母猪 mixes three granularities in one column.** 2009-2020 are annual
-  (a frozen 玄田 snapshot, replayed from bronze — no live source has them);
-  2021-12 → 2025-10 is month-end; 2026 onward is quarter-end only, because the
-  public cadence changed. Quarter-end figures are 国家统计局 survey data; the
-  monthly ones were extrapolated from 农业农村部 定点监测 month-on-month rates.
-  Different reliability, same column — so every row carries its own
-  `granularity`, and for this series granularity also encodes caliber.
-- **屠宰量 changed caliber in 2025-07** (规模以上 → all 定点屠宰企业) and the
-  level stepped up with it. Two indicators, never one line; the closed one is
-  marked `retired`, so its absence is expected rather than a daily failure.
-- **正常保有量 is a moving baseline** (4100 → 3900 → 3750 万头). Any gap or
-  ratio must use the baseline in force at the time, not today's.
-- **Three hog-price calibers exist** (玄田 全国均价, 行情宝 平台成交, and
-  农业农村部 500-county). Never plot them as one line; each gets its own panel.
-- **玉米 is quoted in 元/吨**, not 元/公斤. Unit reconciliation happens in gold,
-  so silver stays faithful to the source.
-- **PSY efficiency offsets herd cuts.** A 5% fall in sows is not a 5% fall in
-  supply. Any capacity→supply model needs a productivity term or it will be
+- **Breeding sow inventory mixes three granularities in one column.**
+  2009-2020 are annual (a frozen third-party snapshot, replayed from bronze —
+  no live source still has them); 2021-12 to 2025-10 is month-end; 2026 onward
+  is quarter-end only, because the public cadence changed. Quarter-end figures
+  are statistics-bureau survey data; the monthly ones were extrapolated from
+  the ministry's fixed-point monitoring. Different reliability, same column —
+  so every row carries its own `granularity`, and for this series granularity
+  also encodes caliber.
+- **Slaughter volume changed caliber in July 2025** (plants above designated
+  size → all designated plants) and the level stepped up with it. Two
+  indicators, never one line; the closed one is marked `retired`, so its
+  absence is expected rather than a daily failure.
+- **The normal-holding target is a moving baseline** (41 → 39 → 37.5 million
+  head). Any gap or ratio must use the baseline in force at the time, not
+  today's.
+- **Three hog-price calibers exist** (Xuantian's national average,
+  Hangqingbao's platform transactions, and the ministry's 500-county market
+  survey). Never plot them as one line; each gets its own panel.
+- **Corn is quoted per tonne**, not per kilogram. Unit reconciliation happens
+  in gold, so silver stays faithful to the source.
+- **Sow productivity offsets herd cuts.** A 5% fall in sows is not a 5% fall in
+  supply. Any capacity-to-supply model needs a productivity term or it will be
   wrong in exactly the direction that costs money.
 
 ## Status
 
-Phase 1 complete: config → fetch → bronze → validate → silver → gold → contract
-→ static dashboard, with 41 tests over real captured payloads.
+Phase 1 complete: config → fetch → bronze → validate → silver → gold →
+contract → static dashboard, with 69 tests over real captured payloads, and the
+dashboard published in English and Chinese.
 
-Next: 农业农村部 500-county as an independent second caliber (which also closes
-margin arithmetic within one survey), then the bitemporal verification layer
-that the storage was built for.
+Next: the ministry's 500-county survey as an independent second caliber (which
+also closes margin arithmetic within one survey), then the bitemporal
+verification layer that the storage was built for.

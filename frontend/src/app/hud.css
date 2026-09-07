@@ -29,6 +29,45 @@
   --gauge-off: rgba(255, 255, 255, 0.13);
 }
 
+/* ---------- language switch ---------- */
+
+/* Sits directly above the instrument header, set as a row of plate labels so
+   it reads as part of the panel's chrome rather than as site navigation. */
+.lang {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.lang a,
+.lang b {
+  color: var(--muted);
+  font-weight: 400;
+  text-decoration: none;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.lang a:hover,
+.lang a:focus-visible {
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+/* The current language is stated, not offered. Marking it with a border
+   rather than only a colour keeps it distinguishable without hue. */
+.lang b[aria-current] {
+  color: var(--ink);
+  border-color: var(--border);
+  background: var(--surface-1);
+}
+
 /* ---------- instrument header ---------- */
 
 .hud {
@@ -68,11 +107,21 @@
   align-items: center;
   gap: 12px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: var(--type);
   letter-spacing: 0.06em;
   color: var(--ink-2);
   white-space: nowrap;
   padding-top: 2px;
+}
+
+/* The reference sets its title in widely tracked capitals. Done here rather
+   than by padding the string with spaces, so both languages get the same
+   treatment from one rule and neither dictionary carries layout. The negative
+   margin removes the trailing gap tracking leaves after the last glyph, which
+   would otherwise push the title off-centre between the tick rules. */
+.hud-title span {
+  letter-spacing: 0.4em;
+  margin-right: -0.4em;
 }
 
 /* The rule of vertical strokes flanking the title in the reference. A
@@ -93,7 +142,7 @@
    row past the wrapper instead of wrapping. Same trap as the tile grid. */
 .hud-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 9ch minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto 13ch minmax(0, 1fr);
   gap: 20px;
   align-items: start;
   padding: 16px 0 4px;
@@ -307,7 +356,10 @@
   display: flex;
   flex-direction: column;
   gap: 7px;
-  min-width: 9ch;
+  /* Wide enough for the heading, which is the indicator's own name from the
+     contract — three times longer in English than in Chinese. The plot inside
+     stays narrow; the extra width is for the label. */
+  min-width: 13ch;
 }
 
 .scale-head {
@@ -402,7 +454,7 @@
    taken out. */
 @media (max-width: 1060px) {
   .hud-body {
-    grid-template-columns: minmax(0, 1fr) auto 9ch;
+    grid-template-columns: minmax(0, 1fr) auto 13ch;
     gap: 18px;
   }
 

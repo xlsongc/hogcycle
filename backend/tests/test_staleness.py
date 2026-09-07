@@ -21,6 +21,7 @@ def spec(**kw) -> IndicatorSpec:
     base = dict(
         id="s",
         name_zh="s",
+        name_en="s",
         tier="capacity",
         freq="monthly",
         unit="万头",

@@ -13,8 +13,11 @@
 import { useMemo, useState } from "react";
 import type { Panel } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
+import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
-export function TableView({ panels }: { panels: Panel[] }) {
+export function TableView({ panels, locale }: { panels: Panel[]; locale: Locale }) {
+  const t = dict(locale);
   const [open, setOpen] = useState(false);
 
   const rows = useMemo(() => {
@@ -34,21 +37,23 @@ export function TableView({ panels }: { panels: Panel[] }) {
     <>
       <div className="bar">
         <button aria-pressed={open} onClick={() => setOpen((v) => !v)}>
-          {open ? "隐藏表格" : "表格视图"}
+          {open ? t.table.hide : t.table.show}
         </button>
-        <span className="hint">按月重采样 · 每月取最后一个观测值 · 共 {rows.length} 行</span>
+        <span className="hint">{t.table.note(rows.length)}</span>
       </div>
       {open && (
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">月份</th>
+                <th scope="col">{t.table.month}</th>
                 {panels.map((p) => (
                   <th key={p.id} scope="col">
-                    {p.name}
+                    {nameOf(p, locale)}
                     <br />
-                    <span style={{ color: "var(--muted)" }}>{p.unit}</span>
+                    <span style={{ color: "var(--muted)" }}>
+                      {unitOf(p.unit, locale)}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -58,7 +63,7 @@ export function TableView({ panels }: { panels: Panel[] }) {
                 <tr key={month}>
                   <td>{month}</td>
                   {panels.map((p) => (
-                    <td key={p.id}>{fmt(values[p.id] ?? null, p.unit)}</td>
+                    <td key={p.id}>{fmt(values[p.id] ?? null, p.unit, locale)}</td>
                   ))}
                 </tr>
               ))}

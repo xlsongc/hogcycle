@@ -31,7 +31,11 @@ WALL_TIERS = frozenset({"capacity", "margin", "price", "noise"})
 
 # Reference lines that mean something in the domain, not chart decoration.
 THRESHOLDS: dict[str, dict[str, Any]] = {
-    "hog_corn_ratio": {"value": 5.0, "label": "5:1 盈亏线"},
+    "hog_corn_ratio": {
+        "value": 5.0,
+        "label_zh": "5:1 盈亏线",
+        "label_en": "5:1 breakeven",
+    },
 }
 
 _G = {"daily": "D", "weekly": "W", "monthly": "M", "quarterly": "Q", "annual": "A"}
@@ -156,7 +160,8 @@ def build_wall(
         panels.append(
             {
                 "id": spec.id,
-                "name": spec.name_zh,
+                "name_zh": spec.name_zh,
+                "name_en": spec.name_en,
                 "tier": spec.tier,
                 "unit": spec.unit,
                 "freq": spec.freq,
@@ -173,7 +178,8 @@ def build_wall(
             readings.append(
                 {
                     "id": spec.id,
-                    "name": spec.name_zh,
+                    "name_zh": spec.name_zh,
+                    "name_en": spec.name_en,
                     "tier": spec.tier,
                     "in_wall": in_wall,
                     "unit": spec.unit,

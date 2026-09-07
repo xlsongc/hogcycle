@@ -59,16 +59,23 @@
   );
 }
 
+/* A flex row so the unit can drop to its own line rather than be clipped:
+   "10k head" beside a six-figure reading does not fit a tile sized for 万头,
+   and a truncated unit on a readout is worse than a second line. */
 .tile-digits {
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  /* A gap rather than a margin on the unit: flex applies it only between
+     items on the same line, so a wrapped unit starts flush with the number. */
+  column-gap: 6px;
   font-family: var(--mono);
   font-size: 22px;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
   color: var(--lcd-ink);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: clip;
 }
 
 /* Every segment lit, sitting behind the real value — the giveaway that a
@@ -85,7 +92,6 @@
   font-family: var(--mono);
   font-size: 11px;
   color: rgba(242, 239, 226, 0.45);
-  margin-left: 6px;
 }
 
 .tile-bar {

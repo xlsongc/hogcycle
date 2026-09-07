@@ -14,7 +14,9 @@
  */
 
 import type { Panel } from "@/types/generated/wall";
-import { MAX_OVERLAY_SERIES, TIER_LABEL, slotColor } from "@/charts/base/theme";
+import { MAX_OVERLAY_SERIES, slotColor } from "@/charts/base/theme";
+import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 
 const TIER_ORDER: Panel["tier"][] = ["capacity", "margin", "price", "noise", "equity"];
 
@@ -23,9 +25,11 @@ type Props = {
   selected: string[];
   slots: Map<string, number>;
   onToggle: (id: string) => void;
+  locale: Locale;
 };
 
-export function SeriesPicker({ panels, selected, slots, onToggle }: Props) {
+export function SeriesPicker({ panels, selected, slots, onToggle, locale }: Props) {
+  const t = dict(locale);
   const atCap = selected.length >= MAX_OVERLAY_SERIES;
 
   return (
@@ -35,7 +39,7 @@ export function SeriesPicker({ panels, selected, slots, onToggle }: Props) {
         if (!group.length) return null;
         return (
           <div className="picker-group" key={tier}>
-            <span className="picker-tier">{TIER_LABEL[tier]}</span>
+            <span className="picker-tier">{t.tier[tier]}</span>
             {group.map((panel) => {
               const on = selected.includes(panel.id);
               const slot = slots.get(panel.id);
@@ -47,8 +51,8 @@ export function SeriesPicker({ panels, selected, slots, onToggle }: Props) {
                   disabled={!on && atCap}
                   title={
                     !on && atCap
-                      ? `最多同时叠放 ${MAX_OVERLAY_SERIES} 条 —— 再多就得生成新色相，而生成的色相在色觉缺陷下与已有色无法区分`
-                      : panel.unit
+                      ? t.picker.atCapTitle(MAX_OVERLAY_SERIES)
+                      : unitOf(panel.unit, locale)
                   }
                   onClick={() => onToggle(panel.id)}
                 >
@@ -59,7 +63,7 @@ export function SeriesPicker({ panels, selected, slots, onToggle }: Props) {
                       borderColor: on && slot != null ? slotColor(slot) : "var(--axis)",
                     }}
                   />
-                  {panel.name}
+                  {nameOf(panel, locale)}
                 </button>
               );
             })}
@@ -67,8 +71,8 @@ export function SeriesPicker({ panels, selected, slots, onToggle }: Props) {
         );
       })}
       <span className="hint">
-        已选 {selected.length}/{MAX_OVERLAY_SERIES}
-        {atCap ? " · 已达上限" : ""}
+        {t.picker.selected(selected.length, MAX_OVERLAY_SERIES)}
+        {atCap ? t.picker.atCap : ""}
       </span>
     </div>
   );

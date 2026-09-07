@@ -16,7 +16,7 @@ from .spec import Extract, IndicatorSpec, Registry
 DEFAULT_CONFIG = "config/sources.yaml"
 
 _KNOWN_KEYS = {
-    "id", "name_zh", "tier", "freq", "unit", "lo", "hi", "adapter",
+    "id", "name_zh", "name_en", "tier", "freq", "unit", "lo", "hi", "adapter",
     "call", "extract", "accept", "revises", "zero_is_null", "max_age_days",
     "retired", "notes",
 }

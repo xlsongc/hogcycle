@@ -22,6 +22,7 @@ indicators:
 
   - id: sow_inventory
     name_zh: 能繁母猪存栏
+    name_en: Breeding sow inventory
     tier: capacity
     freq: monthly
     unit: 万头
@@ -56,6 +57,7 @@ indicators:
 
   - id: hog_inventory
     name_zh: 生猪存栏
+    name_en: Hog inventory
     tier: capacity
     freq: quarterly
     unit: 万头
@@ -73,6 +75,7 @@ indicators:
 
   - id: slaughter
     name_zh: 定点屠宰量（全口径）
+    name_en: Slaughter volume (all designated plants)
     tier: capacity
     freq: monthly
     unit: 万头
@@ -90,6 +93,7 @@ indicators:
 
   - id: slaughter_above_scale
     name_zh: 定点屠宰量（规模以上）
+    name_en: Slaughter volume (plants above designated size)
     tier: capacity
     freq: monthly
     unit: 万头
@@ -108,6 +112,7 @@ indicators:
 
   - id: piglet_price
     name_zh: 仔猪价格
+    name_en: Piglet price
     tier: capacity
     freq: weekly
     unit: CNY/kg
@@ -124,6 +129,7 @@ indicators:
 
   - id: sow_binary_price
     name_zh: 二元母猪价格
+    name_en: Crossbred gilt price
     tier: capacity
     freq: monthly
     unit: CNY/kg
@@ -144,6 +150,7 @@ indicators:
 
   - id: corn_price
     name_zh: 玉米价格
+    name_en: Corn price
     tier: margin
     freq: daily
     unit: CNY/tonne
@@ -160,6 +167,7 @@ indicators:
 
   - id: hog_corn_ratio
     name_zh: 猪粮比价
+    name_en: Hog-to-corn price ratio
     tier: margin
     freq: weekly
     unit: ratio
@@ -175,6 +183,7 @@ indicators:
 
   - id: hog_price_index
     name_zh: 生猪成交均价
+    name_en: Average hog transaction price
     tier: price
     freq: weekly
     unit: CNY/kg
@@ -191,6 +200,7 @@ indicators:
 
   - id: hog_price_wai3
     name_zh: 外三元生猪出栏均价
+    name_en: Three-way crossbred hog ex-farm price
     tier: price
     freq: daily
     unit: CNY/kg
@@ -205,6 +215,7 @@ indicators:
 
   - id: carcass_price
     name_zh: 白条肉平均出厂价格
+    name_en: Carcass pork ex-plant price
     tier: price
     freq: weekly
     unit: CNY/kg
@@ -220,6 +231,7 @@ indicators:
 
   - id: meat_price_index
     name_zh: 肉类价格指数（已封存）
+    name_en: Meat price index (retired)
     tier: price
     freq: monthly
     unit: index
@@ -241,6 +253,7 @@ indicators:
 
   - id: pork_retail_price
     name_zh: 猪肉零售价（36城精瘦肉）
+    name_en: Pork retail price (lean cuts, 36 cities)
     tier: price
     freq: monthly
     unit: CNY/kg
@@ -258,6 +271,7 @@ indicators:
 
   - id: hog_weight
     name_zh: 出栏均重
+    name_en: Average market weight
     tier: noise
     freq: weekly
     unit: kg
@@ -293,6 +307,7 @@ indicators:
 
   - id: eq_muyuan
     name_zh: 牧原股份
+    name_en: Muyuan Foods
     tier: equity
     freq: daily
     unit: CNY
@@ -306,6 +321,7 @@ indicators:
 
   - id: eq_wens
     name_zh: 温氏股份
+    name_en: Wens Foodstuff
     tier: equity
     freq: daily
     unit: CNY
@@ -319,6 +335,7 @@ indicators:
 
   - id: eq_newhope
     name_zh: 新希望
+    name_en: New Hope Liuhe
     tier: equity
     freq: daily
     unit: CNY
@@ -332,6 +349,7 @@ indicators:
 
   - id: eq_shennong
     name_zh: 神农集团
+    name_en: Shennong Group
     tier: equity
     freq: daily
     unit: CNY
@@ -345,6 +363,7 @@ indicators:
 
   - id: eq_juxing
     name_zh: 巨星农牧
+    name_en: Juxing Agriculture
     tier: equity
     freq: daily
     unit: CNY
@@ -358,6 +377,7 @@ indicators:
 
   - id: eq_huatong
     name_zh: 华统股份
+    name_en: Huatong Meat
     tier: equity
     freq: daily
     unit: CNY

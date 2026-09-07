@@ -15,6 +15,13 @@
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --border: rgba(11, 11, 11, 0.1);
+
+  /* The two pixel grids. A pixel face rendered at a non-integer multiple of
+     the size it was drawn at is resampled and goes soft, which defeats the
+     point of using one — so prose size is dictated by the font, not the other
+     way round. zpix is drawn on 12px, and the Chinese page is mostly zpix. */
+  --type: 12px;
+  --type-lh: 21px;
   --chip: rgba(11, 11, 11, 0.045);
 
   /* Tier hues. Validated all-pairs in both modes with the dataviz palette
@@ -108,12 +115,7 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  /* 12px is zpix's native design size. A pixel face rendered at a non-integer
-     multiple of its grid gets resampled and goes soft, which defeats the
-     point of using one — so the body size is dictated by the font, not the
-     other way round. Departure Mono's own 11px grid keeps working here
-     because 11 and 22 are still used explicitly for numerals (.num). */
-  font: 12px/1.75 var(--sans);
+  font: var(--type)/var(--type-lh) var(--sans);
   /* Pixel faces are drawn as on/off pixels; antialiasing greys their edges
      and undoes the lattice. */
   -webkit-font-smoothing: none;
@@ -124,6 +126,14 @@ body {
   font-family: var(--mono);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+}
+
+/* The English page renders entirely in Departure Mono, which is drawn on 11px
+   — at 12px every glyph on it would be resampled. The line height stays a
+   whole number of pixels for the same reason the size does. */
+html:lang(en) {
+  --type: 11px;
+  --type-lh: 20px;
 }
 
 .wrap {
@@ -153,7 +163,7 @@ header .sub {
   flex-wrap: wrap;
   gap: 7px;
   align-items: center;
-  font-size: 12px;
+  font-size: var(--type);
   color: var(--ink-2);
 }
 
@@ -201,22 +211,9 @@ header .sub {
 }
 
 .tile-label {
-  font-size: 12px;
+  font-size: var(--type);
   color: var(--ink-2);
   margin-bottom: 4px;
-}
-
-.tile-value {
-  font-family: var(--mono);
-  font-size: 22px;
-  line-height: 1.2;
-  color: var(--ink);
-}
-
-.tile-value small {
-  font-size: 11px;
-  color: var(--muted);
-  margin-left: 4px;
 }
 
 .tile-note {
@@ -386,113 +383,4 @@ footer li {
 
 .panel-readout {
   margin-left: 2px;
-}
-
-/* ---------- sections, filters, picker, overlay ---------- */
-
-h2.section {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  color: var(--ink-2);
-  margin: 30px 0 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--grid);
-}
-
-.section-note {
-  font-size: 11.5px;
-  color: var(--muted);
-  line-height: 1.65;
-  margin: 0 0 12px;
-  max-width: 76ch;
-}
-
-.filters {
-  margin: 0 0 20px;
-}
-
-.filter-label {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-}
-
-select {
-  font: 11px var(--mono);
-  color: var(--ink-2);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 5px 8px;
-}
-
-button:disabled {
-  opacity: 0.38;
-  cursor: not-allowed;
-}
-
-.picker {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 12px;
-}
-
-.picker-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-.picker-tier {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  width: 3.4em;
-  flex: none;
-  letter-spacing: 0.04em;
-}
-
-button.pick {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font: 11.5px var(--sans);
-  padding: 4px 10px;
-}
-
-button.pick[aria-pressed="true"] {
-  background: var(--chip);
-  color: var(--ink);
-}
-
-.pick-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.5px solid var(--axis);
-  flex: none;
-}
-
-.overlay-card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 10px 14px 4px;
-}
-
-.overlay-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 2px;
-}
-
-.overlay-chart {
-  height: 340px;
 }

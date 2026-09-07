@@ -50,7 +50,12 @@ class Extract:
 @dataclass(frozen=True, slots=True)
 class IndicatorSpec:
     id: str
+    # Both names are required. An indicator that reaches the wall without an
+    # English name would render its Chinese one on the English page, which is
+    # the kind of failure that looks like a rendering glitch and is actually a
+    # missing definition.
     name_zh: str
+    name_en: str
     tier: Tier
     freq: str
     unit: str
