@@ -18,3 +18,4 @@
 {"fetched_at": "2026-09-12T05:13:52.984808+00:00", "snapshot_id": "c3b19825d147782cf71ad62f332f01538a0de6432dcc32c330f29569e70825ea", "source": "akshare:index_hog_spot_price:成交均重", "bytes": 108365, "new_content": false}
 {"fetched_at": "2026-09-13T05:29:19.367367+00:00", "snapshot_id": "c3b19825d147782cf71ad62f332f01538a0de6432dcc32c330f29569e70825ea", "source": "akshare:index_hog_spot_price:成交均重", "bytes": 108365, "new_content": false}
 {"fetched_at": "2026-09-14T05:33:18.360640+00:00", "snapshot_id": "0bf238dad9d4b73727a553a9b1a956124d9c09654168dd45ef0f6516a181790e", "source": "akshare:index_hog_spot_price:成交均重", "bytes": 108548, "new_content": true}
+{"fetched_at": "2026-09-15T05:34:07.962627+00:00", "snapshot_id": "0bf238dad9d4b73727a553a9b1a956124d9c09654168dd45ef0f6516a181790e", "source": "akshare:index_hog_spot_price:成交均重", "bytes": 108548, "new_content": false}
