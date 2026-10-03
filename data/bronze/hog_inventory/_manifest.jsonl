@@ -25,3 +25,4 @@
 {"fetched_at": "2026-09-30T06:07:25.039672+00:00", "snapshot_id": "574c1955753895dd6276a8f3b65c5948bfc7960bf42f5913d737b248518fd40e", "source": "moa:moa_hog_release:生猪存栏", "bytes": 24684, "new_content": true}
 {"fetched_at": "2026-10-01T06:41:34.141094+00:00", "snapshot_id": "1a669f89217c6e9d414440a1d6559c7e848a6c0ec3de1010113d0b438ca95037", "source": "moa:moa_hog_release:生猪存栏", "bytes": 20165, "new_content": true}
 {"fetched_at": "2026-10-02T06:24:35.064127+00:00", "snapshot_id": "1a669f89217c6e9d414440a1d6559c7e848a6c0ec3de1010113d0b438ca95037", "source": "moa:moa_hog_release:生猪存栏", "bytes": 20165, "new_content": false}
+{"fetched_at": "2026-10-03T05:53:23.813963+00:00", "snapshot_id": "1a669f89217c6e9d414440a1d6559c7e848a6c0ec3de1010113d0b438ca95037", "source": "moa:moa_hog_release:生猪存栏", "bytes": 20165, "new_content": false}
