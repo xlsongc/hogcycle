@@ -13,6 +13,7 @@ still needs neither.
 
 from __future__ import annotations
 
+import datetime as dt
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -47,6 +48,47 @@ class Extract:
     value: str = "value"
 
 
+# The longest a person may quiet the guard in one go. Renewing is allowed, but
+# it is a commit that edits `review_by`, which is a decision someone has to
+# make and can be asked about. An acknowledgement without a horizon is how a
+# known outage turns back into an unknown one.
+MAX_ACK_DAYS = 92
+
+
+@dataclass(frozen=True, slots=True)
+class UpstreamDark:
+    """A human has seen this series stop and taken ownership of the fix.
+
+    This is the third state between live and retired. The caliber still
+    exists, but the source we reach has stopped carrying it, and the
+    primary-source replacement has not been built yet. The guard keeps
+    reporting the series every run; it only stops *failing* the run, and only
+    until `review_by`. After that the alarm comes back by itself.
+    """
+
+    acknowledged: dt.date
+    review_by: dt.date
+    reason: str
+
+    def __post_init__(self) -> None:
+        if not self.reason.strip():
+            raise ValueError(
+                "upstream_dark.reason is required: say what broke and what replaces it"
+            )
+        span = (self.review_by - self.acknowledged).days
+        if span <= 0:
+            raise ValueError(
+                f"upstream_dark.review_by {self.review_by} must be after "
+                f"acknowledged {self.acknowledged}"
+            )
+        if span > MAX_ACK_DAYS:
+            raise ValueError(
+                f"upstream_dark spans {span} days ({self.acknowledged} → "
+                f"{self.review_by}); the limit is {MAX_ACK_DAYS}. Renew it when "
+                "it lapses instead of setting a horizon nobody will reach."
+            )
+
+
 @dataclass(frozen=True, slots=True)
 class IndicatorSpec:
     id: str
@@ -78,6 +120,9 @@ class IndicatorSpec:
     # absence stops being an error: it is neither a failed collection nor a
     # stale one, and it does not belong on a wall that reads as current.
     retired: bool = False
+    # The caliber is alive but the source we reach went dark, and someone has
+    # acknowledged it with a deadline. See UpstreamDark.
+    upstream_dark: UpstreamDark | None = None
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -95,6 +140,11 @@ class IndicatorSpec:
                 raise ValueError(f"{self.id}: unknown granularity in accept: {unknown}")
         if self.max_age_days is not None and self.max_age_days < 1:
             raise ValueError(f"{self.id}: max_age_days must be >= 1")
+        if self.retired and self.upstream_dark is not None:
+            raise ValueError(
+                f"{self.id}: retired and upstream_dark contradict each other — "
+                "a closed caliber has nothing left to wait for"
+            )
 
     @property
     def call_key(self) -> str:

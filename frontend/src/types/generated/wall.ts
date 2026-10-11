@@ -64,4 +64,8 @@ export interface Reading {
   /** Percent change against the observation nearest one year earlier, or null when none sits near the anniversary. Null is a real answer: a series that began this year has no year-on-year. */
   yoy?: number | null;
   n?: number;
+  /** The series has not advanced within its own cadence as of generated_at. A stale reading is still shown, because hiding it is the silent failure this project exists to avoid, but it must not read as a current level. An upstream_dark acknowledgement in config does not soften this: it quiets the collector's alarm, not the page. */
+  stale: boolean;
+  /** Days from obs_date to generated_at: how far the reader should discount a stale reading. */
+  age_days?: number | null;
 }

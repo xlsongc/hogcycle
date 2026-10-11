@@ -123,3 +123,9 @@
   font-weight: 400;
 }
 
+
+/* A stale reading keeps its tile, since hiding it is the silent failure, but
+   its digits drop to the unlit ink so the screen reads as switched off. */
+.tile.stale .tile-digits {
+  color: var(--muted);
+}

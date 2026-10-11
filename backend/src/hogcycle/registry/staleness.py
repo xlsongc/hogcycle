@@ -19,6 +19,13 @@ alarm is worse than none. So each limit spans at least two publication cycles
 plus the lag, and an indicator whose real cadence differs from its declared
 `freq` overrides it with `max_age_days` in config rather than loosening the
 default for everyone.
+
+The opposite failure is real too. A guard that stays red every day for a
+cause everyone already knows hides the next cause nobody knows yet. When a
+person has seen the freeze and owns the fix, `upstream_dark` in config says
+so with a deadline: the series is still reported as stale on every run and on
+the site, but it stops failing the run until `review_by`, and then it fails
+again without anyone having to remember.
 """
 
 from __future__ import annotations
@@ -49,8 +56,30 @@ class Staleness:
     latest: dt.date | None
     age_days: int | None
     limit: int
+    # The fact: the series has not advanced within its limit. Never softened by
+    # an acknowledgement — the site shows a stale reading as stale regardless.
     stale: bool
     retired: bool = False
+    # A person owns this freeze until `review_by`. Only ever True when stale.
+    acknowledged: bool = False
+    review_by: dt.date | None = None
+
+    @property
+    def failing(self) -> bool:
+        """Whether this should turn the run red."""
+        return self.stale and not self.acknowledged
+
+    @property
+    def lapsed(self) -> bool:
+        """Still frozen past the date someone promised to look again."""
+        return self.stale and self.review_by is not None and not self.acknowledged
+
+    @property
+    def resumed(self) -> bool:
+        """Advancing again while config still says it is dark. Not a failure,
+        but the acknowledgement would mask the next freeze until it lapses,
+        so it should be removed."""
+        return not self.stale and self.review_by is not None and self.latest is not None
 
     @property
     def note(self) -> str:
@@ -58,8 +87,14 @@ class Staleness:
             return "retired"
         if self.latest is None:
             return "no data"
+        if self.acknowledged:
+            return f"dark {self.age_days}d, ack until {self.review_by}"
+        if self.lapsed:
+            return f"STALE {self.age_days}d > {self.limit}d, ack lapsed {self.review_by}"
         if self.stale:
             return f"STALE {self.age_days}d > {self.limit}d"
+        if self.resumed:
+            return f"{self.age_days}d, still marked dark"
         return f"{self.age_days}d"
 
 
@@ -84,7 +119,17 @@ def check(
         # collected is a different problem with a different fix.
         return Staleness(spec.id, None, None, limit, stale=False)
     age = (today - latest).days
-    return Staleness(spec.id, latest, age, limit, stale=age > limit)
+    stale = age > limit
+    dark = spec.upstream_dark
+    return Staleness(
+        spec.id,
+        latest,
+        age,
+        limit,
+        stale=stale,
+        acknowledged=stale and dark is not None and today <= dark.review_by,
+        review_by=None if dark is None else dark.review_by,
+    )
 
 
 def check_all(

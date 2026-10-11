@@ -43,7 +43,7 @@ export function ReadingTiles({
         return (
           <div
             key={r.id}
-            className="tile"
+            className={r.stale ? "tile stale" : "tile"}
             style={{ ["--tier" as string]: `var(--${r.tier})` }}
           >
             <div className="tile-label">
@@ -93,6 +93,16 @@ function note(r: Reading, locale: Locale) {
   const t = dict(locale).tiles;
   const where = r.percentile == null ? null : t.percentileNote(r.percentile);
 
+  // First, because every note below describes the present: "below the 5:1
+  // breakeven" said of a number two months old is a claim about today that
+  // the data cannot support.
+  if (r.stale) {
+    return (
+      <>
+        {t.stale(r.age_days ?? 0)} · {r.obs_date}
+      </>
+    );
+  }
   if (r.id === "hog_corn_ratio" && r.value != null && r.value < 5) {
     return t.belowBreakeven;
   }

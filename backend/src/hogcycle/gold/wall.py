@@ -19,6 +19,7 @@ import datetime as dt
 from typing import Any
 
 from ..registry.spec import Registry
+from ..registry.staleness import check
 from ..storage.silver import SilverStore
 
 TIER_ORDER = ("capacity", "margin", "price", "noise", "equity")
@@ -175,6 +176,11 @@ def build_wall(
         values = [r["value"] for r in rows if r["value"] is not None]
         if values:
             latest = rows[-1]
+            # Judged at `moment`, not today, so a wall rebuilt as of a past date
+            # shows what was stale then. A stale reading still gets its tile:
+            # hiding it would be the silent kind of failure. Saying how old it
+            # is lets the reader discount it, which is their call to make.
+            age = check(spec, latest["obs_date"], today=moment.date())
             readings.append(
                 {
                     "id": spec.id,
@@ -191,6 +197,8 @@ def build_wall(
                     else None,
                     "yoy": year_on_year(rows, latest),
                     "n": len(rows),
+                    "stale": age.stale,
+                    "age_days": age.age_days,
                 }
             )
 

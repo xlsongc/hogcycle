@@ -120,6 +120,11 @@ cd frontend && npm install && npm run dev
 「停止推进的序列」当作失败。详见
 [ADR-0013](docs/adr/0013-sow-inventory-moves-to-the-primary-source.md)。
 
+2026 年 8 月，它抓到同一个镜像又停了三张周度表——然后运行连红 26 天没人看，
+这本身也是一种静默。现在停更会自动开一个 GitHub issue，页面会把过期读数标成
+「停更」；已知的停更可以带期限确认（最长 92 天），到期警报自动回来。详见
+[ADR-0015](docs/adr/0015-acknowledged-outages-expire.md)。
+
 以下这些坑，全部编码在 `sources.yaml` 里：
 
 - **能繁母猪存栏在同一列里混了三种粒度。** 2009-2020 是年度值（一份冻结的第三方
@@ -141,7 +146,7 @@ cd frontend && npm install && npm run dev
 ## 状态
 
 阶段一已完成：config → fetch → bronze → validate → silver → gold → contract
-→ 静态看板，69 个测试全部跑在真实抓取的载荷上，看板同时以英文与中文发布。
+→ 静态看板，84 个测试，其中适配器测试全部跑在真实抓取的载荷上，看板同时以英文与中文发布。
 
 下一步：把农业农村部 500 县作为独立的第二口径接进来（这同时能让利润类算术在
 同一份调查内闭合），然后是当初建这套存储就是为了做的双时态验证层。

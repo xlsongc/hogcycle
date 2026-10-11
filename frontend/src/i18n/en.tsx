@@ -73,6 +73,11 @@ export const en = {
     percentile: (name: string, pct: number) =>
       `${name}: ${ordinal(pct)} historical percentile`,
     now: (label: string, value: number) => `${label} now ${value}`,
+    stale: "STALE",
+    staleSince: (date: string, days: number) =>
+      `No new data since ${date} (${days} days)`,
+    was: (label: string, value: number, date: string) =>
+      `${label} was ${value} on ${date}; nothing newer`,
   },
 
   tiles: {
@@ -86,13 +91,18 @@ export const en = {
       </>
     ),
     movingBaseline: "baseline moves, so no gap is computed",
+    stale: (days: number) => (
+      <>
+        <b>Stale</b> · no new data for {days} days
+      </>
+    ),
   },
 
   page: {
     heading: "The Hog Cycle Wall",
-    sub: (
+    sub: (n: number) => (
       <>
-        Twenty series on one shared time axis: a causal-chain wall above, a
+        {n} series on one shared time axis: a causal-chain wall above, a
         free overlay below. This page computes and aligns —{" "}
         <strong>it does not call the phase</strong>. There are roughly three
         cycles of usable history, and any automatic rule would be fitted to its

@@ -48,6 +48,12 @@ def _check(payload: dict[str, Any], schema: dict[str, Any]) -> None:
         if dates != sorted(dates):
             raise ContractError(f"panel {panel['id']!r} points are not ordered by date")
 
+    reading_required = schema["properties"]["readings"]["items"].get("required", [])
+    for reading in payload["readings"]:
+        missing = [k for k in reading_required if k not in reading]
+        if missing:
+            raise ContractError(f"reading {reading.get('id')!r} missing {missing}")
+
 
 def write_contract(
     payload: dict[str, Any],

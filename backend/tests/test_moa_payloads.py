@@ -157,6 +157,23 @@ def test_footnotes_naming_indicators_are_not_read_as_data(registry, payload):
     assert next(o.value for o in obs if o.obs_date == dt.date(2026, 6, 30)) == 42491.0
 
 
+def test_piglet_price_monthly_reads_every_edition_and_skips_its_footnote(
+    registry, payload
+):
+    """The interim primary source while 玄田's weekly 仔猪 table is dark. Every
+    edition also carries a footnote that begins 「“全国仔猪价格”为农业农村部…」;
+    with no period token it must not become a row."""
+    spec, obs = normalise(registry, payload, "piglet_price_monthly")
+    assert {o.obs_date: o.value for o in obs} == {
+        dt.date(2025, 2, 28): 36.21,
+        dt.date(2025, 12, 31): 23.39,
+        dt.date(2026, 6, 30): 22.54,
+        dt.date(2026, 7, 31): 22.64,
+    }
+    assert {o.granularity for o in obs} == {"monthly"}
+    assert validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
+
+
 # --------------------------------------------------------------------------
 # The fetch window
 # --------------------------------------------------------------------------

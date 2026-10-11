@@ -25,7 +25,7 @@ export function Wall({ data, locale }: { data: WallContract; locale: Locale }) {
 
       <header>
         <h1>{t.heading}</h1>
-        <p className="sub">{t.sub}</p>
+        <p className="sub">{t.sub(data.panels.length)}</p>
         <div className="chain">
           <span className="chip">
             <i style={{ background: "var(--capacity)" }} />

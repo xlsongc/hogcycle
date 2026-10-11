@@ -57,6 +57,10 @@ export const zh: Dict = {
     noPercentile: (name: string) => `${name}：历史分位不足，样本太短`,
     percentile: (name: string, pct: number) => `${name}：历史第 ${pct} 分位`,
     now: (label: string, value: number) => `${label} 当前 ${value}`,
+    stale: "停更",
+    staleSince: (date: string, days: number) => `${date} 之后无新数据（${days} 天）`,
+    was: (label: string, value: number, date: string) =>
+      `${label} 在 ${date} 为 ${value}，之后无新数据`,
   },
 
   tiles: {
@@ -70,13 +74,18 @@ export const zh: Dict = {
       </>
     ),
     movingBaseline: "基准为移动值，故不计缺口",
+    stale: (days: number) => (
+      <>
+        <b>停更</b> · {days} 天无新数据
+      </>
+    ),
   },
 
   page: {
     heading: "猪周期图表墙",
-    sub: (
+    sub: (n: number) => (
       <>
-        二十个序列，一条共享时间轴：上半部是因果链图表墙，下半部可自选叠放。
+        {n} 个序列，一条共享时间轴：上半部是因果链图表墙，下半部可自选叠放。
         本页只做计算与对齐，<strong>不做阶段判定</strong>
         ——可用历史约三轮周期，任何自动判定规则都会被自己的样本拟合。
       </>

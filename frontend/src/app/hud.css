@@ -481,3 +481,24 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- a series that has stopped advancing ---------- */
+
+/* Text rather than colour alone, so the state survives greyscale and screen
+   readers; the colour only repeats what the word already says. */
+.stale-tag {
+  margin-left: 6px;
+  padding: 0 3px;
+  border: 1px solid var(--critical);
+  color: var(--critical);
+  font-style: normal;
+  font-size: var(--type);
+  line-height: 1.2;
+}
+
+/* The value keeps its place on the instrument but drops to the muted ink, so
+   it cannot pass for a live reading at a glance. */
+.gauge.stale .gauge-value,
+.scale-now.stale {
+  color: var(--muted);
+}

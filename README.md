@@ -133,6 +133,13 @@ last rows, so the collector reported success every morning for eleven months.
 advancing as a failure. See
 [ADR-0013](docs/adr/0013-sow-inventory-moves-to-the-primary-source.md).
 
+It caught the same mirror freezing three more weekly tables in August 2026,
+and then the run stayed red for 26 days unread, which is its own kind of
+silence. Now a freeze opens a GitHub issue, and the page marks a stale reading
+as stale. A known outage can be acknowledged with a deadline of at most 92
+days, after which the alarm returns on its own. See
+[ADR-0015](docs/adr/0015-acknowledged-outages-expire.md).
+
 Traps, all encoded in `sources.yaml`:
 
 - **Breeding sow inventory mixes three granularities in one column.**
@@ -162,7 +169,7 @@ Traps, all encoded in `sources.yaml`:
 ## Status
 
 Phase 1 complete: config → fetch → bronze → validate → silver → gold →
-contract → static dashboard, with 69 tests over real captured payloads, and the
+contract → static dashboard, with 84 tests, the adapters among them over real captured payloads, and the
 dashboard published in English and Chinese.
 
 Next: the ministry's 500-county survey as an independent second caliber (which

@@ -30,8 +30,11 @@ export function Bar({ reading, locale }: { reading: Reading; locale: Locale }) {
   const lit = litSegments(pct, SEGMENTS);
 
   return (
-    <div className="gauge">
-      <span className="gauge-label">{name}</span>
+    <div className={reading.stale ? "gauge stale" : "gauge"}>
+      <span className="gauge-label">
+        {name}
+        {reading.stale && <StaleTag date={reading.obs_date} days={reading.age_days} locale={locale} />}
+      </span>
       <span
         className="gauge-track"
         role="img"
@@ -49,6 +52,26 @@ export function Bar({ reading, locale }: { reading: Reading; locale: Locale }) {
   );
 }
 
+/** Marks a reading whose series has stopped advancing. The instrument stays on
+ *  the panel, since removing it would be the silent kind of failure, but it
+ *  may not pass for a live one. */
+function StaleTag({
+  date,
+  days,
+  locale,
+}: {
+  date: string;
+  days?: number | null;
+  locale: Locale;
+}) {
+  const t = dict(locale).gauge;
+  return (
+    <em className="stale-tag" title={t.staleSince(date, days ?? 0)}>
+      {t.stale}
+    </em>
+  );
+}
+
 type ScaleProps = {
   min: number;
   max: number;
@@ -57,6 +80,9 @@ type ScaleProps = {
   unit: string;
   /** A line that means something in the domain, e.g. the 5:1 盈亏线. */
   threshold?: { value: number; label: string } | null;
+  /** Set when the series has stopped advancing: the marker then reads as
+   *  "was, on this date", not "now". */
+  stale?: { date: string; days?: number | null } | null;
   locale: Locale;
 };
 
@@ -80,7 +106,16 @@ function niceStep(span: number, target: number): number {
  * is also what lets the marker say something: 4.55 sitting just *below* the
  * 5:1 line is the whole point of showing this series at all.
  */
-export function Scale({ min, max, value, label, unit, threshold, locale }: ScaleProps) {
+export function Scale({
+  min,
+  max,
+  value,
+  label,
+  unit,
+  threshold,
+  stale,
+  locale,
+}: ScaleProps) {
   const t = dict(locale).gauge;
   const lo = Math.min(min, value ?? min, threshold?.value ?? min);
   const hi = Math.max(max, value ?? max, threshold?.value ?? max);
@@ -97,7 +132,10 @@ export function Scale({ min, max, value, label, unit, threshold, locale }: Scale
   return (
     <div className="scale">
       <div className="scale-head">
-        <span>{label}</span>
+        <span>
+          {label}
+          {stale && <StaleTag date={stale.date} days={stale.days} locale={locale} />}
+        </span>
         <span className="scale-unit">{unitOf(unit, locale)}</span>
       </div>
 
@@ -118,10 +156,10 @@ export function Scale({ min, max, value, label, unit, threshold, locale }: Scale
 
         {value != null && (
           <span
-            className="scale-now num"
+            className={stale ? "scale-now num stale" : "scale-now num"}
             style={{ top: `${y(value)}%` }}
             role="img"
-            aria-label={t.now(label, value)}
+            aria-label={stale ? t.was(label, value, stale.date) : t.now(label, value)}
           >
             <b aria-hidden="true">◀</b>
             {value}

@@ -58,6 +58,13 @@ with zero HTTP requests.
   months. `hogcycle status --fail-on-stale` is the guard. When a series is
   genuinely finished because upstream closed a caliber, mark it `retired` in
   config; do not silence the guard by loosening a threshold.
+- **A known outage gets an owner and a deadline, not silence.** When the
+  caliber is alive but the source we reach went dark, and the primary-source
+  fix is not built yet, mark it `upstream_dark` with a `review_by` at most 92
+  days out (ADR-0015). It stops failing the run until that date, then fails
+  again by itself. The page still shows it as stale: an acknowledgement quiets
+  the collector, never the reader. A red run nobody reads hides the next
+  freeze, which is why this exists. It is not a way to get CI green.
 - **Prefer the primary source to a mirror.** A convenient wrapper around
   someone else's copy of a government release inherits their outages and
   their abandonment, and tells you about neither.
@@ -134,6 +141,7 @@ hogcycle collect                     # all indicators; one failure does not abor
 hogcycle collect --months-back 60    # backfill 农业农村部 editions (default 6)
 hogcycle status                      # coverage, latest obs_date, and age per series
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
+hogcycle status --json               # one object per series; the stale-series issue reads it
 hogcycle revisions --indicator sow_inventory
 hogcycle export                      # gold → frontend/src/data/wall.json
 hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
@@ -166,3 +174,4 @@ so you do not have to re-derive them.
 | 0012 | The overlay normalises rather than adding an axis |
 | 0013 | 能繁母猪存栏 moves to the primary source; staleness is a failure |
 | 0014 | Two prerendered languages; names travel in the contract |
+| 0015 | A known outage is acknowledged with a deadline; the page still says so |

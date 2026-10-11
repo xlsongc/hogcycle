@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import logging
 import sys
 from pathlib import Path
@@ -45,7 +46,14 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--fail-on-stale",
         action="store_true",
-        help="status: exit non-zero if any series has stopped advancing",
+        help="status: exit non-zero if any series has stopped advancing "
+        "without an unexpired upstream_dark acknowledgement",
+    )
+    p.add_argument(
+        "--json",
+        action="store_true",
+        help="status: print one JSON object per series instead of the table, "
+        "for the workflow that files the stale-series issue",
     )
     return p
 
@@ -114,6 +122,24 @@ def main(argv: list[str] | None = None) -> int:
         rows = {r["indicator"]: r for r in silver.coverage()}
         latest = {k: v["latest"] for k, v in rows.items() if v["latest"]}
         ages = {s.indicator: s for s in check_all(registry, latest)}
+        failing = [s for s in ages.values() if s.failing]
+
+        if args.json:
+            for spec in registry:
+                st = ages[spec.id]
+                print(json.dumps({
+                    "indicator": spec.id,
+                    "latest": None if st.latest is None else st.latest.isoformat(),
+                    "age_days": st.age_days,
+                    "limit": st.limit,
+                    "stale": st.stale,
+                    "failing": st.failing,
+                    "acknowledged": st.acknowledged,
+                    "review_by": None if st.review_by is None else st.review_by.isoformat(),
+                    "retired": st.retired,
+                }))
+            return 1 if args.fail_on_stale and failing else 0
+
         print(
             f"{'indicator':<20} {'tier':<9} {'n':>6}  {'first':<12} "
             f"{'latest':<12} {'age':<16}"
@@ -129,16 +155,28 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print(f"{spec.id:<20} {spec.tier:<9} {'—':>6}  (no data)")
 
-        stale = [s for s in ages.values() if s.stale]
-        if stale:
+        acked = [s for s in ages.values() if s.acknowledged]
+        if acked:
+            # Printed every run on purpose. Acknowledged is not resolved: the
+            # number on the site is still old, and someone owes a fix.
+            print(f"\n{len(acked)} series are dark upstream and acknowledged:")
+            for s in acked:
+                print(f"  {s.indicator:<20} latest {s.latest}  review by {s.review_by}")
+        resumed = [s for s in ages.values() if s.resumed]
+        if resumed:
+            print("\nAdvancing again but still marked upstream_dark — remove the mark:")
+            for s in resumed:
+                print(f"  {s.indicator:<20} latest {s.latest}")
+
+        if failing:
             # Loud, and worth the paragraph: this is the exact failure that
             # hid an eleven-month freeze in the leading indicator.
             print(
-                f"\n{len(stale)} series have stopped advancing — an upstream "
+                f"\n{len(failing)} series have stopped advancing — an upstream "
                 "that keeps serving its last payload looks identical to a "
                 "quiet day:"
             )
-            for s in stale:
+            for s in failing:
                 print(f"  {s.indicator:<20} latest {s.latest}  ({s.note})")
             return 1 if args.fail_on_stale else 0
         return 0

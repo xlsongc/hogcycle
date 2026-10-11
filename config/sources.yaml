@@ -13,6 +13,12 @@
 # date/value —— 那是一个明确约定，不是模糊猜测。之前那份靠全局候选列名猜列的
 # 实现，正是 sow_inventory 静默采不进来的根因。
 #
+# upstream_dark 是介于「活着」和 retired 之间的第三种状态：口径还在，但我们
+# 够得着的源停更了，一手来源的 adapter 还没建。陈旧度守卫照样每次报它、网站
+# 照样标它过期，只是到 review_by 之前不再让运行变红 —— 过了这天自动重新变红。
+# 一次最多 92 天，续期要改 review_by 提交一次，是个有人负责的决定。
+# 别拿它代替 retired（口径关闭）或调松 max_age_days（节奏本来就慢）。
+#
 # freq 是「裸日期标签」的兜底粒度。带中文期间标签的行（2009 / 2025年7月 /
 # 2025年一季度（末） / 2018年第01周）由标签自己决定粒度，逐行记录。
 
@@ -120,12 +126,39 @@ indicators:
     hi: 200.0
     adapter: akshare
     call: {fn: futures_hog_cost, symbol: 仔猪价格}
+    upstream_dark:
+      acknowledged: 2026-10-11
+      review_by: 2026-12-31
+      reason: >
+        玄田这张周度表最后一行是 2026-08-20，之后照常返回旧数据；同站的玉米、
+        外三元日频表一直在更新，所以不是网络或 VPN 问题，是镜像停了这张表 ——
+        与 ADR-0013 同一种故障。一手来源是农业农村部 500 县集贸市场周报
+        （ADR-0005），adapter 建成前由 piglet_price_monthly 提供同一调查的月均值。
     notes: >
       补栏意愿的价格表达，是产能层里最灵敏的一个。它是日频市场定价、永不修订，
       在「养殖户想不想补栏」这件事上比能繁母猪存栏更早也更干净 —— 母猪存栏是
       补栏行为的结果，仔猪价是补栏意愿的即时报价。
       注意源站按公斤报价，而行业新闻常按元/头报 7kg 断奶仔猪 —— 换算前先确认
       体重口径。
+
+  - id: piglet_price_monthly
+    name_zh: 仔猪价格（月均）
+    name_en: Piglet price (monthly mean)
+    tier: capacity
+    freq: monthly
+    unit: CNY/kg
+    lo: 5.0
+    hi: 200.0
+    adapter: moa
+    call: {fn: moa_hog_release}
+    extract: {value: 全国仔猪价格}
+    notes: >
+      农业农村部全国 500 个县域中心集贸市场固定监测的仔猪价格，随五部委联合发布
+      每月一期。与 piglet_price 是同一套调查：2021-12 至 2026-07 的 55 个月里，
+      43 个月与玄田周度值的当月均值精确到分相同，53 个月相差在 1% 以内。
+      但它是月均而不是周值 —— 粒度不同就是两个指标，不接成一条线。
+      2026-10 加入，作为玄田周度表停更期间的一手替代；500 县周报 adapter 建成后
+      周度回到一手来源，本序列作为月度口径继续保留。
 
   - id: sow_binary_price
     name_zh: 二元母猪价格
@@ -175,6 +208,13 @@ indicators:
     hi: 25.0
     adapter: akshare
     call: {fn: futures_hog_supply, symbol: 猪粮比价}
+    upstream_dark:
+      acknowledged: 2026-10-11
+      review_by: 2026-12-31
+      reason: >
+        玄田这张周度表最后一行是 2026-08-19，之后照常返回旧数据，同站日频表照常
+        更新。一手来源是国家发改委每周发布的猪粮比价，需要新 adapter。农业农村部
+        月度联合发布里没有这一项，所以没有临时替代。
     notes: >
       官方调控触发线 5:1（过度下跌一级预警）。历史深度约 6 年，是一期里
       养殖利润的代理指标 —— 真实测算要等农业农村部 500 县同口径成本数据接入。
@@ -224,6 +264,14 @@ indicators:
     adapter: akshare
     call: {fn: futures_hog_supply, symbol: 白条肉}
     extract: {period: 周期, value: 白条肉平均出厂价格}
+    upstream_dark:
+      acknowledged: 2026-10-11
+      review_by: 2026-12-31
+      reason: >
+        玄田这张周度表最后一行是 2026年第33周，之后照常返回旧数据，同站日频表
+        照常更新。一手来源是农业农村部屠宰行业监测的周度出厂价，需要新 adapter；
+        接入时先核对 2025年7月 屠宰统计扩大覆盖面时这条价格的口径是否也变了。
+        联合发布里的「批发市场白条猪价格」是批发端，不是出厂价，不能顶替。
     notes: >
       屠宰端出厂价，约 8.5 年周频。期间标签形如「2018年第01周」，由周解析器
       映射到该 ISO 周的周日；第N周与 ISO 周在年末年初可能差几天，对周频序列

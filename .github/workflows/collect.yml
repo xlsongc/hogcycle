@@ -9,6 +9,8 @@ on:
 # rewriting it destroys exactly the history the project exists to keep.
 permissions:
   contents: write
+  # The stale-series issue. A red run alone stayed red for 26 days unread.
+  issues: write
 
 # A manual dispatch overlapping the cron run would race on push. Queue instead
 # of cancelling — a skipped run silently loses a day of daily series, which
@@ -48,6 +50,21 @@ jobs:
       # source, not a reason to throw away the data this run did collect.
       # Failing here turns the eleven-month silent freeze that motivated
       # docs/adr/0013 into a red run on the first day it would recur.
-      - name: Fail if any series has stopped advancing
+      - name: Check for series that have stopped advancing
+        id: stale
         if: always()
-        run: hogcycle status --fail-on-stale
+        run: |
+          hogcycle status | tee status.txt
+          hogcycle status --json > status.jsonl
+
+      # A red run is easy to stop hearing. The issue is what reaches a person;
+      # see the script for why it comments only when something changed.
+      - name: File, update or close the stale-series issue
+        if: always() && steps.stale.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/stale-issue.sh status.txt status.jsonl
+
+      - name: Fail if any series has stopped advancing
+        if: always() && steps.stale.outcome == 'success'
+        run: hogcycle status --fail-on-stale > /dev/null

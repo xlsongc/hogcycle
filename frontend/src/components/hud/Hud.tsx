@@ -26,7 +26,10 @@ import { dict } from "@/i18n/dict";
  *  tier filter: the header is a hand-picked instrument panel, not an
  *  exhaustive listing, and the wall below already shows everything. */
 const LEFT = ["sow_inventory", "hog_inventory", "slaughter"];
-const RIGHT = ["hog_price_index", "piglet_price", "corn_price"];
+// 仔猪 is the monthly primary-source print while 玄田's weekly table is dark
+// upstream (config: piglet_price.upstream_dark). Swap back once the 500县
+// weekly adapter lands.
+const RIGHT = ["hog_price_index", "piglet_price_monthly", "corn_price"];
 const HERO = "sow_inventory";
 const SCALE_OF = "hog_corn_ratio";
 
@@ -134,6 +137,7 @@ export function Hud({ data, locale }: { data: WallContract; locale: Locale }) {
             label={nameOf(ratio, locale)}
             unit="RATIO"
             threshold={ratioThreshold}
+            stale={ratio.stale ? { date: ratio.obs_date, days: ratio.age_days } : null}
             locale={locale}
           />
         )}
