@@ -68,4 +68,22 @@ export interface Reading {
   stale: boolean;
   /** Days from obs_date to generated_at: how far the reader should discount a stale reading. */
   age_days?: number | null;
+  /** UTC date this warehouse first learned the latest observation (transaction time). For a backfilled series it is the backfill date, not the publisher's release date. */
+  first_seen: string | null;
+  /** Set when the latest value is the lowest or highest the series has been for at least a year. since is the most recent earlier observation at least as extreme, or the window's first observation when all is true. A fact with a fixed definition, never a phase call. */
+  extreme: Extreme | null;
+  /** For a series with a domain threshold: how many consecutive observations sit on the latest value's side of it, and since when. A value on the line counts as above. */
+  threshold_run: ThresholdRun | null;
+}
+
+export interface Extreme {
+  kind: "low" | "high";
+  since: string;
+  all: boolean;
+}
+
+export interface ThresholdRun {
+  side: "below" | "above";
+  since: string;
+  n: number;
 }

@@ -23,31 +23,13 @@
  */
 
 import { useEffect, useMemo, useRef } from "react";
-import * as echarts from "echarts/core";
-import { LineChart } from "echarts/charts";
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  AxisPointerComponent,
-  MarkLineComponent,
-} from "echarts/components";
-import { CanvasRenderer } from "echarts/renderers";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { shiftMonths } from "@/lib/dates";
 
 import type { Panel } from "@/types/generated/wall";
+import { echarts } from "./base/echarts";
 import { cssVar, fmt, monoFont, slotColor } from "./base/theme";
-
-echarts.use([
-  LineChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  AxisPointerComponent,
-  MarkLineComponent,
-  CanvasRenderer,
-]);
 
 export type LagSpec = { id: string; months: number };
 
@@ -61,17 +43,6 @@ type Props = {
   lag: LagSpec | null;
   locale: Locale;
 };
-
-/** Shifts a date forward by whole months, clamping to the month's length. */
-function shiftMonths(iso: string, months: number): string {
-  if (!months) return iso;
-  const [y, m, d] = iso.split("-").map(Number) as [number, number, number];
-  const total = (y * 12 + (m - 1)) + months;
-  const ny = Math.floor(total / 12);
-  const nm = (total % 12) + 1;
-  const last = new Date(Date.UTC(ny, nm, 0)).getUTCDate();
-  return `${ny}-${String(nm).padStart(2, "0")}-${String(Math.min(d, last)).padStart(2, "0")}`;
-}
 
 export function Overlay({ panels, selected, slots, min, max, lag, locale }: Props) {
   const t = dict(locale);

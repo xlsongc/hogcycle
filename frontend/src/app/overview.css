@@ -1,0 +1,128 @@
+/* The overview page: the thesis chart, the computed facts, and the table of
+   every reading. */
+
+.thesis .bar {
+  margin: 0 0 10px;
+}
+
+/* ---------- what the numbers say ---------- */
+
+.fact-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 14px 28px;
+}
+
+.fact-group h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin: 0 0 6px;
+}
+
+.fact-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact-group li {
+  padding: 6px 0;
+  border-top: 1px solid var(--grid);
+  color: var(--ink-2);
+}
+
+.fact-group li b {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+/* ---------- every reading ---------- */
+
+/* The table scrolls sideways inside its own frame on a narrow screen, so the
+   page itself never does. */
+.readings-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-1);
+}
+
+table.readings th,
+table.readings td {
+  padding: 7px 11px;
+}
+
+table.readings thead th {
+  position: static;
+}
+
+table.readings td:first-child {
+  font-family: var(--sans);
+  font-size: var(--type);
+}
+
+table.readings td b {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+table.readings .tier-row th {
+  text-align: left;
+  color: var(--tier, var(--muted));
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--grid);
+  border-top: 1px solid var(--grid);
+  cursor: help;
+}
+
+table.readings tr.stale td:nth-child(2) b {
+  color: var(--muted);
+}
+
+.row-note {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* A reading's place in its own history: a line from its lowest reading to its
+   highest, with a mark where today sits. A segmented bar with one block lit
+   read as broken; a mark near the left end reads as "near the bottom". */
+.position {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: help;
+}
+
+.strip {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 7px;
+  border-left: 1px solid var(--axis);
+  border-right: 1px solid var(--axis);
+}
+
+.strip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3px;
+  height: 1px;
+  background: var(--axis);
+}
+
+.strip i {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 7px;
+  margin-left: -1px;
+  background: var(--tier, var(--ink));
+}

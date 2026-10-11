@@ -1,0 +1,163 @@
+/* The small-multiples wall and everything that reads it: panels, the probe
+   label beside the cursor, the drag-to-zoom band, and the toolbar that stays
+   pinned above the wall with its time axis. */
+
+.wall {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.panel + .panel {
+  border-top: 1px solid var(--grid);
+}
+
+/* Landing on /wall/#id must not tuck the panel under the pinned toolbar. */
+.panel {
+  scroll-margin-top: 112px;
+}
+
+.panel:target {
+  box-shadow: inset 2px 0 0 var(--tier, var(--muted));
+}
+
+.panel:target .panel-title {
+  text-decoration: underline;
+  text-decoration-color: var(--tier, var(--muted));
+  text-underline-offset: 4px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  padding: 10px 14px 0;
+}
+
+.panel-title {
+  font-size: var(--type);
+  color: var(--ink);
+}
+
+.panel-unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* The header readout is where every panel reports the hovered date, so it
+   has to be legible at a glance: the value in full ink, the date beside it. */
+.panel-readout {
+  margin-left: 2px;
+  display: inline-flex;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.panel-readout b {
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.panel-readout.live b {
+  color: var(--tier, var(--ink));
+}
+
+.panel-tier {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--tier, var(--muted));
+  letter-spacing: 0.04em;
+  cursor: help;
+}
+
+.panel-body {
+  position: relative;
+}
+
+.panel-chart {
+  height: 104px;
+}
+
+.panel-chart.tall {
+  height: 124px;
+}
+
+.panel-chart.hero {
+  height: 176px;
+}
+
+/* ---------- reading beside the cursor ---------- */
+
+.probe {
+  position: absolute;
+  top: 6px;
+  margin-left: 14px;
+  z-index: 3;
+  pointer-events: none;
+  padding: 4px 8px;
+  background: var(--ink);
+  color: var(--page);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.probe b {
+  font-weight: 400;
+}
+
+/* Past the right two-fifths, the label goes to the cursor's left instead of
+   running off the panel. */
+.probe.flip {
+  margin-left: 0;
+  transform: translateX(calc(-100% - 14px));
+}
+
+/* ---------- drag to zoom ---------- */
+
+.drag-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: var(--chip);
+  border-left: 1px solid var(--axis);
+  border-right: 1px solid var(--axis);
+}
+
+.panel-chart {
+  cursor: crosshair;
+}
+
+/* ---------- the pinned toolbar ---------- */
+
+.wall-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: var(--page);
+  padding-top: 4px;
+  margin-top: 14px;
+  border-bottom: 1px solid var(--grid);
+}
+
+.wall-toolbar .bar {
+  margin-top: 6px;
+}
+
+/* One pixel of border either side, matching the wall's, so the ruler's ticks
+   sit exactly above the panels' grid. */
+.ruler {
+  height: 28px;
+  margin: 0 1px;
+}
+
+.how-to {
+  margin-top: 12px;
+}

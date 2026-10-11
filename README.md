@@ -62,8 +62,8 @@ backend/src/hogcycle/
 
 frontend/src/
   app/(en)/ app/(zh)/       one prerendered root layout per language
-  charts/                   ECharts panels + the connected wall
-  components/               instrument header, tiles, table view, toggles
+  charts/                   ECharts panels, the wall, time-synced crosshair
+  components/               page bodies, instrument header, overview, nav
   i18n/                     every string the UI renders, in both languages
   types/generated/          generated from contracts/ — never hand-written
 ```
@@ -113,6 +113,20 @@ that can be shared and indexed and a correct `lang` attribute in the markup it
 serves. Indicator names travel in the contract in both languages, because the
 caliber lives in the name and a lookup table on the frontend would be free to
 drift from it. See [ADR-0014](docs/adr/0014-the-site-speaks-two-languages.md).
+
+Each language has three pages:
+
+- **Overview**: the instrument header; the thesis (breeding sows shifted by
+  the biological lag, above the hog price); "what the numbers say", which are
+  facts with fixed definitions computed in the pipeline and never a phase
+  call; and every reading in one table.
+- **Causal-chain wall**: every cycle series on one time axis. Hover to read
+  every panel at one date, drag to zoom, double-click to reset. The time
+  axis stays pinned while the wall scrolls.
+- **Compare**: any series on one axis, with one shiftable to test a lead.
+
+Every view (window, zoom, selection, shift) lives in the URL, so a view is a
+link. See [ADR-0016](docs/adr/0016-pages-and-a-crosshair-synced-by-time.md).
 
 ## Data sources and caveats
 
@@ -169,8 +183,9 @@ Traps, all encoded in `sources.yaml`:
 ## Status
 
 Phase 1 complete: config → fetch → bronze → validate → silver → gold →
-contract → static dashboard, with 84 tests, the adapters among them over real captured payloads, and the
-dashboard published in English and Chinese.
+contract → static dashboard, with 94 tests, the adapters among them over real
+captured payloads, and the site published in English and Chinese as three
+pages each.
 
 Next: the ministry's 500-county survey as an independent second caliber (which
 also closes margin arithmetic within one survey), then the bitemporal

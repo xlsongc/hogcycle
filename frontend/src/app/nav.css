@@ -1,0 +1,99 @@
+/* The bar across the top of every page. */
+
+.site-nav {
+  border-bottom: 1px solid var(--grid);
+  background: var(--page);
+}
+
+.site-nav-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-nav ul {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav ul a {
+  display: inline-block;
+  padding: 4px 9px;
+  color: var(--ink-2);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.site-nav ul a:hover,
+.site-nav ul a:focus-visible {
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+/* The current page is marked by a border as well as ink, so it does not rest
+   on colour alone. */
+.site-nav ul a[aria-current="page"] {
+  color: var(--ink);
+  border-color: var(--axis);
+  background: var(--surface-1);
+}
+
+.site-nav-end {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- language switch ---------- */
+
+/* Set as plate labels, like the header's chrome. The current language is
+   stated, not offered. */
+.lang {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.lang a,
+.lang b {
+  color: var(--muted);
+  font-weight: 400;
+  text-decoration: none;
+  padding: 2px 5px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.lang a:hover,
+.lang a:focus-visible {
+  color: var(--ink);
+  border-color: var(--border);
+}
+
+/* The current language is stated, not offered. Marking it with a border
+   rather than only a colour keeps it distinguishable without hue. */
+.lang b[aria-current] {
+  color: var(--ink);
+  border-color: var(--border);
+  background: var(--surface-1);
+}

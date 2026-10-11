@@ -14,6 +14,27 @@ export const LOCALES: readonly Locale[] = ["en", "zh"] as const;
 /** English is the default, so it owns the root path. */
 export const PATH: Record<Locale, string> = { en: "/", zh: "/zh/" };
 
+/** The site's pages. Each is prerendered once per locale, so a page is a
+ *  (locale, page) pair and every one of them has its own shareable URL. */
+export type Page = "overview" | "wall" | "compare";
+
+export const PAGES: readonly Page[] = ["overview", "wall", "compare"] as const;
+
+const SLUG: Record<Page, string> = { overview: "", wall: "wall/", compare: "compare/" };
+
+/** Trailing slash included: GitHub Pages serves /wall/ as /wall/index.html,
+ *  and next.config sets trailingSlash for the same reason. */
+export function pathOf(locale: Locale, page: Page): string {
+  return PATH[locale] + SLUG[page];
+}
+
+/** Which page a pathname is, from either locale. `usePathname` already has
+ *  the basePath removed, so this only has to strip the language prefix. */
+export function pageOf(pathname: string): Page {
+  const rest = pathname.replace(/^\/zh(?=\/|$)/, "").replace(/\/+$/, "");
+  return PAGES.find((p) => SLUG[p] && rest === `/${SLUG[p].slice(0, -1)}`) ?? "overview";
+}
+
 /** For the <html lang> attribute. Chinese is region-tagged because zh alone
  *  leaves a reader to guess between simplified and traditional forms. */
 export const HTML_LANG: Record<Locale, string> = { en: "en", zh: "zh-CN" };

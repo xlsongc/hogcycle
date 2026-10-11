@@ -29,10 +29,12 @@ export function tierColor(tier: Tier): string {
 }
 
 /** next/font generates a hashed family name, so the literal "Departure Mono"
- *  resolves to nothing inside a canvas. Read the variable the loader sets. */
+ *  resolves to nothing inside a canvas. Read the variables the loader sets —
+ *  both of them, so Chinese in a canvas label (数据始于, 盈亏线) lands on the
+ *  same pixel face as the page instead of a heavy system fallback. */
 export function monoFont(): string {
-  const v = cssVar("--font-departure", "");
-  return v ? `${v}, monospace` : "ui-monospace, monospace";
+  const faces = [cssVar("--font-departure", ""), cssVar("--font-zpix", "")].filter(Boolean);
+  return faces.length ? `${faces.join(", ")}, monospace` : "ui-monospace, monospace";
 }
 
 /** Formats a value the way its unit wants to be read.
@@ -59,7 +61,18 @@ type BaseArgs = {
   max: string;
   showAxisLabels: boolean;
   locale: Locale;
+  /** A vertical line at a date that means something, e.g. today on a chart
+   *  whose shifted series runs past it. */
+  marker?: { date: string; label: string } | null;
 };
+
+/** Series ids, so a single series can be updated without resending the
+ *  whole option — the probe dot moves on every pointer move. */
+export const SERIES = { line: "line", coarse: "coarse", probe: "probe" } as const;
+
+/** Below this share of the window, a "data starts here" label would not fit
+ *  inside its shaded band, so the band is drawn bare. */
+const START_LABEL_MIN_SHARE = 0.18;
 
 /**
  * A y-range snapped to round numbers around the data.
@@ -112,7 +125,7 @@ function niceUnit(x: number): number {
  * would invent a correlation the data does not contain.
  */
 export function panelOption(
-  { panel, min, max, showAxisLabels, locale }: BaseArgs
+  { panel, min, max, showAxisLabels, locale, marker }: BaseArgs
 ): EChartsOption {
   const name = nameOf(panel, locale);
   const color = tierColor(panel.tier);
@@ -136,9 +149,20 @@ export function panelOption(
 
   const yScale = domain(panel);
 
+  // A daily series holds about a year (docs/adr/0004). On an 11-year axis an
+  // empty decade beside it reads as missing data; shading it says "this
+  // series starts here" instead.
+  const first = panel.points.find((p) => p.v != null)?.d;
+  const before = first && first > min ? first : null;
+  const share = before
+    ? (Date.parse(before) - Date.parse(min)) / (Date.parse(max) - Date.parse(min) || 1)
+    : 0;
+  const chip = cssVar("--chip", "rgba(0,0,0,.045)");
+
   return {
     animation: false,
-    grid: { left: 58, right: 58, top: 8, bottom: showAxisLabels ? 22 : 8 },
+    // A marker's label sits above the plot, so it needs the headroom.
+    grid: { left: 58, right: 58, top: marker ? 18 : 8, bottom: showAxisLabels ? 22 : 8 },
     xAxis: {
       type: "time",
       min,
@@ -152,7 +176,16 @@ export function panelOption(
         fontSize: 11,
       },
       splitLine: { show: false },
-      axisPointer: { show: true, label: { show: false }, lineStyle: { color: muted, width: 1 } },
+      axisPointer: {
+        show: true,
+        // Off, because ECharts would otherwise light the *nearest* point at
+        // any distance: hovering 2024 lit 屠宰量's first point in 2025-07
+        // while its header said "no data near this date". The probe series
+        // below draws the dot only when an observation is genuinely near.
+        triggerEmphasis: false,
+        label: { show: false },
+        lineStyle: { color: muted, width: 1 },
+      },
     },
     yAxis: {
       type: "value",
@@ -173,6 +206,7 @@ export function panelOption(
     },
     series: [
       {
+        id: SERIES.line,
         type: "line",
         name,
         data,
@@ -182,19 +216,62 @@ export function panelOption(
         lineStyle: { width: 2, color },
         itemStyle: { color, borderColor: surface, borderWidth: 2 },
         emphasis: { scale: 1.4 },
-        markLine: panel.threshold
+        markLine:
+          panel.threshold || marker
+            ? {
+                silent: true,
+                symbol: "none",
+                data: [
+                  ...(panel.threshold
+                    ? [
+                        {
+                          yAxis: panel.threshold.value,
+                          lineStyle: { color: critical, width: 1, type: [4, 3] as number[] },
+                          label: {
+                            formatter: labelOf(panel.threshold, locale),
+                            color: critical,
+                            fontSize: 11,
+                            fontFamily: monoFont(),
+                            position: "insideEndTop" as const,
+                          },
+                        },
+                      ]
+                    : []),
+                  ...(marker
+                    ? [
+                        {
+                          xAxis: marker.date,
+                          lineStyle: { color: muted, width: 1, type: [2, 3] as number[] },
+                          // "end" draws upright above the line's top; the
+                          // inside positions run the text along the line,
+                          // which on a vertical line means sideways.
+                          label: {
+                            formatter: marker.label,
+                            color: muted,
+                            fontSize: 11,
+                            fontFamily: monoFont(),
+                            position: "end" as const,
+                            distance: 2,
+                          },
+                        },
+                      ]
+                    : []),
+                ],
+              }
+            : undefined,
+        markArea: before
           ? {
               silent: true,
-              symbol: "none",
-              data: [{ yAxis: panel.threshold.value }],
-              lineStyle: { color: critical, width: 1, type: [4, 3] },
+              itemStyle: { color: chip },
               label: {
-                formatter: labelOf(panel.threshold, locale),
-                color: critical,
+                show: share >= START_LABEL_MIN_SHARE,
+                position: "insideRight",
+                color: muted,
                 fontSize: 11,
                 fontFamily: monoFont(),
-                position: "insideEndTop",
+                formatter: dict(locale).chart.startsAt(before.slice(0, 7)),
               },
+              data: [[{ xAxis: min }, { xAxis: before }]],
             }
           : undefined,
         markPoint: {
@@ -231,6 +308,7 @@ export function panelOption(
       ...(mixed
         ? [
             {
+              id: SERIES.coarse,
               type: "scatter" as const,
               name: `${name} (${dict(locale).chart.coarse})`,
               silent: true,
@@ -244,6 +322,17 @@ export function panelOption(
             },
           ]
         : []),
+      // The hovered observation, filled by the panel on pointer moves. Empty
+      // whenever nothing sits near the pointer, which is the whole point.
+      {
+        id: SERIES.probe,
+        type: "scatter" as const,
+        silent: true,
+        z: 5,
+        symbolSize: 9,
+        data: [] as [string, number][],
+        itemStyle: { color, borderColor: surface, borderWidth: 2 },
+      },
     ],
   };
 }

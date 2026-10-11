@@ -12,10 +12,19 @@ export const zh: Dict = {
   meta: {
     title: "猪周期图表墙",
     description: "把猪周期的因果链放在一条共享时间轴上，供人判断，不代人判断。",
+    pages: {
+      overview: "总览",
+      wall: "因果链图表墙",
+      compare: "对比",
+    },
   },
 
   nav: {
+    pages: "页面",
     language: "语言",
+    overview: "总览",
+    wall: "因果链",
+    compare: "对比",
   },
 
   hud: {
@@ -61,35 +70,83 @@ export const zh: Dict = {
     staleSince: (date: string, days: number) => `${date} 之后无新数据（${days} 天）`,
     was: (label: string, value: number, date: string) =>
       `${label} 在 ${date} 为 ${value}，之后无新数据`,
+    open: (name: string) => `在图表墙上查看${name}`,
   },
 
-  tiles: {
+  overview: {
+    thesisHeading: "产能领先价格",
+    thesisNote: (
+      <>
+        把能繁母猪存栏按所选月数整体前移，放在它理应领先的猪价上方。这个滞后由生物学
+        钉死在 10–12 个月（妊娠 114 天 + 育肥约 6 个月），所以位移量不是拟合出来的参数。
+        两格共用一条时间轴、各自一套纵轴：<b>不是双轴图</b>。今天之后的那段前移曲线，
+        是已经存在的产能被画在生物学让它上市的位置 —— 这是对齐，<b>不是预测</b>。
+      </>
+    ),
+    lead: "前移",
+    leadOption: (n: number) => (n ? `${n} 个月` : "不前移"),
+    shifted: (n: number) => (n ? `（前移 ${n} 个月）` : ""),
+    today: "今天",
+
+    changesHeading: "数字在说什么",
+    changesNote: (
+      <>
+        由管道按固定定义计算出的事实：新发布的数据、相对阈值的连续位置、多年极值。
+        <b>没有一条是阶段判定</b> —— 判断留给读者。
+      </>
+    ),
+    groups: {
+      fresh: "新数据",
+      runs: "阈值",
+      extremes: "多年极值",
+      stale: "停止更新",
+    },
+    freshNote: "近 30 天内首次采集到的月度与季度读数",
+    collected: (date: string) => `采集于 ${date}`,
+    extreme: (kind: "low" | "high", since: string, all: boolean) =>
+      `${all ? `序列开始（${since}）` : since}以来${kind === "low" ? "最低" : "最高"}`,
+    run: (below: boolean, line: string, n: number, since: string) =>
+      `自 ${since} 起连续 ${n} 期在${line}${below ? "下方" : "上方"}`,
+    staleFor: (days: number, date: string) => `最后读数 ${date}，已 ${days} 天`,
+    nothing: "按这些定义，暂无可报告的事实。",
+  },
+
+  readings: {
+    heading: "全部读数",
+    note: "因果链图表墙上的每一条序列。点名称打开它在图表墙上的那一格。",
+    name: "序列",
+    value: "最新值",
     yoy: "同比",
-    noPercentile: "历史分位：样本不足",
-    percentile: (pct: number) => `历史第 ${pct} 分位`,
-    percentileNote: (pct: number) => <>历史第 {pct} 分位</>,
-    belowBreakeven: (
-      <>
-        <b>低于 5:1 盈亏线</b> · 养殖亏损中
-      </>
-    ),
-    movingBaseline: "基准为移动值，故不计缺口",
-    stale: (days: number) => (
-      <>
-        <b>停更</b> · {days} 天无新数据
-      </>
-    ),
+    position: "历史位置",
+    asOf: "日期",
+    status: "状态",
+    ordinal: (pct: number) => `第 ${pct} 分位`,
+    positionTitle: (pct: number) =>
+      `在该序列 2015 年以来自身历史中的第 ${pct} 分位：0 为最低读数，100 为最高`,
+    noPositionTitle: "历史太短，不计分位",
+    live: "更新中",
+    movingBaseline: "调控基准为移动值，故不计缺口",
   },
 
-  page: {
-    heading: "猪周期图表墙",
+  wall: {
+    heading: "因果链图表墙",
     sub: (n: number) => (
       <>
-        {n} 个序列，一条共享时间轴：上半部是因果链图表墙，下半部可自选叠放。
-        本页只做计算与对齐，<strong>不做阶段判定</strong>
-        ——可用历史约三轮周期，任何自动判定规则都会被自己的样本拟合。
+        {n} 个序列，一条共享时间轴，按因果顺序排列。每格自带纵轴与单位 ——
+        小倍数，<strong>不是双轴图</strong>。本页只做计算与对齐，
+        <strong>不做阶段判定</strong>——可用历史约三轮周期，任何自动判定规则都会被
+        自己的样本拟合。
       </>
     ),
+    howTo: (
+      <>
+        悬停在任意位置，读出所有格在同一日期的数值。在任意一格上<b>拖选</b>即可缩放；
+        <b>双击</b>或点「重置缩放」恢复。空心点是粗粒度读数（年度或季度），出现在
+        别处更细的序列里 —— 是另一种测量，不是更平滑的采样。
+      </>
+    ),
+    zoomed: "自定义窗口",
+    reset: "重置缩放",
     chainCapacity: "产能",
     chainToPrice: "→ 10-12 个月后 →",
     chainPrice: "价格",
@@ -107,8 +164,8 @@ export const zh: Dict = {
       </>,
       <>
         猪肉零售价（36 城精瘦肉，发改委采集）测的<b>不是生猪</b>而是零售端猪肉，
-        量纲相同但环节不同，天然高于出场价 —— 它和上面几条既不是同一口径，
-        也不是同一个量，只在叠放里做参照。
+        量纲相同但环节不同，天然高于出场价 —— 它和墙上的生猪价格既不是同一口径，
+        也不是同一个量，应当读作产业链的零售端。
       </>,
       <>
         能繁母猪存栏来自
@@ -122,7 +179,7 @@ export const zh: Dict = {
       <>
         定点屠宰量在 <b>2025 年 7 月换了口径</b>（「规模以上」扩为全部定点企业），
         绝对值随之跳升，因此拆成两条序列而<b>不接成一条</b>。旧口径已停止发布，
-        标记为封存：它是历史，不是坏掉的采集，所以不出现在上方读数卡片里。
+        标记为封存：它是历史，不是坏掉的采集，所以不在图表墙上，只出现在对比页。
       </>,
       <>
         正常保有量是<b>移动基准</b>（4100 → 3900 → 3750 万头）。缺口或比值必须用
@@ -139,33 +196,26 @@ export const zh: Dict = {
     ],
   },
 
-  dashboard: {
-    window: "时间窗口",
+  window: {
+    label: "时间窗口",
     ranges: { all: "全部", "8y": "近 8 年", "3y": "近 3 年", "1y": "近 1 年" },
-    appliesBelow: " · 同时作用于下方全部图表",
+    stamp: (known: string, start: string, end: string) =>
+      `知识时点 ${known} · 数据窗口 ${start} → ${end}`,
+  },
 
-    wallHeading: "因果链图表墙",
-    wallNote: (
-      <>
-        物理周期本身，按 产能 → 价格 → 利润 的因果顺序排列。每格自带纵轴与单位 ——
-        这不是双轴图，是小倍数，也是把 万头、元/公斤 和纯比值放上同一条时间轴的
-        唯一诚实做法。
-      </>
-    ),
-
-    overlayHeading: "自选叠放",
-    overlayNote: (
+  compare: {
+    heading: "对比",
+    sub: (
       <>
         任选序列压在一条时间轴上。单位一致时画原值；单位混杂时全部指数化到窗口起点，
         因为把不同量纲塞进两条纵轴会凭空造出数据里没有的相关性。股票只出现在这里 ——
         股价是对周期的索取权，不是周期的一环。
       </>
     ),
-
-    lag: "滞后位移",
+    lag: "位移",
     noLag: "不位移",
-    shiftForward: "前移",
-    months: (n: number) => `${n} 月`,
+    forward: "前移",
+    months: (n: number) => `${n} 个月`,
     lagNote: (
       <>
         把某条序列整体前移，检验领先关系。能繁母猪前移 10–12 个月压到猪价上 ——
@@ -173,9 +223,7 @@ export const zh: Dict = {
         这也是判断「产能信号<i>当时</i>能不能叫出拐点」的第一张图。
       </>
     ),
-
-    stamp: (known: string, start: string, end: string) =>
-      `知识时点 ${known} · 数据窗口 ${start} → ${end}`,
+    share: "这个视图记在地址栏里 —— 复制网址即可分享。",
   },
 
   picker: {
@@ -194,6 +242,22 @@ export const zh: Dict = {
 
   chart: {
     noData: "此期间无数据",
+    noneNear: "该日期附近无数据",
+    startsAt: (month: string) => `数据始于 ${month}`,
+    granularityName: {
+      D: "日度读数",
+      W: "周度读数",
+      M: "月度读数",
+      Q: "季度读数",
+      A: "年度读数",
+    },
+    tierNote: {
+      capacity: "产能：领先价格 10–12 个月",
+      margin: "利润：决定产能变化能否持续",
+      price: "价格：被预测的结果，不是驱动因素",
+      noise: "噪音：短期扰动，影响股价，不改变周期",
+      equity: "股票：对周期的索取权，不是周期的一环",
+    },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}，单位 ${unit}，共 ${n} 个观测点`,
     coarse: "粗粒度",

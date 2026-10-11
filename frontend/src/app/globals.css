@@ -189,92 +189,6 @@ header .sub {
   font-size: 11px;
 }
 
-/* ---------- reading tiles ---------- */
-
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(172px, 1fr));
-  gap: 9px;
-  margin: 22px 0;
-}
-
-.tile {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 11px 13px;
-  border-left: 2px solid var(--tier, var(--muted));
-  /* Grid items default to min-width:auto, so a long unbreakable note widens
-     its track past the minmax() minimum and the row overflows instead of
-     wrapping to fewer columns. */
-  min-width: 0;
-}
-
-.tile-label {
-  font-size: var(--type);
-  color: var(--ink-2);
-  margin-bottom: 4px;
-}
-
-.tile-note {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 5px;
-  line-height: 1.5;
-}
-
-.tile-note b {
-  color: var(--critical);
-  font-weight: 400;
-}
-
-/* ---------- chart wall ---------- */
-
-.wall {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.panel + .panel {
-  border-top: 1px solid var(--grid);
-}
-
-.panel-head {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 10px 14px 0;
-}
-
-.panel-title {
-  font-size: 12.5px;
-  color: var(--ink);
-}
-
-.panel-unit {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.panel-tier {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--tier, var(--muted));
-  letter-spacing: 0.04em;
-}
-
-.panel-chart {
-  height: 104px;
-}
-
-.panel-chart.tall {
-  height: 124px;
-}
-
 /* ---------- controls, table, footer ---------- */
 
 .bar {
@@ -362,7 +276,8 @@ td:first-child {
 
 footer {
   margin-top: 26px;
-  font-size: 11.5px;
+  /* On the page's own pixel grid: 11.5px resampled both faces into blur. */
+  font-size: var(--type);
   color: var(--muted);
   line-height: 1.7;
 }
@@ -381,6 +296,27 @@ footer li {
   margin: 3px 0;
 }
 
-.panel-readout {
-  margin-left: 2px;
+/* For text a screen reader needs and a sighted reader gets from layout. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
+
+.muted {
+  color: var(--muted);
+}
+
+a {
+  color: inherit;
+  text-decoration-color: var(--axis);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-color: currentColor;
+}
+

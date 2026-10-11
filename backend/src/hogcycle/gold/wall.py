@@ -21,6 +21,7 @@ from typing import Any
 from ..registry.spec import Registry
 from ..registry.staleness import check
 from ..storage.silver import SilverStore
+from .facts import extreme, first_seen_date, threshold_run
 
 TIER_ORDER = ("capacity", "margin", "price", "noise", "equity")
 
@@ -199,6 +200,15 @@ def build_wall(
                     "n": len(rows),
                     "stale": age.stale,
                     "age_days": age.age_days,
+                    "first_seen": first_seen_date(
+                        silver.first_seen(spec.id, latest["obs_date"], moment=moment)
+                    ),
+                    "extreme": extreme(
+                        rows, latest, min_history=MIN_HISTORY_FOR_PERCENTILE
+                    ),
+                    "threshold_run": threshold_run(rows, threshold["value"])
+                    if (threshold := THRESHOLDS.get(spec.id))
+                    else None,
                 }
             )
 

@@ -1,0 +1,103 @@
+/* The header's vertical ratio scale, and the marks every page uses for a
+   reading whose series has stopped advancing. Split out of hud.css to stay
+   under the 500-line ceiling. */
+
+/* ---------- vertical scale ---------- */
+
+.scale {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  /* Wide enough for the heading, which is the indicator's own name from the
+     contract — three times longer in English than in Chinese. The plot inside
+     stays narrow; the extra width is for the label. */
+  min-width: 13ch;
+}
+
+.scale-head {
+  display: flex;
+  flex-direction: column;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.scale-unit {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--axis);
+}
+
+/* Ticks are placed by value, not stacked in rows, so the marker lands where
+   the reading actually falls relative to the threshold. */
+.scale-plot {
+  position: relative;
+  height: 188px;
+  width: 100%;
+  border-left: 1px solid var(--axis);
+}
+
+.scale-tick,
+.scale-now {
+  position: absolute;
+  left: 6px;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.scale-tick {
+  color: var(--axis);
+}
+
+/* Flush right, opposite the tick labels. The current value sits within a few
+   tenths of the 5:1 line — which is the reading worth having — so the two
+   labels would otherwise land on top of each other exactly when it matters. */
+.scale-now {
+  color: var(--ink);
+  left: auto;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.scale-now b {
+  font-weight: 400;
+  font-size: 9px;
+  color: var(--capacity);
+}
+
+.scale-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed var(--critical);
+  opacity: 0.75;
+}
+
+.scale-note {
+  color: var(--critical);
+  white-space: nowrap;
+}
+
+/* ---------- a series that has stopped advancing ---------- */
+
+/* Text rather than colour alone, so the state survives greyscale and screen
+   readers; the colour only repeats what the word already says. */
+.stale-tag {
+  margin-left: 6px;
+  padding: 0 3px;
+  border: 1px solid var(--critical);
+  color: var(--critical);
+  font-style: normal;
+  font-size: var(--type);
+  line-height: 1.2;
+}
+
+/* The value keeps its place on the instrument but drops to the muted ink, so
+   it cannot pass for a live reading at a glance. */
+.gauge.stale .gauge-value,
+.scale-now.stale {
+  color: var(--muted);
+}

@@ -10,9 +10,13 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import "../hud.css";
-import "../tiles.css";
+import "../hud-scale.css";
+import "../nav.css";
+import "../wall.css";
+import "../overview.css";
 import "../controls.css";
 import { fontVars } from "../fonts";
+import { SiteNav } from "@/components/shell/SiteNav";
 import { HTML_LANG } from "@/i18n/locale";
 import { en } from "@/i18n/en";
 
@@ -24,7 +28,10 @@ export const metadata: Metadata = {
 export default function EnLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang={HTML_LANG.en} className={fontVars}>
-      <body>{children}</body>
+      <body>
+        <SiteNav locale="en" />
+        {children}
+      </body>
     </html>
   );
 }

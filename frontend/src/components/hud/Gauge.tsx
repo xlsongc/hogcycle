@@ -13,10 +13,11 @@
  * empty track with a dash rather than a plausible-looking fill.
  */
 
+import Link from "next/link";
 import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { litSegments } from "@/lib/segments";
-import { nameOf, unitOf, type Locale } from "@/i18n/locale";
+import { nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
 /** Blocks in a bar. Discrete because the panel is a pixel grid, and because
@@ -32,13 +33,16 @@ export function Bar({ reading, locale }: { reading: Reading; locale: Locale }) {
   return (
     <div className={reading.stale ? "gauge stale" : "gauge"}>
       <span className="gauge-label">
-        {name}
+        <Link href={`${pathOf(locale, "wall")}#${reading.id}`} title={t.open(name)}>
+          {name}
+        </Link>
         {reading.stale && <StaleTag date={reading.obs_date} days={reading.age_days} locale={locale} />}
       </span>
       <span
         className="gauge-track"
         role="img"
         aria-label={pct == null ? t.noPercentile(name) : t.percentile(name, pct)}
+        title={pct == null ? t.noPercentile(name) : t.percentile(name, pct)}
         style={{ ["--tier" as string]: `var(--${reading.tier})` }}
       >
         {Array.from({ length: SEGMENTS }, (_, i) => (

@@ -21,17 +21,7 @@ import { PixelPig } from "./PixelPig";
 import { fmt } from "@/charts/base/theme";
 import { labelOf, nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-
-/** The series each bracketed group shows, in causal order. Ids rather than a
- *  tier filter: the header is a hand-picked instrument panel, not an
- *  exhaustive listing, and the wall below already shows everything. */
-const LEFT = ["sow_inventory", "hog_inventory", "slaughter"];
-// 仔猪 is the monthly primary-source print while 玄田's weekly table is dark
-// upstream (config: piglet_price.upstream_dark). Swap back once the 500县
-// weekly adapter lands.
-const RIGHT = ["hog_price_index", "piglet_price_monthly", "corn_price"];
-const HERO = "sow_inventory";
-const SCALE_OF = "hog_corn_ratio";
+import { HERO, LEFT, RIGHT, SCALE_OF } from "./ids";
 
 function pick(readings: Reading[], ids: string[]): Reading[] {
   return ids
@@ -39,7 +29,18 @@ function pick(readings: Reading[], ids: string[]): Reading[] {
     .filter((r): r is Reading => !!r);
 }
 
-export function Hud({ data, locale }: { data: WallContract; locale: Locale }) {
+/** `data` may carry only the panels the header draws (the ratio scale);
+ *  `seriesCount` is the size of the whole contract, which the coverage group
+ *  reports. The overview passes a trimmed contract to keep its page light. */
+export function Hud({
+  data,
+  seriesCount,
+  locale,
+}: {
+  data: WallContract;
+  seriesCount: number;
+  locale: Locale;
+}) {
   const t = dict(locale).hud;
   const left = pick(data.readings, LEFT);
   const right = pick(data.readings, RIGHT);
@@ -93,7 +94,7 @@ export function Hud({ data, locale }: { data: WallContract; locale: Locale }) {
             </div>
             <div className="hud-kv">
               <span>{t.series}</span>
-              <b className="num">{String(data.panels.length).padStart(3, "0")}</b>
+              <b className="num">{String(seriesCount).padStart(3, "0")}</b>
             </div>
           </Group>
         </div>

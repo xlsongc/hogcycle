@@ -157,6 +157,26 @@ class SilverStore:
             for r in rows
         ]
 
+    def first_seen(
+        self, indicator: str, obs_date: dt.date, *, moment: dt.datetime
+    ) -> dt.datetime | None:
+        """When an observation was first learned, as known at `moment`.
+
+        The earliest `fetched_at` for that obs_date, so a later revision does
+        not make an old period look new. For a series loaded by backfill this
+        is the backfill date, not the publisher's release date — transaction
+        time records when *we* knew, which is all this store can vouch for.
+        """
+        rows = self.query(
+            """
+            SELECT min(fetched_at) FROM silver
+            WHERE indicator = $indicator AND obs_date = $obs_date
+              AND fetched_at <= $moment
+            """,
+            {"indicator": indicator, "obs_date": obs_date, "moment": moment},
+        )
+        return rows[0][0] if rows else None
+
     def coverage(self) -> list[dict[str, Any]]:
         """One row per indicator: how much we hold and how fresh it is."""
         rows = self.query(

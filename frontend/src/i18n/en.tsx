@@ -26,10 +26,19 @@ export const en = {
     title: "The Hog Cycle Wall",
     description:
       "The causal chain of China's hog cycle on one shared time axis, laid out for a human to judge — not judged for them.",
+    pages: {
+      overview: "Overview",
+      wall: "Causal-chain wall",
+      compare: "Compare",
+    },
   },
 
   nav: {
+    pages: "Pages",
     language: "Language",
+    overview: "Overview",
+    wall: "Wall",
+    compare: "Compare",
   },
 
   hud: {
@@ -78,37 +87,90 @@ export const en = {
       `No new data since ${date} (${days} days)`,
     was: (label: string, value: number, date: string) =>
       `${label} was ${value} on ${date}; nothing newer`,
+    open: (name: string) => `Open ${name} on the wall`,
   },
 
-  tiles: {
+  overview: {
+    thesisHeading: "Capacity leads price",
+    thesisNote: (
+      <>
+        Breeding sow inventory, shifted forward by the lead you pick, above the
+        hog price it is supposed to lead. Biology fixes the lag at 10–12
+        months — 114 days&rsquo; gestation plus about six months to finish — so
+        the shift is not a fitted parameter. Two panels on one time axis, each
+        on its own scale: <b>not a dual axis</b>. Past today the shifted line
+        is capacity that already exists, drawn where biology puts it on the
+        market. It is an alignment, <b>not a forecast</b>.
+      </>
+    ),
+    lead: "Lead",
+    leadOption: (n: number) => (n ? `+${n} mo` : "None"),
+    shifted: (n: number) => (n ? ` · shifted +${n} mo` : ""),
+    today: "today",
+
+    changesHeading: "What the numbers say",
+    changesNote: (
+      <>
+        Facts with fixed definitions, computed in the pipeline: new releases,
+        runs against a threshold, multi-year extremes.{" "}
+        <b>None of them is a call on the phase</b> — that stays with the reader.
+      </>
+    ),
+    groups: {
+      fresh: "New data",
+      runs: "Thresholds",
+      extremes: "Multi-year extremes",
+      stale: "Stopped updating",
+    },
+    freshNote: "monthly and quarterly readings first collected in the last 30 days",
+    collected: (date: string) => `collected ${date}`,
+    extreme: (kind: "low" | "high", since: string, all: boolean) =>
+      `${kind === "low" ? "lowest" : "highest"} since ${all ? `the series begins (${since})` : since}`,
+    run: (below: boolean, line: string, n: number, since: string) =>
+      `${below ? "below" : "above"} the ${line} for ${n} straight readings, since ${since}`,
+    staleFor: (days: number, date: string) => `last reading ${date}, ${days} days ago`,
+    nothing: "Nothing to report under these definitions.",
+  },
+
+  readings: {
+    heading: "All readings",
+    note: "Every series on the causal wall. Select a name to open its panel.",
+    name: "Series",
+    value: "Latest",
     yoy: "YoY",
-    noPercentile: "Historical percentile: too little history",
-    percentile: (pct: number) => `${ordinal(pct)} historical percentile`,
-    percentileNote: (pct: number) => <>{ordinal(pct)} percentile</>,
-    belowBreakeven: (
-      <>
-        <b>Below the 5:1 breakeven</b> · farrow-to-finish is losing money
-      </>
-    ),
-    movingBaseline: "baseline moves, so no gap is computed",
-    stale: (days: number) => (
-      <>
-        <b>Stale</b> · no new data for {days} days
-      </>
-    ),
+    position: "Position",
+    asOf: "As of",
+    status: "Status",
+    ordinal: (pct: number) => ordinal(pct),
+    positionTitle: (pct: number) =>
+      `${ordinal(pct)} percentile of its own history since 2015: 0 is its lowest reading, 100 its highest`,
+    noPositionTitle: "Too little history for a percentile",
+    live: "live",
+    movingBaseline: "the target baseline moves, so no gap is computed",
   },
 
-  page: {
-    heading: "The Hog Cycle Wall",
+  wall: {
+    heading: "Causal-chain wall",
     sub: (n: number) => (
       <>
-        {n} series on one shared time axis: a causal-chain wall above, a
-        free overlay below. This page computes and aligns —{" "}
-        <strong>it does not call the phase</strong>. There are roughly three
-        cycles of usable history, and any automatic rule would be fitted to its
-        own sample.
+        {n} series on one shared time axis, in causal order. Each panel keeps
+        its own axis and unit — small multiples, <strong>not a dual axis</strong>.
+        The wall computes and aligns; <strong>it does not call the phase</strong>.
+        There are roughly three cycles of usable history, and any automatic rule
+        would be fitted to its own sample.
       </>
     ),
+    howTo: (
+      <>
+        Hover anywhere to read every panel at that date. <b>Drag</b> across a
+        panel to zoom; <b>double-click</b> or Reset to zoom back out. Hollow
+        points are coarser readings (annual or quarterly) inside a series that
+        is finer elsewhere — a different kind of measurement, not a smoother
+        sample.
+      </>
+    ),
+    zoomed: "custom window",
+    reset: "Reset zoom",
     chainCapacity: "Capacity",
     chainToPrice: "→ 10-12 months later →",
     chainPrice: "Price",
@@ -131,8 +193,8 @@ export const en = {
         Pork retail price (lean cuts, 36 cities, collected by the NDRC)
         measures <b>pork at retail, not live hogs</b>. Same dimension,
         different point in the chain, so it sits structurally above the
-        ex-plant price — it shares neither caliber nor quantity with the series
-        above, and appears only in the overlay, for reference.
+        ex-plant price. It shares neither caliber nor quantity with the hog
+        prices on the wall: read it as the retail end of the chain.
       </>,
       <>
         Breeding sow inventory comes from the monthly{" "}
@@ -154,8 +216,8 @@ export const en = {
         above designated size to all designated plants) and the level stepped
         up with it, so it is kept as <b>two series rather than spliced into
         one</b>. The old caliber has stopped publishing and is marked retired:
-        it is history, not a broken collector, which is why it does not appear
-        in the readout tiles above.
+        it is history, not a broken collector, which is why it is not on the
+        wall and appears only in Compare.
       </>,
       <>
         The normal-holding target is a <b>moving baseline</b> (41 → 39 → 37.5
@@ -175,23 +237,16 @@ export const en = {
     ],
   },
 
-  dashboard: {
-    window: "Time window",
+  window: {
+    label: "Window",
     ranges: { all: "All", "8y": "8Y", "3y": "3Y", "1y": "1Y" },
-    appliesBelow: " · applies to every chart below",
+    stamp: (known: string, start: string, end: string) =>
+      `Knowledge as of ${known} · data window ${start} → ${end}`,
+  },
 
-    wallHeading: "Causal-chain wall",
-    wallNote: (
-      <>
-        The physical cycle itself, in causal order: capacity → price → margin.
-        Every cell carries its own axis and unit — this is small multiples, not
-        a dual-axis chart, and it is the only honest way to put head counts,
-        CNY/kg and a bare ratio on one time axis.
-      </>
-    ),
-
-    overlayHeading: "Free overlay",
-    overlayNote: (
+  compare: {
+    heading: "Compare",
+    sub: (
       <>
         Any series, stacked on one time axis. Where the units agree it draws
         raw values; where they do not, everything is indexed to the start of
@@ -200,10 +255,9 @@ export const en = {
         share price is a claim on the cycle, not a link in it.
       </>
     ),
-
-    lag: "Lag shift",
-    noLag: "No shift",
-    shiftForward: "Forward",
+    lag: "Shift",
+    noLag: "None",
+    forward: "Forward by",
     months: (n: number) => `${n} mo`,
     lagNote: (
       <>
@@ -215,9 +269,7 @@ export const en = {
         <i>at the time</i>.
       </>
     ),
-
-    stamp: (known: string, start: string, end: string) =>
-      `Knowledge as of ${known} · data window ${start} → ${end}`,
+    share: "This view lives in the address bar — copy the URL to share it.",
   },
 
   picker: {
@@ -237,6 +289,22 @@ export const en = {
 
   chart: {
     noData: "No data in this window",
+    noneNear: "nothing near this date",
+    startsAt: (month: string) => `data from ${month}`,
+    granularityName: {
+      D: "daily reading",
+      W: "weekly reading",
+      M: "monthly reading",
+      Q: "quarterly reading",
+      A: "annual reading",
+    },
+    tierNote: {
+      capacity: "Capacity: leads price by 10–12 months",
+      margin: "Margin: decides whether a capacity move persists",
+      price: "Price: the outcome, not a driver",
+      noise: "Noise: short-run disturbance that moves equities, not the cycle",
+      equity: "Equity: a claim on the cycle, not a link in it",
+    },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}, unit ${unit}, ${n} observations`,
     coarse: "coarse",

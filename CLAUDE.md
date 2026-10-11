@@ -127,6 +127,9 @@ value to suit a unit label.
   indicator whose name uses a new character and it will fall back to a system
   face mid-sentence. Re-cut with `frontend/scripts/subset-cjk-font.sh`.
   zpix is *not* an open licence — see `frontend/src/fonts/Zpix-NOTICE.md`.
+- **Small-multiple panels sync by time, never by index.** `echarts.connect()`
+  links pointers by data index, which puts panels of different frequencies
+  on different dates. Use `charts/base/pointerSync.ts` (ADR-0016).
 - **Nothing in the header is invented.** It looks like an instrument panel,
   which is exactly why every gauge has to be filled from the contract: a
   decorative bar next to real ones makes the reader trust neither.
@@ -175,3 +178,4 @@ so you do not have to re-derive them.
 | 0013 | 能繁母猪存栏 moves to the primary source; staleness is a failure |
 | 0014 | Two prerendered languages; names travel in the contract |
 | 0015 | A known outage is acknowledged with a deadline; the page still says so |
+| 0016 | Three pages per language; panels share a crosshair by time, not by index |
