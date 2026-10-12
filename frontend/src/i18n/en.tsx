@@ -157,34 +157,34 @@ export const en = {
     heading: "Causal-chain wall",
     sub: (n: number) => (
       <>
-        {n} series on one shared time axis, in causal order. Each panel keeps
-        its own axis and unit — small multiples, <strong>not a dual axis</strong>.
-        The wall computes and aligns; <strong>it does not call the phase</strong>.
-        There are roughly three cycles of usable history, and any automatic rule
-        would be fitted to its own sample.
+        {n} series on one time axis, grouped along the causal chain. Each panel
+        keeps its own axis and unit (small multiples, <strong>not a dual
+        axis</strong>). The wall computes and aligns; <strong>it does not call
+        the phase</strong>.
       </>
     ),
     howTo: (
       <>
-        Hover anywhere to read every panel at that date. <b>Drag</b> across a
-        panel to zoom; <b>double-click</b> or Reset to zoom back out. Hollow
-        points are coarser readings (annual or quarterly) inside a series that
-        is finer elsewhere — a different kind of measurement, not a smoother
-        sample.
+        Hover to read every panel at one date; <b>drag</b> across a panel to
+        zoom, <b>double-click</b> to reset. Hollow points are annual or
+        quarterly readings: a different measurement, not a smoother sample.
       </>
     ),
     zoomed: "custom window",
     reset: "Reset zoom",
-    chainCapacity: "Capacity",
-    chainToPrice: "→ 10-12 months later →",
-    chainPrice: "Price",
-    chainToMargin: "→ minus cost →",
-    chainMargin: "Margin",
-    chainFeedback: "→ feeds back into capacity",
-    chainNoise: "Noise (does not move the cycle)",
 
     footerHeading: "Calibers and limits",
     footer: [
+      <>
+        The carcass ex-plant price <b>changed whom it surveys in 2024-01</b>{" "}
+        (plants above designated size → every designated plant). The level
+        barely moved, but it is still <b>two calibers</b>: the older one is
+        retired and appears only in Compare. The 500-county hog-to-corn ratio
+        divides two prices from the same weekly report and collection day. It
+        tracks the NDRC ratio (correlation 0.996) but runs 0.26 lower on
+        average, so it <b>carries no 5:1 line</b>: that line is defined on the
+        NDRC caliber.
+      </>,
       <>
         Average hog transaction price and average market weight are on the{" "}
         <b>Hangqingbao platform-transaction caliber</b>; the three-way
@@ -243,7 +243,7 @@ export const en = {
 
   window: {
     label: "Window",
-    ranges: { all: "All", "8y": "8Y", "3y": "3Y", "1y": "1Y" },
+    ranges: { all: "All", "8y": "8Y", "5y": "5Y", "3y": "3Y", "1y": "1Y" },
     stamp: (known: string, start: string, end: string) =>
       `Knowledge as of ${known} · data window ${start} → ${end}`,
   },

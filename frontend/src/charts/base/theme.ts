@@ -83,10 +83,20 @@ const START_LABEL_MIN_SHARE = 0.18;
  * history, not against zero, so the baseline carries no meaning worth that
  * much room. A threshold line is folded in so it can never fall outside.
  */
-function domain(panel: Panel): { min: number; max: number } | { scale: true } {
-  const values = panel.points
+function domain(
+  panel: Panel,
+  from: string,
+  to: string
+): { min: number; max: number } | { scale: true } {
+  const all = panel.points.map((p) => p.v).filter((v): v is number => v != null);
+  // Fitted to what the window shows. Scaled to the whole history, a five-year
+  // view of 能繁母猪 drew 3,780-4,300 on a 2,900-4,800 axis and read as flat.
+  // Segments that cross the window's edge are clipped by the chart.
+  const shown = panel.points
+    .filter((p) => p.d >= from && p.d <= to)
     .map((p) => p.v)
     .filter((v): v is number => v != null);
+  const values = shown.length ? shown : all;
   if (!values.length) return { scale: true };
 
   let lo = Math.min(...values);
@@ -147,7 +157,7 @@ export function panelOption(
     (p): p is typeof p & { v: number } => p.v != null
   );
 
-  const yScale = domain(panel);
+  const yScale = domain(panel, min, max);
 
   // A daily series holds about a year (docs/adr/0004). On an 11-year axis an
   // empty decade beside it reads as missing data; shading it says "this

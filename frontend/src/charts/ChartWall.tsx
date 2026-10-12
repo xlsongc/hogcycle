@@ -10,8 +10,10 @@
  * of different frequencies on different dates (see base/pointerSync.ts).
  */
 
+import { Fragment } from "react";
 import type { Panel } from "@/types/generated/wall";
 import type { Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
 import { PanelChart } from "./PanelChart";
 
 export const WALL_GROUP = "hogcycle-wall";
@@ -26,24 +28,34 @@ type Props = {
 };
 
 export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) {
+  const t = dict(locale);
   return (
     <div className="wall">
       {panels.map((panel, i) => {
         const last = i === panels.length - 1;
+        // A heading where the tier changes: seventeen identical panels read
+        // as a list, while four labelled groups read as the chain they are.
+        const opens = i === 0 || panels[i - 1]?.tier !== panel.tier;
         return (
-          <PanelChart
-            key={panel.id}
-            panel={panel}
-            group={WALL_GROUP}
-            min={min}
-            max={max}
-            locale={locale}
-            showAxisLabels={last}
-            size={last ? "tall" : "short"}
-            anchor
-            onZoom={onZoom}
-            onReset={onReset}
-          />
+          <Fragment key={panel.id}>
+            {opens && (
+              <h2 className="wall-tier" style={{ ["--tier" as string]: `var(--${panel.tier})` }}>
+                {t.chart.tierNote[panel.tier]}
+              </h2>
+            )}
+            <PanelChart
+              panel={panel}
+              group={WALL_GROUP}
+              min={min}
+              max={max}
+              locale={locale}
+              showAxisLabels={last}
+              size={last ? "tall" : "short"}
+              anchor
+              onZoom={onZoom}
+              onReset={onReset}
+            />
+          </Fragment>
         );
       })}
     </div>

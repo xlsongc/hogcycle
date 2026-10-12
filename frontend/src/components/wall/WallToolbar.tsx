@@ -16,10 +16,11 @@ type Props = {
   max: string;
   group: string;
   onRange: (r: Range) => void;
+  onReset: () => void;
   locale: Locale;
 };
 
-export function WallToolbar({ range, min, max, group, onRange, locale }: Props) {
+export function WallToolbar({ range, min, max, group, onRange, onReset, locale }: Props) {
   const t = dict(locale);
   const custom = range.kind === "custom";
 
@@ -37,7 +38,7 @@ export function WallToolbar({ range, min, max, group, onRange, locale }: Props) 
           </button>
         ))}
         {custom && (
-          <button onClick={() => onRange({ kind: "preset", preset: "all" })}>
+          <button onClick={onReset}>
             {t.wall.reset}
           </button>
         )}

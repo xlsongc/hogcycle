@@ -20,27 +20,6 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
       <header>
         <h1>{w.heading}</h1>
         <p className="sub">{w.sub(panels.length)}</p>
-        <div className="chain">
-          <span className="chip">
-            <i style={{ background: "var(--capacity)" }} />
-            {w.chainCapacity}
-          </span>
-          <span className="arrow">{w.chainToPrice}</span>
-          <span className="chip">
-            <i style={{ background: "var(--price)" }} />
-            {w.chainPrice}
-          </span>
-          <span className="arrow">{w.chainToMargin}</span>
-          <span className="chip">
-            <i style={{ background: "var(--margin)" }} />
-            {w.chainMargin}
-          </span>
-          <span className="arrow">{w.chainFeedback}</span>
-          <span className="chip">
-            <i style={{ background: "var(--noise)" }} />
-            {w.chainNoise}
-          </span>
-        </div>
         <p className="section-note how-to">{w.howTo}</p>
       </header>
 

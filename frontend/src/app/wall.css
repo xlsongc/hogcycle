@@ -161,3 +161,20 @@
 .how-to {
   margin-top: 12px;
 }
+
+/* A tier's heading inside the wall: the group's colour, and what the tier
+   does in the chain, so the panels below it are read for that. */
+.wall-tier {
+  margin: 0;
+  padding: 7px 14px;
+  font-size: var(--type);
+  font-weight: 400;
+  color: var(--tier, var(--ink-2));
+  background: var(--page);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--grid);
+}
+
+.wall-tier:first-child {
+  border-top: 0;
+}
