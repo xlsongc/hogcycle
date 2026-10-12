@@ -48,6 +48,7 @@ from ..contracts.schema import Observation
 from ..registry.spec import IndicatorSpec
 
 URL = "https://apps.fas.usda.gov/psdonline/downloads/psd_livestock_csv.zip"
+_DOH = "https://cloudflare-dns.com/dns-query"
 COUNTRY = "China"
 COMMODITIES = ("Animal Numbers, Swine", "Meat, Swine")
 
@@ -84,14 +85,67 @@ class UsdaPsdAdapter:
     name = "usda_psd"
 
     def fetch(self, spec: IndicatorSpec) -> Any:
-        import requests
-
-        r = requests.get(URL, timeout=120)
-        r.raise_for_status()
-        rows = rows_from_zip(r.content)
+        body, last_modified = download(URL)
+        rows = rows_from_zip(body)
         if not rows:
             raise ValueError(f"{spec.id}: no {COUNTRY} swine rows in {URL}")
-        return {"url": URL, "last_modified": r.headers.get("Last-Modified"), "rows": rows}
+        return {"url": URL, "last_modified": last_modified, "rows": rows}
+
+
+def download(url: str) -> tuple[bytes, str | None]:
+    """The file and its Last-Modified, resolving the host over DNS-over-HTTPS
+    when the system resolver cannot.
+
+    On 2026-10-12 `apps.fas.usda.gov` failed to resolve both on GitHub's
+    runner ("Temporary failure in name resolution") and on the development
+    machine (SERVFAIL), while 1.1.1.1 and 8.8.8.8 answered. The publisher is
+    not refusing anyone; a resolver is failing. So only a resolution error
+    takes the fallback, the connection still verifies USDA's certificate
+    against its real name, and any other failure is raised as it is.
+    """
+    import requests
+
+    try:
+        r = requests.get(url, timeout=120)
+        r.raise_for_status()
+        return r.content, r.headers.get("Last-Modified")
+    except requests.exceptions.ConnectionError as exc:
+        if "resolve" not in str(exc).lower():
+            raise
+    return _download_by_address(url)
+
+
+def _download_by_address(url: str) -> tuple[bytes, str | None]:
+    from urllib.parse import urlsplit
+
+    import certifi
+    import requests
+    import urllib3
+
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    answer = requests.get(
+        _DOH,
+        params={"name": host, "type": "A"},
+        headers={"accept": "application/dns-json"},
+        timeout=30,
+    ).json()
+    addresses = [a["data"] for a in answer.get("Answer", []) if a.get("type") == 1]
+    if not addresses:
+        raise ConnectionError(f"{host} resolves nowhere, not even over DNS-over-HTTPS")
+    pool = urllib3.HTTPSConnectionPool(
+        addresses[0],
+        443,
+        server_hostname=host,
+        assert_hostname=host,
+        cert_reqs="CERT_REQUIRED",
+        ca_certs=certifi.where(),
+        timeout=urllib3.Timeout(connect=30, read=120),
+    )
+    r = pool.request("GET", parts.path, headers={"Host": host})
+    if r.status != 200:
+        raise ConnectionError(f"{url} via {addresses[0]}: HTTP {r.status}")
+    return r.data, r.headers.get("Last-Modified")
 
     def normalise(
         self,
