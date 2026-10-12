@@ -22,15 +22,7 @@
   box-shadow: inset 2px 0 0 var(--tier, var(--muted));
 }
 
-.panel:target a.panel-title {
-  text-decoration: none;
-}
-
-a.panel-title:hover {
-  text-decoration: underline;
-}
-
-.panel-title {
+.panel:target .panel-title {
   text-decoration: underline;
   text-decoration-color: var(--tier, var(--muted));
   text-underline-offset: 4px;
@@ -47,6 +39,15 @@ a.panel-title:hover {
 .panel-title {
   font-size: var(--type);
   color: var(--ink);
+}
+
+/* On the wall a panel's name opens its series page. */
+a.panel-title {
+  text-decoration: none;
+}
+
+a.panel-title:hover {
+  text-decoration: underline;
 }
 
 .panel-unit {
