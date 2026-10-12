@@ -92,6 +92,11 @@ with zero HTTP requests.
   passed while the two most important indicators could not be collected at
   all, because every test fed itself a synthetic `date`/`value` frame.
   Fixtures are captured from bronze; see `backend/tests/fixtures/`.
+- **Collect a source from where it answers.** A host that refuses datacenter
+  addresses is `reach: cn` and is collected by `scripts/local-collector`.
+  Never route around a 403 through a scraping proxy or by defeating the
+  site's checks: the publisher's refusal is a fact about the source, not a
+  bug in ours.
 - **The daily run is not optional.** akshare's *daily* series are a rolling
   ~1-year window: data older than that disappears from upstream entirely. The
   collector runs to preserve data before it is deleted, not only to catch
@@ -169,6 +174,8 @@ hogcycle collect                     # all indicators; one failure does not abor
 hogcycle collect --months-back 60    # backfill 农业农村部 editions (default 6)
 hogcycle collect --indicator a,b --weekly-pages 25   # backfill the weekly reports
 hogcycle replay                      # re-parse every bronze snapshot, zero HTTP
+hogcycle collect --reach anywhere    # what the GitHub run collects
+scripts/local-collector/collect.sh   # the `reach: cn` sources, from an ordinary network
 hogcycle status                      # coverage, latest obs_date, and age per series
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
 hogcycle status --json               # one object per series; the stale-series issue reads it
@@ -211,3 +218,4 @@ so you do not have to re-derive them.
 | 0019 | The overview answers one question; the instrument panel is gone |
 | 0020 | Every series has its own page; its description travels in the contract |
 | 0021 | USDA's estimates of China come in; a forecast is a kind of indicator |
+| 0022 | Each source is collected from where it answers; GitHub watches all of them |

@@ -33,6 +33,8 @@ Tier = Literal["capacity", "margin", "price", "noise", "equity"]
 # actually answers is whether the market leads or lags 能繁母猪.
 TIERS: tuple[str, ...] = ("capacity", "margin", "price", "noise", "equity")
 
+REACHES: tuple[str, ...] = ("anywhere", "cn")
+
 
 @dataclass(frozen=True, slots=True)
 class Extract:
@@ -137,6 +139,13 @@ class IndicatorSpec:
     # off the wall, whose every panel reads as "what happened", and out of the
     # window's end, which would otherwise run the whole wall into next year.
     forecast: bool = False
+    # Where the collector has to run to reach the source. "cn" hosts refuse
+    # or time out on datacenter addresses — 农业农村部 answered GitHub's
+    # runners with 403 and 玄田 never answered at all on 2026-10-12, while
+    # both served a residential connection — so they are collected from a
+    # machine on an ordinary network, and the GitHub run collects the rest
+    # and watches everything for staleness (ADR-0022).
+    reach: str = "anywhere"
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -160,6 +169,8 @@ class IndicatorSpec:
             and self.caliber_from > self.caliber_until
         ):
             raise ValueError(f"{self.id}: caliber_from is after caliber_until")
+        if self.reach not in REACHES:
+            raise ValueError(f"{self.id}: reach {self.reach!r} must be one of {REACHES}")
         if self.retired and self.upstream_dark is not None:
             raise ValueError(
                 f"{self.id}: retired and upstream_dark contradict each other — "

@@ -52,6 +52,14 @@ def _parser() -> argparse.ArgumentParser:
         "(default 6; raise it to backfill, e.g. 60 reaches 2021-12)",
     )
     p.add_argument(
+        "--reach",
+        choices=["all", "anywhere", "cn"],
+        default="all",
+        help="collect: only indicators whose source answers from this kind of "
+        "network (config `reach`); the GitHub run takes 'anywhere', a machine "
+        "on an ordinary connection takes 'cn'",
+    )
+    p.add_argument(
         "--weekly-pages",
         type=int,
         default=2,
@@ -114,6 +122,8 @@ def main(argv: list[str] | None = None) -> int:
             # in one run share a fetch when they read the same report.
             ids = args.indicator.split(",")
             registry = Registry({i: registry[i] for i in ids})
+        if args.reach != "all":
+            registry = Registry({s.id: s for s in registry if s.reach == args.reach})
         results = collect_all(registry, adapters, bronze, silver)
         for r in results:
             mark = "ok  " if r.ok else "FAIL"

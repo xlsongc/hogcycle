@@ -33,7 +33,13 @@ jobs:
       # Exits non-zero only when a whole source is unreachable, never for a
       # single flaky series. The steps below run either way: a bad source is
       # a reason to go red, not a reason to throw away what did collect.
-      - run: hogcycle collect
+      #
+      # Only sources that answer a datacenter address. 农业农村部 returns 403
+      # to this runner and 玄田 never answers it; those (`reach: cn`) are
+      # collected by scripts/local-collector on an ordinary connection. The
+      # staleness check below still covers every series, so this run is the
+      # watchdog for that one too (ADR-0022).
+      - run: hogcycle collect --reach anywhere
       - name: Commit changed series
         if: always()
         run: |

@@ -35,6 +35,7 @@ indicators:
     lo: 1000.0
     hi: 10000.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 能繁母猪存栏}
     revises: true
@@ -72,6 +73,7 @@ indicators:
     lo: 10000.0
     hi: 100000.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 生猪存栏}
     revises: true
@@ -90,6 +92,7 @@ indicators:
     lo: 100.0
     hi: 20000.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 生猪定点屠宰企业屠宰量}
     notes: >
@@ -108,6 +111,7 @@ indicators:
     lo: 100.0
     hi: 20000.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 规模以上生猪定点屠宰企业屠宰量}
     # 2025年7月起上游不再发布这个口径。序列到此为止 —— 它是完成了，不是冻住
@@ -127,6 +131,7 @@ indicators:
     lo: 5.0
     hi: 200.0
     adapter: moa_weekly
+    reach: cn
     call: {report: market}
     extract: {value: 全国仔猪平均价格}
     notes: >
@@ -149,6 +154,7 @@ indicators:
     lo: 5.0
     hi: 200.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 全国仔猪价格}
     notes: >
@@ -168,6 +174,7 @@ indicators:
     lo: 5.0
     hi: 200.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 全国二元母猪销售价格}
     notes: >
@@ -230,6 +237,7 @@ indicators:
     lo: 500.0
     hi: 5000.0
     adapter: akshare
+    reach: cn
     call: {fn: futures_hog_cost, symbol: 玉米}
     notes: >
       源站按 元/吨 报价（约 2374），不是元/公斤 —— 早先配置误写为 CNY/kg 且
@@ -247,6 +255,7 @@ indicators:
     lo: 1.0
     hi: 25.0
     adapter: akshare
+    reach: cn
     call: {fn: futures_hog_supply, symbol: 猪粮比价}
     upstream_dark:
       acknowledged: 2026-10-11
@@ -271,6 +280,7 @@ indicators:
     lo: 0.5
     hi: 10.0
     adapter: moa_weekly
+    reach: cn
     call: {report: market}
     extract: {value: 全国玉米平均价格}
     notes: >
@@ -288,6 +298,7 @@ indicators:
     lo: 1.0
     hi: 10.0
     adapter: moa_weekly
+    reach: cn
     call: {report: market}
     extract: {value: 育肥猪配合饲料平均价格}
     notes: >
@@ -321,6 +332,7 @@ indicators:
     lo: 3.0
     hi: 60.0
     adapter: akshare
+    reach: cn
     call: {fn: futures_hog_core, symbol: 外三元}
     notes: >
       玄田数据/中国养猪网口径。全国均价，不是加权。
@@ -336,6 +348,7 @@ indicators:
     lo: 3.0
     hi: 60.0
     adapter: moa_weekly
+    reach: cn
     call: {report: market}
     extract: {value: 全国生猪平均价格}
     notes: >
@@ -352,6 +365,7 @@ indicators:
     lo: 5.0
     hi: 60.0
     adapter: moa_weekly
+    reach: cn
     call: {report: slaughter, scope: 全部定点}
     extract: {value: 白条肉平均出厂价格}
     caliber_from: 2024-01-01
@@ -373,6 +387,7 @@ indicators:
     lo: 5.0
     hi: 60.0
     adapter: akshare
+    reach: cn
     call: {fn: futures_hog_supply, symbol: 白条肉}
     extract: {period: 周期, value: 白条肉平均出厂价格}
     caliber_until: 2023-12-31
@@ -392,6 +407,7 @@ indicators:
     lo: 50.0
     hi: 400.0
     adapter: akshare
+    reach: cn
     call: {fn: futures_hog_supply, symbol: 肉类价格指数}
     # 玄田这张表和「生猪产能」同时死在 2025年10月：上游最后一行就是
     # 2025-10-01，不是我们采不到。陈旧度守卫上线第一次运行就报了它 340 天。
@@ -414,6 +430,7 @@ indicators:
     lo: 5.0
     hi: 200.0
     adapter: moa
+    reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 36个大中城市猪肉（精瘦肉）零售价格}
     notes: >

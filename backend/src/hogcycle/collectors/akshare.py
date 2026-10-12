@@ -26,6 +26,7 @@ series the whole project exists for — silently failed to collect.
 from __future__ import annotations
 
 import datetime as dt
+import socket
 import time
 from typing import Any
 
@@ -39,6 +40,10 @@ from ..registry.spec import IndicatorSpec
 # and keeps us a polite client of a free service.
 _MIN_INTERVAL_S = 1.5
 _last_call = 0.0
+
+# Long enough for a slow day's full table (the stock history is a few MB),
+# short enough that a host that will not answer fails in a minute, not seven.
+_TIMEOUT_S = 60
 
 
 def _throttle() -> None:
@@ -68,7 +73,16 @@ class AkshareAdapter:
         call = {k: str(v) if isinstance(v, int) else v for k, v in spec.call.items()}
         fn = getattr(ak, call.pop("fn"))
         _throttle()
-        df = fn(**call)
+        # akshare's requests carry no timeout, so an unreachable host hangs a
+        # socket until the OS gives up: on 2026-10-12 every 玄田 call from the
+        # GitHub runner took ~7 minutes to fail, three attempts each, and the
+        # run took 43. A process-wide default bounds what akshare will not.
+        previous = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(_TIMEOUT_S)
+        try:
+            df = fn(**call)
+        finally:
+            socket.setdefaulttimeout(previous)
         # Serialise immediately: bronze stores JSON, not a pickled DataFrame,
         # so a snapshot stays readable when pandas moves on.
         return {

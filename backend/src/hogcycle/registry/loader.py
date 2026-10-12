@@ -20,7 +20,7 @@ _KNOWN_KEYS = {
     "id", "name_zh", "name_en", "tier", "freq", "unit", "lo", "hi", "adapter",
     "call", "extract", "accept", "revises", "zero_is_null", "max_age_days",
     "retired", "upstream_dark", "caliber_from", "caliber_until", "forecast",
-    "notes",
+    "reach", "notes",
 }
 
 _DARK_KEYS = {"acknowledged", "review_by", "reason"}
