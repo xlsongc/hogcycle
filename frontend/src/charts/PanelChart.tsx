@@ -25,7 +25,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Panel } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
-import { SERIES, fmt, panelOption, tierColor } from "./base/theme";
+import { SERIES, fmt, panelOption } from "./base/theme";
 import { syncPointer } from "./base/pointerSync";
 import { shiftMonths, toIso, toTime } from "@/lib/dates";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
@@ -49,7 +49,7 @@ const PLOT_INSET = 58;
 /** Below this, a press-and-release is a click, not a selection. */
 const DRAG_MIN_PX = 6;
 
-type Readout = { d: string; v: number | null; g: string };
+type Readout = { d: string; v: number | null; g: string; p?: string };
 
 /** null → pointer is off the group, so the header shows the latest value.
  *  { hit: null } → pointer is on the group but nothing of this series sits
@@ -68,6 +68,10 @@ export type PanelChartProps = {
   /** Draw the series this many months later than it happened. The header
    *  still reports the date the value describes. */
   shift?: number;
+  /** Where on the time axis a reading goes: at the period it describes, or
+   *  at the day it was published. Readings with no publication date have no
+   *  place in the second view, and are left out of it rather than guessed. */
+  align?: "period" | "release";
   title?: string;
   marker?: { date: string; label: string } | null;
   /** Give the panel an id so /wall/#<id> lands on it. */
@@ -85,6 +89,7 @@ export function PanelChart({
   showAxisLabels = false,
   size = "short",
   shift = 0,
+  align = "period",
   title,
   marker = null,
   anchor = false,
@@ -107,12 +112,22 @@ export function PanelChart({
     resetRef.current = onReset;
   });
 
+  // The points drawn, and the readings they stand for. Kept as two arrays
+  // because a drawn point's date is where it was placed, while the readout
+  // must report the period the value describes.
+  const source = useMemo(
+    () => (align === "release" ? panel.points.filter((p) => p.p) : panel.points),
+    [panel, align]
+  );
   const plotted = useMemo(
-    () =>
-      shift
-        ? { ...panel, points: panel.points.map((p) => ({ ...p, d: shiftMonths(p.d, shift) })) }
-        : panel,
-    [panel, shift]
+    () => ({
+      ...panel,
+      points: source.map((p) => ({
+        ...p,
+        d: shiftMonths(align === "release" && p.p ? p.p : p.d, shift),
+      })),
+    }),
+    [panel, source, align, shift]
   );
   const markerDate = marker?.date;
   const markerLabel = marker?.label;
@@ -170,8 +185,8 @@ export function PanelChart({
       const g = plotted.points[best]?.g ?? "M";
       const hit = best >= 0 && gap <= (TOLERANCE_MS[g] ?? 30 * DAY) ? best : null;
       // Report the date the value describes, not where a shift drew it.
-      const orig = hit == null ? null : panel.points[hit];
-      setProbe({ hit: orig ? { d: orig.d, v: orig.v, g: orig.g } : null });
+      const orig = hit == null ? null : source[hit];
+      setProbe({ hit: orig ? { d: orig.d, v: orig.v, g: orig.g, p: orig.p } : null });
       showDot(hit);
     };
     chart.on("updateAxisPointer", onAxis);
@@ -228,7 +243,7 @@ export function PanelChart({
       window.removeEventListener("hogcycle:theme", render);
       chart.dispose();
     };
-  }, [panel, plotted, group, min, max, showAxisLabels, locale, markerDate, markerLabel]);
+  }, [panel, source, plotted, group, min, max, showAxisLabels, locale, markerDate, markerLabel]);
 
   const latest = [...panel.points].reverse().find((p) => p.v != null);
   const shown: Readout | null = probe
@@ -244,7 +259,10 @@ export function PanelChart({
     <div
       className="panel"
       id={anchor ? panel.id : undefined}
-      style={{ ["--tier" as string]: tierColor(panel.tier) }}
+      // A var() reference rather than the resolved colour: the server cannot
+      // read computed styles, so resolving here rendered a different colour
+      // on each side of hydration.
+      style={{ ["--tier" as string]: `var(--${panel.tier})` }}
     >
       <div className="panel-head">
         <span className="panel-title">{name}</span>
@@ -284,6 +302,12 @@ export function PanelChart({
                 <b>{fmt(probe.hit.v, panel.unit, locale)}</b> {unitOf(panel.unit, locale)}
                 <br />
                 {probe.hit.d} · {granName(probe.hit.g)}
+                {probe.hit.p && (
+                  <>
+                    <br />
+                    {t.chart.published(probe.hit.p)}
+                  </>
+                )}
               </>
             ) : (
               t.chart.noneNear

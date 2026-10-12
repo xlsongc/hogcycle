@@ -62,10 +62,13 @@ export function labelOf(
 /** Units stay in the contract exactly as the source writes them, because the
  *  unit is part of the caliber. Only the display form is localised, and only
  *  where the source's own form is not already language-neutral. */
-const UNIT_EN: Record<string, string> = { "万头": "10k head" };
+const UNIT_DISPLAY: Record<Locale, Record<string, string>> = {
+  en: { "万头": "10k head", ratio: ": 1" },
+  zh: { "CNY/kg": "元/公斤", "CNY/tonne": "元/吨", kg: "公斤", ratio: ": 1" },
+};
 
 export function unitOf(unit: string, locale: Locale): string {
-  return locale === "en" ? (UNIT_EN[unit] ?? unit) : unit;
+  return UNIT_DISPLAY[locale][unit] ?? unit;
 }
 
 /** Number grouping. Both locales group in thousands here, but stating it

@@ -1,0 +1,96 @@
+/**
+ * The three readings the cycle turns on, in causal order: capacity, the
+ * price it becomes, and the margin that decides whether capacity follows.
+ *
+ * Each card answers the questions a reader has about one number, in the
+ * order they have them: what is it, how big, which way has it been going,
+ * how unusual is that, and how old is it. Every line is a fact gold computed
+ * (gold/facts.py) or a field the contract carries; the card arranges them
+ * and decides nothing. A stale reading keeps its card and says so first,
+ * because a card that quietly showed August's number in October would be
+ * the silent failure the collector guards against.
+ */
+
+import Link from "next/link";
+import type { Panel, Reading } from "@/types/generated/wall";
+import { fmt } from "@/charts/base/theme";
+import { nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
+import { dict } from "@/i18n/dict";
+import { granularityLetter, lagDays, periodLabel, shortDate } from "@/lib/period";
+import { Sparkline } from "./Sparkline";
+
+export type Role = "capacity" | "price" | "margin";
+
+export type Signal = { role: Role; reading: Reading; panel: Panel };
+
+type Props = { signals: Signal[]; end: string; locale: Locale };
+
+export function Signals({ signals, end, locale }: Props) {
+  return (
+    <div className="signals">
+      {signals.map((s) => (
+        <SignalCard key={s.role} {...s} end={end} locale={locale} />
+      ))}
+    </div>
+  );
+}
+
+function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: string; locale: Locale }) {
+  const t = dict(locale);
+  const o = t.overview;
+  const g = granularityLetter(r.granularity ?? "");
+  const name = nameOf(r, locale);
+
+  // The headline fact: a run beats a single move, which beats a year-on-year,
+  // because each says strictly more about direction than the next.
+  const trend = r.streak
+    ? o.streak(r.streak.dir, r.streak.n, g)
+    : r.change
+      ? o.change(r.change.pct, r.change.since)
+      : null;
+  const dir = r.streak?.dir ?? (r.change ? (r.change.pct < 0 ? "down" : "up") : null);
+  const context = r.extreme
+    ? o.extreme(r.extreme.kind, r.extreme.since, r.extreme.all)
+    : r.percentile != null
+      ? o.position(r.percentile)
+      : null;
+
+  return (
+    <article
+      className={r.stale ? "signal stale" : "signal"}
+      style={{ ["--tier" as string]: `var(--${r.tier})` }}
+    >
+      <header>
+        <span className="signal-role">{t.tier[role]}</span>
+        <span className="signal-note">{o.role[role]}</span>
+      </header>
+      <h3>
+        <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{name}</Link>
+      </h3>
+      <p className="signal-value">
+        <b className="num">{fmt(r.value, r.unit, locale)}</b>
+        <span className="signal-unit">{unitOf(r.unit, locale)}</span>
+      </p>
+      {r.stale && <p className="signal-stale">{o.staleBadge(r.age_days ?? 0)}</p>}
+      <ul className="signal-facts">
+        {trend && (
+          <li className={dir ? `dir-${dir}` : undefined}>
+            <span aria-hidden="true">{dir === "down" ? "▼" : dir === "up" ? "▲" : "•"}</span>{" "}
+            {trend}
+            {r.streak && r.yoy != null && <span className="muted"> · {o.yoy(r.yoy)}</span>}
+          </li>
+        )}
+        {context && <li className="muted">{context}</li>}
+      </ul>
+      <Sparkline panel={panel} end={end} label={t.chart.panelLabel(name, r.unit, panel.points.length)} />
+      <footer>
+        <span>{periodLabel(r.obs_date, g, locale)}</span>
+        <span className="muted">
+          {r.published_on
+            ? o.released(shortDate(r.published_on), lagDays(r.obs_date, r.published_on))
+            : o.releaseUnknown}
+        </span>
+      </footer>
+    </article>
+  );
+}

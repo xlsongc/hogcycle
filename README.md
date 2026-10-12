@@ -10,32 +10,43 @@ Live: **https://xlsongc.github.io/hogcycle/** (English) ·
 ## Why this exists
 
 `akshare` already returns most of the series this project needs in one line
-each. So the interesting problem is not fetching — it is that a plain fetch
-gives you **today's version of history**, and the single most important
-indicator in the cycle, breeding sow inventory, is revised after the fact.
-
-That makes the obvious question unanswerable:
+each. So the interesting problem is not fetching. A plain fetch gives you
+**today's version of history, dated by the period each number describes**,
+and that cannot answer the question that matters:
 
 > Would a capacity-based signal have called the turn *before* the price moved,
 > using only what was knowable at the time?
 
-You cannot check that against a table that silently absorbs revisions. So the
-store keeps two time axes and never overwrites:
+Two things break it. A history table silently absorbs corrections, source
+switches and caliber changes. And breeding sow inventory, the one real
+leading indicator, becomes public **20 to 59 days after** the period it
+describes (28 at the median). A backtest that treats the period's date as
+the day it was known looks a month or two ahead. So the store keeps three
+times and never overwrites:
 
-| axis | column | meaning |
+| time | column | meaning |
 | --- | --- | --- |
-| valid time | `obs_date` | the date the number describes |
-| transaction time | `fetched_at` | the moment we learned it |
+| valid time | `obs_date` | the period the number describes |
+| transaction time | `fetched_at` | the moment this warehouse learned it |
+| publication time | `published_on` | the day the publisher released it, when the source says so |
 
-`SilverStore.as_of(moment)` then reconstructs the state of knowledge at any past
-date. Everything else in the repo exists to keep that guarantee honest.
+`SilverStore.as_of(moment)` reconstructs what the warehouse believed at any
+moment. `SilverStore.published(indicator, by=day)` reconstructs what anyone
+could have known on any day, including days before collection began. Two
+real rows from silver:
 
 ```
---- knowledge as of 2026-05-01 ---     --- knowledge today ---
-  2025-12-31  4038.0                     2025-12-31  4038.0
-  2026-03-31  3920.0                     2026-03-31  3904.0   <- revised
-                                         2026-06-30  3780.0
+能繁母猪存栏  2026-06-30  3780.0   published 2026-07-23   learned 2026-10-12
+仔猪价格      2023-10-25  25.36    (mirror, undated)      learned 2026-09-06
+              2023-10-25  25.63    published 2023-10-30   learned 2026-10-12  <- the ministry's own number
 ```
+
+The second is the mirror this project used to read, which had mistyped one
+week. The switch to the primary source recorded the correction instead of
+overwriting it. The project was built expecting 能繁母猪 itself to be
+restated. In the 55 primary-source editions held, it never was
+([ADR-0017](docs/adr/0017-publication-date-is-a-third-time.md)). A
+restatement would land as a second release row.
 
 There is a second, blunter reason to run the collector daily, and it has
 nothing to do with revisions: akshare's **daily** series are a rolling ~1-year
@@ -63,7 +74,7 @@ backend/src/hogcycle/
 frontend/src/
   app/(en)/ app/(zh)/       one prerendered root layout per language
   charts/                   ECharts panels, the wall, time-synced crosshair
-  components/               page bodies, instrument header, overview, nav
+  components/               page bodies, overview cards, nav
   i18n/                     every string the UI renders, in both languages
   types/generated/          generated from contracts/ — never hand-written
 ```
@@ -116,10 +127,13 @@ drift from it. See [ADR-0014](docs/adr/0014-the-site-speaks-two-languages.md).
 
 Each language has three pages:
 
-- **Overview**: the instrument header; the thesis (breeding sows shifted by
-  the biological lag, above the hog price); "what the numbers say", which are
-  facts with fixed definitions computed in the pipeline and never a phase
-  call; and every reading in one table.
+- **Overview**: where the cycle stands, as three readings in causal order
+  (capacity, price, margin). Each gives its direction, how unusual it is,
+  the period it describes and the day it was published. Below them: the
+  thesis (breeding sows shifted by the biological lag, above the hog price,
+  placed at either the period or the publication date); the latest releases;
+  facts with fixed definitions, never a phase call; and every reading in one
+  table. See [ADR-0019](docs/adr/0019-the-overview-answers-one-question.md).
 - **Causal-chain wall**: every cycle series on one time axis. Hover to read
   every panel at one date, drag to zoom, double-click to reset. The time
   axis stays pinned while the wall scrolls.
@@ -183,10 +197,14 @@ Traps, all encoded in `sources.yaml`:
 ## Status
 
 Phase 1 complete: config → fetch → bronze → validate → silver → gold →
-contract → static dashboard, with 94 tests, the adapters among them over real
+contract → static dashboard, with 114 tests, the adapters among them over real
 captured payloads, and the site published in English and Chinese as three
-pages each.
+pages each. Every 农业农村部 row carries its release date, and the weekly
+prices come from the ministry's own reports, not a mirror
+([ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)).
 
-Next: the ministry's 500-county survey as an independent second caliber (which
-also closes margin arithmetic within one survey), then the bitemporal
-verification layer that the storage was built for.
+Next: a page per series (caliber, source, release lag, revision trail, CSV),
+and the contract split per page; then a machine-readable source for 发改委's
+猪粮比价 before its acknowledgement lapses on 2026-12-31; then the
+verification layer the storage was built for, a backtest that reads only
+`published()`.

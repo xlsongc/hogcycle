@@ -27,10 +27,12 @@ export interface Panel {
   freq?: string;
   /** Whether this series belongs in the causal-chain wall. False for equities: a share price is a claim on the cycle, not a link in it, so it lives in the overlay instead. */
   in_wall?: boolean;
-  /** Whether upstream restates this series after the fact. True only for 能繁母猪存栏, which is also the only real leading indicator — the coincidence that justifies bitemporal storage. */
+  /** Whether this series is watched for restatement after the fact. Set for 能繁母猪存栏, the only real leading indicator. No period has been restated in the 55 primary-source editions held (2021-12 to 2026-07); its release lag is what a backtest has to respect today. */
   revises?: boolean;
   /** A reference line that means something in the domain, not chart decoration. */
   threshold?: Threshold | null;
+  /** Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with. */
+  release_lag?: ReleaseLag | null;
   /** Ascending by date. Each point keeps its own granularity: this series genuinely mixes annual, quarterly and monthly readings, and flattening them would claim they are equivalent measurements. */
   points: Point[];
 }
@@ -41,12 +43,20 @@ export interface Threshold {
   label_en: string;
 }
 
+export interface ReleaseLag {
+  median_days: number;
+  max_days: number;
+  n: number;
+}
+
 export interface Point {
   /** Period END, ISO date. */
   d: string;
   v: number | null;
   /** daily / weekly / monthly / quarterly / annual */
   g: "D" | "W" | "M" | "Q" | "A";
+  /** The day the publisher released this value, ISO date. Absent when the source does not date its releases: unknown, never assumed to equal d. Present, it is when the value became usable, which for a monthly print is three to nine weeks after d. */
+  p?: string;
 }
 
 export interface Reading {
@@ -59,6 +69,8 @@ export interface Reading {
   unit: string;
   value: number | null;
   obs_date: string;
+  /** The day the publisher released the latest value, or null when the source does not say. */
+  published_on: string | null;
   granularity?: string;
   percentile?: number | null;
   /** Percent change against the observation nearest one year earlier, or null when none sits near the anniversary. Null is a real answer: a series that began this year has no year-on-year. */
@@ -72,6 +84,10 @@ export interface Reading {
   first_seen: string | null;
   /** Set when the latest value is the lowest or highest the series has been for at least a year. since is the most recent earlier observation at least as extreme, or the window's first observation when all is true. A fact with a fixed definition, never a phase call. */
   extreme: Extreme | null;
+  /** Percent change from the previous reading of the same granularity, and that reading's date. Null when there is no previous one. */
+  change: Change | null;
+  /** Consecutive moves in one direction ending at the latest reading, among readings of its granularity: n moves (at least 2) since the reading where the run began. Null when the latest move is flat or the run is shorter. A count of moves, not a trend call. */
+  streak: Streak | null;
   /** For a series with a domain threshold: how many consecutive observations sit on the latest value's side of it, and since when. A value on the line counts as above. */
   threshold_run: ThresholdRun | null;
 }
@@ -80,6 +96,17 @@ export interface Extreme {
   kind: "low" | "high";
   since: string;
   all: boolean;
+}
+
+export interface Change {
+  pct: number;
+  since: string;
+}
+
+export interface Streak {
+  dir: "up" | "down";
+  n: number;
+  since: string;
 }
 
 export interface ThresholdRun {

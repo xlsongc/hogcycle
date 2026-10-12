@@ -9,6 +9,11 @@
  * their alignment would be arbitrary (CLAUDE.md: no dual axis). The shift is
  * the reader's to choose among the biologically meaningful values; none of
  * them is fitted.
+ *
+ * The second switch is the backtest's question. By period, a sow reading
+ * sits at the quarter it describes; by release, at the day it was published,
+ * which is where a reader could first have acted on it. The gap between the
+ * two is lead time the biology grants and the publication lag spends.
  */
 
 import { useState } from "react";
@@ -22,18 +27,24 @@ const GROUP = "hogcycle-thesis";
 const LEADS = [0, 10, 12];
 const DEFAULT_LEAD = 10;
 
+type Align = "period" | "release";
 type Props = { capacity: Panel; price: Panel; end: string; locale: Locale };
 
 export function ThesisChart({ capacity, price, end, locale }: Props) {
   const t = dict(locale).overview;
   const [lead, setLead] = useState(DEFAULT_LEAD);
+  const [align, setAlign] = useState<Align>("period");
+  const lag = capacity.release_lag;
 
+  const placed = (q: Panel["points"][number]) => (align === "release" ? q.p : q.d);
+  const capPts = capacity.points.filter((q) => q.v != null && placed(q));
   const first = (p: Panel) => p.points.find((q) => q.v != null)?.d ?? end;
-  const last = [...capacity.points].reverse().find((q) => q.v != null)?.d ?? end;
+  const capFirst = capPts[0] ? placed(capPts[0]) ?? end : end;
+  const capLast = capPts.length ? placed(capPts[capPts.length - 1]!) ?? end : end;
   // Start where both lines exist, so neither panel opens on an empty stretch.
-  const min = [first(price), shiftMonths(first(capacity), lead)].sort()[1] as string;
+  const min = [first(price), shiftMonths(capFirst, lead)].sort()[1] as string;
   // Run past today when the shifted capacity does: that stretch is the point.
-  const shiftedEnd = shiftMonths(last, lead);
+  const shiftedEnd = shiftMonths(capLast, lead);
   const max = shiftedEnd > end ? shiftedEnd : end;
   const marker = max > end ? { date: end, label: t.today } : null;
 
@@ -46,12 +57,25 @@ export function ThesisChart({ capacity, price, end, locale }: Props) {
             {t.leadOption(n)}
           </button>
         ))}
+        {lag && (
+          <>
+            <span className="filter-label bar-gap">{t.align}</span>
+            <button aria-pressed={align === "period"} onClick={() => setAlign("period")}>
+              {t.alignPeriod}
+            </button>
+            <button aria-pressed={align === "release"} onClick={() => setAlign("release")}>
+              {t.alignRelease}
+            </button>
+          </>
+        )}
       </div>
+      {align === "release" && lag && <p className="section-note">{t.alignNote(lag.median_days)}</p>}
       <div className="wall">
         <PanelChart
           panel={capacity}
           title={nameOf(capacity, locale) + t.shifted(lead)}
           shift={lead}
+          align={align}
           group={GROUP}
           min={min}
           max={max}

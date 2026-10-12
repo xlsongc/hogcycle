@@ -9,12 +9,21 @@ are the way they are, see `docs/adr/`.
 **A warehouse that remembers what it used to believe.**
 
 能繁母猪存栏 (breeding sow inventory) is the only real leading indicator in
-the China hog cycle — biology fixes a 10-12 month lag from sow to slaughter —
-and it is also the only series upstream restates after the fact. Those two
-facts holding at once is the entire reason for bitemporal storage. Without it
-you cannot answer "would this signal have called the turn using only what was
-knowable at the time?", because your history table has silently absorbed
-revisions and every backtest cheats.
+the China hog cycle — biology fixes a 10-12 month lag from sow to slaughter.
+The question worth asking of it is "would this signal have called the turn
+using only what was knowable at the time?", and a history table cannot
+answer that. It has absorbed every correction, every source switch and every
+caliber change, and it dates each value by the period it describes rather
+than the day anyone could see it. A month's sow figure appears 20 to 59
+days after the month ends (ADR-0017). A backtest on `obs_date` looks ahead
+by that much, and every backtest on an overwritten table cheats.
+
+So three times are kept: `obs_date` (what the value describes),
+`fetched_at` (when this warehouse learned it) and `published_on` (when the
+publisher released it). The project was built expecting 能繁母猪 to be
+restated after the fact. In 55 primary-source editions it never was. The
+store would keep a restatement as a second release, but do not cite one as
+fact until silver holds it.
 
 The bitemporal machinery is not résumé decoration. Delete it and the project
 has no reason to exist.
@@ -67,7 +76,15 @@ with zero HTTP requests.
   freeze, which is why this exists. It is not a way to get CI green.
 - **Prefer the primary source to a mirror.** A convenient wrapper around
   someone else's copy of a government release inherits their outages and
-  their abandonment, and tells you about neither.
+  their abandonment, and tells you about neither. When switching, check the
+  two week by week before trusting either. The 玄田 copies had a mistyped
+  week, a misdated week and a caliber change welded shut (ADR-0018).
+- **A caliber change inside one source is two indicators.** When a survey
+  changes whom it asks, split the history with `caliber_from` /
+  `caliber_until`, even when the level barely moves.
+- **A release date is read, never assumed.** `published_on` is NULL when
+  the source does not state it. No code may fill it from `obs_date` plus a
+  typical lag.
 - **Every adapter needs a real payload fixture.** All five inherited tests
   passed while the two most important indicators could not be collected at
   all, because every test fed itself a synthetic `date`/`value` frame.
@@ -130,9 +147,12 @@ value to suit a unit label.
 - **Small-multiple panels sync by time, never by index.** `echarts.connect()`
   links pointers by data index, which puts panels of different frequencies
   on different dates. Use `charts/base/pointerSync.ts` (ADR-0016).
-- **Nothing in the header is invented.** It looks like an instrument panel,
-  which is exactly why every gauge has to be filled from the contract: a
-  decorative bar next to real ones makes the reader trust neither.
+- **Nothing on a card is invented.** Every line on an overview card is a
+  fact gold computed or a field the contract carries. A decorative number
+  next to real ones makes the reader trust neither (ADR-0019).
+- **Direction is shown, not judged.** No red-for-down or green-for-up: the
+  same move is good news to one reader and bad news to another, and red
+  means "up" on a Chinese market screen.
 - Errors name what they saw. `no value column 能繁母猪存栏 in ['周期', ...]`
   beats `KeyError`.
 
@@ -142,6 +162,8 @@ value to suit a unit label.
 # backend (from repo root, with .venv active)
 hogcycle collect                     # all indicators; one failure does not abort the rest
 hogcycle collect --months-back 60    # backfill 农业农村部 editions (default 6)
+hogcycle collect --indicator a,b --weekly-pages 25   # backfill the weekly reports
+hogcycle replay                      # re-parse every bronze snapshot, zero HTTP
 hogcycle status                      # coverage, latest obs_date, and age per series
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
 hogcycle status --json               # one object per series; the stale-series issue reads it
@@ -179,3 +201,6 @@ so you do not have to re-derive them.
 | 0014 | Two prerendered languages; names travel in the contract |
 | 0015 | A known outage is acknowledged with a deadline; the page still says so |
 | 0016 | Three pages per language; panels share a crosshair by time, not by index |
+| 0017 | The day a value became public is recorded, because that is what a backtest needs |
+| 0018 | Weekly prices come from the ministry's own reports; calibers get explicit bounds |
+| 0019 | The overview answers one question; the instrument panel is gone |

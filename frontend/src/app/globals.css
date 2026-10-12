@@ -22,6 +22,9 @@
      way round. zpix is drawn on 12px, and the Chinese page is mostly zpix. */
   --type: 12px;
   --type-lh: 21px;
+  /* Headings at twice the grid, never at a size between: the only way to make
+     a pixel face larger without blurring it. */
+  --type-2x: 24px;
   --chip: rgba(11, 11, 11, 0.045);
 
   /* Tier hues. Validated all-pairs in both modes with the dataviz palette
@@ -134,6 +137,7 @@ body {
 html:lang(en) {
   --type: 11px;
   --type-lh: 20px;
+  --type-2x: 22px;
 }
 
 .wrap {
@@ -320,3 +324,14 @@ a:hover {
   text-decoration-color: currentColor;
 }
 
+/* Text rather than colour alone, so the state survives greyscale and screen
+   readers; the colour only repeats what the word already says. */
+.stale-tag {
+  margin-left: 6px;
+  padding: 0 3px;
+  border: 1px solid var(--critical);
+  color: var(--critical);
+  font-style: normal;
+  font-size: var(--type);
+  line-height: 1.2;
+}

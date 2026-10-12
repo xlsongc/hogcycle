@@ -9,8 +9,6 @@
 
 import type { Metadata } from "next";
 import "../globals.css";
-import "../hud.css";
-import "../hud-scale.css";
 import "../nav.css";
 import "../wall.css";
 import "../overview.css";

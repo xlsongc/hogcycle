@@ -8,6 +8,15 @@
 
 import type { Dict } from "./en";
 
+/** 一段连续读数的期间量词（「连续 4 个季度下降」）。 */
+const UNIT_ZH: Record<string, string> = {
+  D: "天",
+  W: "周",
+  M: "个月",
+  Q: "个季度",
+  A: "年",
+};
+
 export const zh: Dict = {
   meta: {
     title: "猪周期图表墙",
@@ -27,50 +36,10 @@ export const zh: Dict = {
     compare: "对比",
   },
 
-  hud: {
-    panel: "监测面板",
-    knownAt: "知识时点",
-    local: "本地时刻",
-    title: "猪周期监测",
-    capacity: "产能",
-    coverage: "覆盖",
-    price: "价格",
-    howToRead: "读法",
-    from: "起",
-    to: "止",
-    series: "序列",
-    level: "存栏",
-    yoy: "同比",
-    pctl: "分位",
-    hint: (
-      <>
-        条形填充为该序列<b>自身历史分位</b>，不是绝对水平；样本不足者留空。
-        本面板只读数，不判定。
-      </>
-    ),
-    footSource: "数据源",
-    footSourceValue: "农业农村部五部委联合发布 · akshare",
-    footCaliber: "口径",
-    footCaliberValue: "见页脚",
-    footCollected: "采集",
-    footCollectedValue: (
-      <>
-        每日 <span className="num">09:00 CST</span>
-      </>
-    ),
-    footVerdict: "判定",
-    footVerdictValue: "留给读者",
-  },
 
   gauge: {
-    noPercentile: (name: string) => `${name}：历史分位不足，样本太短`,
-    percentile: (name: string, pct: number) => `${name}：历史第 ${pct} 分位`,
-    now: (label: string, value: number) => `${label} 当前 ${value}`,
     stale: "停更",
     staleSince: (date: string, days: number) => `${date} 之后无新数据（${days} 天）`,
-    was: (label: string, value: number, date: string) =>
-      `${label} 在 ${date} 为 ${value}，之后无新数据`,
-    open: (name: string) => `在图表墙上查看${name}`,
   },
 
   overview: {
@@ -87,28 +56,60 @@ export const zh: Dict = {
     leadOption: (n: number) => (n ? `${n} 个月` : "不前移"),
     shifted: (n: number) => (n ? `（前移 ${n} 个月）` : ""),
     today: "今天",
-
-    changesHeading: "数字在说什么",
     changesNote: (
       <>
-        由管道按固定定义计算出的事实：新发布的数据、相对阈值的连续位置、多年极值。
+        由管道按固定定义计算出的事实：相对阈值的连续位置、多年极值、停止更新的序列。
         <b>没有一条是阶段判定</b> —— 判断留给读者。
       </>
     ),
     groups: {
-      fresh: "新数据",
       runs: "阈值",
       extremes: "多年极值",
       stale: "停止更新",
     },
-    freshNote: "近 30 天内首次采集到的月度与季度读数",
-    collected: (date: string) => `采集于 ${date}`,
     extreme: (kind: "low" | "high", since: string, all: boolean) =>
       `${all ? `序列开始（${since}）` : since}以来${kind === "low" ? "最低" : "最高"}`,
     run: (below: boolean, line: string, n: number, since: string) =>
       `自 ${since} 起连续 ${n} 期在${line}${below ? "下方" : "上方"}`,
     staleFor: (days: number, date: string) => `最后读数 ${date}，已 ${days} 天`,
     nothing: "按这些定义，暂无可报告的事实。",
+
+    heading: "猪周期现在在哪",
+    lede: (
+      <>
+        三个读数，按因果顺序排列：能繁母猪决定 10–12 个月后的生猪供给，猪价是这批
+        供给落地的地方，猪粮比决定养殖户还愿不愿意补栏。每个数字都注明了它描述的
+        时期和公开的日期。没有一个是阶段判定。
+      </>
+    ),
+    stamp: (asOf: string) => `数据截至 ${asOf}`,
+    lastRelease: (date: string) => `最近一次发布 ${date}`,
+    role: {
+      capacity: "领先猪价 10–12 个月",
+      price: "供给落地的地方",
+      margin: "决定补栏是否继续",
+    },
+    streak: (dir: "up" | "down", n: number, g: string) =>
+      `连续 ${n} ${UNIT_ZH[g] ?? "期"}${dir === "down" ? "下降" : "上升"}`,
+    change: (pct: number, since: string) => `较 ${since} ${pct > 0 ? "+" : ""}${pct}%`,
+    yoy: (pct: number) => `同比 ${pct > 0 ? "+" : ""}${pct}%`,
+    position: (pct: number) => `处于自身历史第 ${pct} 分位`,
+    released: (date: string, lag: number) => `${date} 发布，滞后 ${lag} 天`,
+    releaseUnknown: "源头未注明发布日期",
+    staleBadge: (days: number) => `已 ${days} 天没有新数据`,
+    align: "读数画在",
+    alignPeriod: "它描述的时期",
+    alignRelease: "它公开的那天",
+    alignNote: (median: number) => (
+      <>
+        按发布日放置时，每个读数出现在读者第一次能用上它的位置。发布比时期结束
+        中位晚 <b className="num">{median}</b> 天，这段时间是从生物学领先期里扣掉的。
+        2021-12 以前的读数没有发布日期，这一视图里不画，也不去猜。
+      </>
+    ),
+    feedHeading: "最近发布",
+    feedNote: "周度与月度发布，按公开日期从新到旧。",
+    factsHeading: "值得留意",
   },
 
   readings: {
@@ -243,6 +244,7 @@ export const zh: Dict = {
   chart: {
     noData: "此期间无数据",
     noneNear: "该日期附近无数据",
+    published: (date: string) => `${date} 发布`,
     startsAt: (month: string) => `数据始于 ${month}`,
     granularityName: {
       D: "日度读数",

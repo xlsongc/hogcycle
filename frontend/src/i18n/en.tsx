@@ -21,6 +21,15 @@ function ordinal(n: number): string {
   return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
 }
 
+/** Plural period words for a run of readings ("down 4 quarters in a row"). */
+const UNIT_EN: Record<string, string> = {
+  D: "days",
+  W: "weeks",
+  M: "months",
+  Q: "quarters",
+  A: "years",
+};
+
 export const en = {
   meta: {
     title: "The Hog Cycle Wall",
@@ -41,53 +50,11 @@ export const en = {
     compare: "Compare",
   },
 
-  hud: {
-    panel: "Instrument panel",
-    knownAt: "KNOWN AT",
-    local: "LOCAL",
-    title: "HOG CYCLE MONITOR",
-    capacity: "CAPACITY",
-    coverage: "COVERAGE",
-    price: "PRICE",
-    howToRead: "HOW TO READ",
-    from: "FROM",
-    to: "TO",
-    series: "SERIES",
-    level: "LEVEL",
-    yoy: "YOY",
-    pctl: "PCTL",
-    hint: (
-      <>
-        Bar fill is each series&rsquo; <b>own historical percentile</b>, not an
-        absolute level; too little history leaves it empty. This panel reads
-        instruments, it does not judge.
-      </>
-    ),
-    footSource: "SOURCE",
-    footSourceValue: "MARA five-ministry release · akshare",
-    footCaliber: "CALIBER",
-    footCaliberValue: "see footer",
-    footCollected: "COLLECTED",
-    footCollectedValue: (
-      <>
-        daily <span className="num">09:00 CST</span>
-      </>
-    ),
-    footVerdict: "VERDICT",
-    footVerdictValue: "left to the reader",
-  },
 
   gauge: {
-    noPercentile: (name: string) => `${name}: no percentile, history too short`,
-    percentile: (name: string, pct: number) =>
-      `${name}: ${ordinal(pct)} historical percentile`,
-    now: (label: string, value: number) => `${label} now ${value}`,
     stale: "STALE",
     staleSince: (date: string, days: number) =>
       `No new data since ${date} (${days} days)`,
-    was: (label: string, value: number, date: string) =>
-      `${label} was ${value} on ${date}; nothing newer`,
-    open: (name: string) => `Open ${name} on the wall`,
   },
 
   overview: {
@@ -107,29 +74,66 @@ export const en = {
     leadOption: (n: number) => (n ? `+${n} mo` : "None"),
     shifted: (n: number) => (n ? ` · shifted +${n} mo` : ""),
     today: "today",
-
-    changesHeading: "What the numbers say",
     changesNote: (
       <>
-        Facts with fixed definitions, computed in the pipeline: new releases,
-        runs against a threshold, multi-year extremes.{" "}
+        Facts with fixed definitions, computed in the pipeline: runs against a
+        threshold, multi-year extremes, series that stopped updating.{" "}
         <b>None of them is a call on the phase</b> — that stays with the reader.
       </>
     ),
     groups: {
-      fresh: "New data",
       runs: "Thresholds",
       extremes: "Multi-year extremes",
       stale: "Stopped updating",
     },
-    freshNote: "monthly and quarterly readings first collected in the last 30 days",
-    collected: (date: string) => `collected ${date}`,
     extreme: (kind: "low" | "high", since: string, all: boolean) =>
       `${kind === "low" ? "lowest" : "highest"} since ${all ? `the series begins (${since})` : since}`,
     run: (below: boolean, line: string, n: number, since: string) =>
       `${below ? "below" : "above"} the ${line} for ${n} straight readings, since ${since}`,
     staleFor: (days: number, date: string) => `last reading ${date}, ${days} days ago`,
     nothing: "Nothing to report under these definitions.",
+
+    heading: "Where the hog cycle stands",
+    lede: (
+      <>
+        Three readings in causal order. Breeding sows fix hog supply 10–12
+        months out; the hog price is where that supply lands; the hog-to-corn
+        ratio decides whether farmers keep breeding. Each number says which
+        period it describes and the day it became public. None of them is a
+        call on the phase.
+      </>
+    ),
+    stamp: (asOf: string) => `Data as of ${asOf}`,
+    lastRelease: (date: string) => `latest release ${date}`,
+    role: {
+      capacity: "leads price by 10–12 months",
+      price: "where supply lands",
+      margin: "decides whether breeding continues",
+    },
+    streak: (dir: "up" | "down", n: number, g: string) =>
+      `${dir === "down" ? "down" : "up"} ${n} ${UNIT_EN[g] ?? "readings"} in a row`,
+    change: (pct: number, since: string) =>
+      `${pct > 0 ? "+" : ""}${pct}% vs ${since}`,
+    yoy: (pct: number) => `${pct > 0 ? "+" : ""}${pct}% YoY`,
+    position: (pct: number) => `${ordinal(pct)} percentile of its own history`,
+    released: (date: string, lag: number) => `published ${date}, ${lag} days after`,
+    releaseUnknown: "source gives no release date",
+    staleBadge: (days: number) => `no new data for ${days} days`,
+    align: "Place each reading at",
+    alignPeriod: "the period it describes",
+    alignRelease: "the day it was published",
+    alignNote: (median: number) => (
+      <>
+        Placed at its publication date, each reading appears where a reader could
+        first have used it. A release comes a median of{" "}
+        <b className="num">{median}</b> days after the period ends, and that time
+        is spent out of the biological lead. Readings from before 2021-12 carry
+        no publication date and are left out of this view, not guessed at.
+      </>
+    ),
+    feedHeading: "Latest releases",
+    feedNote: "Weekly and monthly prints, newest publication first.",
+    factsHeading: "Worth noting",
   },
 
   readings: {
@@ -290,6 +294,7 @@ export const en = {
   chart: {
     noData: "No data in this window",
     noneNear: "nothing near this date",
+    published: (date: string) => `published ${date}`,
     startsAt: (month: string) => `data from ${month}`,
     granularityName: {
       D: "daily reading",
