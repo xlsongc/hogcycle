@@ -112,9 +112,19 @@ hogcycle status --fail-on-stale      # exit 1 if a series has stopped advancing
 hogcycle revisions --indicator sow_inventory
 hogcycle export               # gold -> frontend/src/data/wall.json
 hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
+hogcycle replay               # re-parse every bronze snapshot, zero HTTP requests
 
 cd frontend && npm install && npm run dev
 ```
+
+**Where collection runs.** 农业农村部 refuses GitHub's runners (HTTP 403)
+and 玄田 never answers them, while both serve an ordinary connection. So
+the sources marked `reach: cn` are collected by
+`scripts/local-collector/collect.sh` from a normal machine, in its own clone,
+and `install.sh` schedules that daily with launchd. The GitHub run collects
+the rest (`--reach anywhere`) and checks *every* series for staleness, so it
+is also the watchdog for the local job
+([ADR-0022](docs/adr/0022-collect-where-the-source-answers.md)).
 
 ## The site
 

@@ -99,9 +99,17 @@ hogcycle status --fail-on-stale      # 有序列停止推进则退出码 1
 hogcycle revisions --indicator sow_inventory
 hogcycle export               # gold -> frontend/src/data/wall.json
 hogcycle export --as-of 2026-01-01   # 重建那一天所见的图表墙
+hogcycle replay               # 用当前解析器重读全部 bronze 快照，零网络请求
 
 cd frontend && npm install && npm run dev
 ```
+
+**采集在哪里跑。** 农业农村部对 GitHub 的 runner 返回 HTTP 403，玄田则完全不响应，
+而两者对普通网络都正常。所以标为 `reach: cn` 的来源由
+`scripts/local-collector/collect.sh` 在一台普通网络的机器上、用独立的 clone 采集，
+`install.sh` 用 launchd 把它排成每天一次。GitHub 那边采其余来源（`--reach anywhere`），
+并对**全部**序列做陈旧度检查，所以它同时是本地任务的看门狗
+（[ADR-0022](docs/adr/0022-collect-where-the-source-answers.md)）。
 
 ## 关于站点
 
