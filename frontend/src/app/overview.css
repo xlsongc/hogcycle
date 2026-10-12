@@ -119,6 +119,11 @@
   color: var(--dir);
 }
 
+.signal-outlook {
+  margin-top: 2px;
+  color: var(--ink-2);
+}
+
 .spark {
   display: block;
   width: 100%;

@@ -27,6 +27,8 @@ export interface Panel {
   freq?: string;
   /** Whether this series belongs in the causal-chain wall. False for equities: a share price is a claim on the cycle, not a link in it, so it lives in the overlay instead. */
   in_wall?: boolean;
+  /** A source's projection rather than a measurement: its latest points lie in the future, and it is kept off the wall. Present on every panel; true for USDA's series. */
+  forecast?: boolean;
   /** Whether this series is watched for restatement after the fact. Set for 能繁母猪存栏, the only real leading indicator. No period has been restated in the 55 primary-source editions held (2021-12 to 2026-07); its release lag is what a backtest has to respect today. */
   revises?: boolean;
   /** A reference line that means something in the domain, not chart decoration. */

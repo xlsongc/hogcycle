@@ -76,21 +76,10 @@ class Observation:
                 f"{self.indicator}: unknown granularity {self.granularity!r}; "
                 f"expected one of {GRANULARITIES}"
             )
-        # Compare against UTC "today" — fetched_at is UTC, so a local date here
-        # would make the guard drift by a day depending on where this runs.
-        today = dt.datetime.now(dt.UTC).date()
-        if self.obs_date > today + dt.timedelta(days=1):
-            raise ValueError(
-                f"{self.indicator}: obs_date {self.obs_date} is in the future"
-            )
-        # A period cannot be reported before it has ended. Seeing this means
-        # the period parser or the publication-date parser is wrong, and
-        # either would hand a backtest a value from the future.
-        if self.published_on is not None and self.published_on < self.obs_date:
-            raise ValueError(
-                f"{self.indicator}: published {self.published_on}, before the "
-                f"period it reports ends ({self.obs_date})"
-            )
+        # Whether a date may lie in the future, or after its release, depends
+        # on what the series is: a measurement may not, a forecast must. That
+        # is a property of the indicator, so it is checked per batch in
+        # validation.validate, which knows which one this is.
 
     def as_row(self) -> dict[str, Any]:
         return asdict(self)

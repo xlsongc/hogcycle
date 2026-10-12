@@ -65,6 +65,8 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
         )}
         {panel.tier === "equity" ? (
           <p className="muted">{s.equity}</p>
+        ) : panel.forecast ? (
+          <p className="muted">{s.forecast}</p>
         ) : panel.in_wall === false ? (
           <p className="muted">{s.retired}</p>
         ) : null}
@@ -81,7 +83,9 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
             {r.published_on && (
               <span className="muted">
                 {" · "}
-                {o.released(r.published_on, lagDays(r.obs_date, r.published_on))}
+                {lagDays(r.obs_date, r.published_on) < 0
+                  ? s.ahead(r.published_on, -lagDays(r.obs_date, r.published_on))
+                  : o.released(r.published_on, lagDays(r.obs_date, r.published_on))}
               </span>
             )}
             {r.stale && <span className="stale-tag">{o.staleBadge(r.age_days ?? 0)}</span>}
@@ -123,7 +127,9 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
             {s.releaseHeading}
           </h2>
           <p className="section-note">
-            {panel.release_lag
+            {panel.forecast
+              ? s.releaseForecast
+              : panel.release_lag
               ? s.releaseBody(
                   panel.release_lag.median_days,
                   panel.release_lag.max_days,

@@ -178,6 +178,47 @@ indicators:
       当天就把这条也点了出来。原 freq 标为 weekly 是错的：源头给的是月末日期，
       月频。历史行仍保留在 silver，粒度按当时解析结果记为 weekly。
 
+
+  # ---------- 境外来源：USDA 对中国的估计与预测 ----------
+
+  - id: usda_sow_stocks
+    name_zh: 能繁母猪期初存栏（USDA 估计）
+    name_en: Sow beginning stocks (USDA estimate)
+    tier: capacity
+    freq: annual
+    unit: 1000 head
+    lo: 10000.0
+    hi: 100000.0
+    adapter: usda_psd
+    call: {commodity: "Animal Numbers, Swine", unit: "(1000 HEAD)", at: start}
+    extract: {value: Sow Beginning Stocks}
+    zero_is_null: true
+    forecast: true
+    notes: >
+      USDA FAS PSD 对中国能繁母猪期初存栏的估计，最新一年是预测。按 1 月 1 日
+      即上年 12 月 31 日记，和统计局年末数同一时点：2023 年末起与统计局一致，
+      2021、2022 年是 USDA 自己的估计（42,000 / 43,000 千头，统计局为
+      4,329 / 4,390 万头）。单位保持 USDA 的千头，不换算成万头。
+      每年 4 月、10 月的畜产品报告会修订，每天采集就能把修订记成新行 ——
+      这是本项目里唯一一个会定期修订自己的来源。
+
+  - id: usda_pork_production
+    name_zh: 猪肉产量（USDA 估计）
+    name_en: Pork production (USDA estimate)
+    tier: capacity
+    freq: annual
+    unit: 1000 t CWE
+    lo: 1000.0
+    hi: 100000.0
+    adapter: usda_psd
+    call: {commodity: "Meat, Swine", unit: "(1000 MT CWE)", at: end}
+    extract: {value: Production}
+    zero_is_null: true
+    forecast: true
+    notes: >
+      USDA 对中国猪肉年产量的估计与预测，千吨胴体当量。是能繁母猪变化最终
+      落到供给上的那一端，且有下一年的预测。
+
   # ---------- margin：决定去化会不会持续 ----------
 
   - id: corn_price

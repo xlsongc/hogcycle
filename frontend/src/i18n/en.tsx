@@ -117,6 +117,8 @@ export const en = {
     yoy: (pct: number) => `${pct > 0 ? "+" : ""}${pct}% YoY`,
     position: (pct: number) => `${ordinal(pct)} percentile of its own history`,
     released: (date: string, lag: number) => `published ${date}, ${lag} days after`,
+    outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
+      `${who} forecast for the end of ${year}: ${value} ${unit}${date ? ` (published ${date})` : ""}`,
     releaseUnknown: "source gives no release date",
     staleBadge: (days: number) => `no new data for ${days} days`,
     align: "Place each reading at",
@@ -143,6 +145,11 @@ export const en = {
     noUrl: "No public page: collected through an API.",
     retired: "This caliber is closed upstream. The page keeps its history.",
     equity: "A share price is a claim on the cycle, not a link in it, so it is not on the wall.",
+    forecast:
+      "This is USDA's estimate and forecast, not a measurement, so it is kept off the wall.",
+    releaseForecast:
+      "A forecast is published before the period it describes ends, and revised as that period approaches. USDA sets China's numbers each April and October.",
+    ahead: (date: string, days: number) => `published ${date}, ${days} days before the period ends`,
     latest: "Latest reading",
     chartHeading: "History",
     releaseHeading: "When it becomes public",

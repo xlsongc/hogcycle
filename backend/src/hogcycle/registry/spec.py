@@ -132,6 +132,11 @@ class IndicatorSpec:
     # read rather than being an error.
     caliber_from: dt.date | None = None
     caliber_until: dt.date | None = None
+    # A source's projection rather than a measurement: its obs_dates may lie
+    # in the future and its releases precede the periods they describe. Kept
+    # off the wall, whose every panel reads as "what happened", and out of the
+    # window's end, which would otherwise run the whole wall into next year.
+    forecast: bool = False
     notes: str = ""
 
     def __post_init__(self) -> None:

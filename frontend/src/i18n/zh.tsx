@@ -95,6 +95,8 @@ export const zh: Dict = {
     yoy: (pct: number) => `同比 ${pct > 0 ? "+" : ""}${pct}%`,
     position: (pct: number) => `处于自身历史第 ${pct} 分位`,
     released: (date: string, lag: number) => `${date} 发布，滞后 ${lag} 天`,
+    outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
+      `${who} 预测 ${year} 年末：${value} ${unit}${date ? `（${date} 发布）` : ""}`,
     releaseUnknown: "源头未注明发布日期",
     staleBadge: (days: number) => `已 ${days} 天没有新数据`,
     align: "读数画在",
@@ -119,6 +121,9 @@ export const zh: Dict = {
     noUrl: "没有公开页面：通过接口采集。",
     retired: "上游已关闭这个口径，本页只保留历史。",
     equity: "股价是对周期的索取权，不是周期的一环，所以不在图表墙上。",
+    forecast: "这是 USDA 的估计与预测，不是测量，所以不放在图表墙上。",
+    releaseForecast: "预测在它描述的时期结束之前发布，并随时期临近而修订。USDA 每年 4 月和 10 月设定中国的数字。",
+    ahead: (date: string, days: number) => `${date} 发布，比时期结束早 ${days} 天`,
     latest: "最新读数",
     chartHeading: "历史",
     releaseHeading: "什么时候公开",

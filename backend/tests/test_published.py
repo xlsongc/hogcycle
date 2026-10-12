@@ -93,9 +93,12 @@ def test_a_release_implausibly_late_for_its_period_fails(spec):
 
 
 def test_a_value_cannot_be_published_before_its_period_ends():
-    with pytest.raises(ValueError, match="before the period"):
-        Observation("x", D(2026, 3, 31), 1.0, "u", "monthly", "s", "t",
-                    dt.datetime(2026, 4, 2, tzinfo=UTC), published_on=D(2026, 3, 30))
+    early = Observation("x", D(2026, 3, 31), 1.0, "u", "monthly", "s", "t",
+                        dt.datetime(2026, 4, 2, tzinfo=UTC), published_on=D(2026, 3, 30))
+    with pytest.raises(ValidationError, match="before the period"):
+        validate([early], unit="u", lo=0, hi=10)
+    # ...unless the indicator is a forecast, which is published before by definition.
+    assert validate([early], unit="u", lo=0, hi=10, forecast=True) == [early]
 
 
 # --------------------------------------------------------------------------

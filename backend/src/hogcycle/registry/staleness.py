@@ -95,6 +95,9 @@ class Staleness:
             return f"STALE {self.age_days}d > {self.limit}d"
         if self.resumed:
             return f"{self.age_days}d, still marked dark"
+        if self.age_days is not None and self.age_days < 0:
+            # Only a forecast reaches past today; say what it reaches to.
+            return f"forecast to {self.latest}"
         return f"{self.age_days}d"
 
 

@@ -82,6 +82,9 @@ with zero HTTP requests.
 - **A caliber change inside one source is two indicators.** When a survey
   changes whom it asks, split the history with `caliber_from` /
   `caliber_until`, even when the level barely moves.
+- **A forecast declares itself.** Only a spec with `forecast: true` may carry
+  future obs_dates or releases that precede their period. It stays off the
+  wall, and the page quotes it as its source's, never as ours.
 - **A release date is read, never assumed.** `published_on` is NULL when
   the source does not state it. No code may fill it from `obs_date` plus a
   typical lag.
@@ -207,3 +210,4 @@ so you do not have to re-derive them.
 | 0018 | Weekly prices come from the ministry's own reports; calibers get explicit bounds |
 | 0019 | The overview answers one question; the instrument panel is gone |
 | 0020 | Every series has its own page; its description travels in the contract |
+| 0021 | USDA's estimates of China come in; a forecast is a kind of indicator |

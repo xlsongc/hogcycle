@@ -232,3 +232,21 @@ series:
     about:
       zh: 华统股份的后复权日收盘价，只出现在对比页。
       en: Huatong Meat's back-adjusted daily close, in Compare only.
+
+  usda_sow_stocks:
+    publisher:
+      zh: 美国农业部海外农业局（USDA FAS）PSD 数据库
+      en: USDA Foreign Agricultural Service, PSD Online
+    url: https://apps.fas.usda.gov/psdonline/
+    about:
+      zh: USDA 对中国年初能繁母猪存栏的估计，最新一年是它的预测。近几年与统计局年末数一致，更早几年是 USDA 自己的估计。每年 4 月和 10 月修订。
+      en: USDA's estimate of China's breeding sows at the start of each year, with the latest year a forecast. Recent years match the statistics bureau's year-end figure; earlier ones are USDA's own estimate. Revised every April and October.
+
+  usda_pork_production:
+    publisher:
+      zh: 美国农业部海外农业局（USDA FAS）PSD 数据库
+      en: USDA Foreign Agricultural Service, PSD Online
+    url: https://apps.fas.usda.gov/psdonline/
+    about:
+      zh: USDA 对中国猪肉年产量的估计，千吨胴体当量，含下一年的预测。母猪存栏的变化最终落到这里。
+      en: USDA's estimate of China's annual pork output in thousand tonnes carcass-weight equivalent, including next year's forecast. It is where a change in the sow herd ends up.

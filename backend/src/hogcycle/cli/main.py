@@ -10,6 +10,7 @@ from pathlib import Path
 from ..collectors.akshare import AkshareAdapter
 from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
+from ..collectors.usda_psd import UsdaPsdAdapter
 from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
 from ..export.series_csv import DEFAULT_DIR as CSV_DIR
 from ..export.series_csv import write_series_csv
@@ -105,6 +106,7 @@ def main(argv: list[str] | None = None) -> int:
             "akshare": AkshareAdapter(),
             "moa": MoaAdapter(months_back=args.months_back),
             "moa_weekly": MoaWeeklyAdapter(pages=args.weekly_pages),
+            "usda_psd": UsdaPsdAdapter(),
         }
         if args.indicator:
             # `registry[...]` raises naming every known id, which is what you
@@ -141,6 +143,7 @@ def main(argv: list[str] | None = None) -> int:
             "akshare": AkshareAdapter(),
             "moa": MoaAdapter(),
             "moa_weekly": MoaWeeklyAdapter(),
+            "usda_psd": UsdaPsdAdapter(),
         }
         ids = args.indicator.split(",") if args.indicator else None
         specs = [registry[i] for i in ids] if ids else list(registry)

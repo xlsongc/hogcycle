@@ -200,14 +200,15 @@ Traps, all encoded in `sources.yaml`:
 ## Status
 
 Phase 1 complete: config → fetch → bronze → validate → silver → gold →
-contract → static dashboard, with 114 tests, the adapters among them over real
+contract → static dashboard, with 122 tests, the adapters among them over real
 captured payloads, and the site published in English and Chinese as three
 pages each. Every 农业农村部 row carries its release date, and the weekly
 prices come from the ministry's own reports, not a mirror
-([ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)).
+([ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)). USDA's
+estimates and forecasts of China's herd and pork output come in as a second,
+foreign account, and the only source that revises itself on a schedule
+([ADR-0021](docs/adr/0021-a-foreign-source-and-forecasts.md)).
 
-Next: a page per series (caliber, source, release lag, revision trail, CSV),
-and the contract split per page; then a machine-readable source for 发改委's
-猪粮比价 before its acknowledgement lapses on 2026-12-31; then the
-verification layer the storage was built for, a backtest that reads only
-`published()`.
+Next: a machine-readable source for 发改委's 猪粮比价 before its
+acknowledgement lapses on 2026-12-31; then the verification layer the storage
+was built for, a backtest that reads only `published()`.

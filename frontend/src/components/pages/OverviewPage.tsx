@@ -31,6 +31,7 @@ const CARDS: [Role, string[]][] = [
   ["price", ["hog_price_index"]],
   ["margin", ["hog_corn_ratio_county", "hog_corn_ratio"]],
 ];
+const OUTLOOK: Partial<Record<Role, string>> = { capacity: "usda_sow_stocks" };
 const CAPACITY = "sow_inventory";
 const PRICE = "hog_price_index";
 
@@ -46,7 +47,13 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
 
   const signals = CARDS.flatMap(([role, ids]): Signal[] => {
     const id = ids.find((i) => readingOf(i) && panelOf(i));
-    return id ? [{ role, reading: readingOf(id) as Reading, panel: panelOf(id) as Panel }] : [];
+    if (!id) return [];
+    const reading = readingOf(id) as Reading;
+    // Another source's forecast of the same quantity, when it reaches past
+    // the latest measurement. Only USDA publishes one.
+    const ahead = OUTLOOK[role] ? readingOf(OUTLOOK[role]) : undefined;
+    const outlook = ahead && ahead.obs_date > reading.obs_date ? ahead : undefined;
+    return [{ role, reading, panel: panelOf(id) as Panel, outlook }];
   });
   const lastRelease = cycle
     .map((r) => r.published_on)

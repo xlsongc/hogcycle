@@ -205,7 +205,7 @@ def build_wall(
         # available in the overlay — comparing 规模以上 against 全口径 屠宰量
         # is a legitimate thing to want — but it is kept off the wall, whose
         # tiles are read as "where we are now".
-        in_wall = spec.tier in WALL_TIERS and not spec.retired
+        in_wall = spec.tier in WALL_TIERS and not spec.retired and not spec.forecast
         panels.append(
             {
                 "id": spec.id,
@@ -215,9 +215,12 @@ def build_wall(
                 "unit": spec.unit,
                 "freq": spec.freq,
                 "revises": spec.revises,
+                "forecast": spec.forecast,
                 "in_wall": in_wall,
                 "threshold": THRESHOLDS.get(spec.id),
-                "release_lag": release_lag(rows),
+                # A forecast is released before its period, so a "lag" would
+                # be negative and mean nothing a backtest can use.
+                "release_lag": None if spec.forecast else release_lag(rows),
                 "about": (about or {}).get(spec.id),
                 "revisions": (
                     [] if is_derived(spec) else revision_trail(spec, silver, start)
@@ -271,7 +274,11 @@ def build_wall(
         "generated_at": moment.isoformat(),
         "window": {
             "start": (start.isoformat() if start else None),
-            "end": max((p["points"][-1]["d"] for p in panels), default=None),
+            # Forecasts reach into next year; letting them set the end would
+            # run every panel's axis past today.
+            "end": max(
+                (p["points"][-1]["d"] for p in panels if not p["forecast"]), default=None
+            ),
         },
         "panels": panels,
         "readings": readings,

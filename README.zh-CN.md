@@ -167,10 +167,11 @@ cd frontend && npm install && npm run dev
 ## 状态
 
 阶段一已完成：config → fetch → bronze → validate → silver → gold → contract
-→ 静态站点，114 个测试，其中适配器测试全部跑在真实抓取的载荷上；站点以英文与中文
+→ 静态站点，122 个测试，其中适配器测试全部跑在真实抓取的载荷上；站点以英文与中文
 各三个页面发布。农业农村部的每一行都带发布日期，周度价格直接读农业农村部原文，
-不再经过镜像（[ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)）。
+不再经过镜像（[ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)）。USDA 对中国母猪存栏与猪肉
+产量的估计和预测作为第二个、境外的口径接入，它也是唯一定期修订自己的来源
+（[ADR-0021](docs/adr/0021-a-foreign-source-and-forecasts.md)）。
 
-下一步：每个序列一页（口径、来源、发布滞后、修订轨迹、CSV），并按页拆分合约；
-然后在 2026-12-31 确认期满前，为发改委猪粮比价找到可机读的来源；再然后是当初建这套
+下一步：在 2026-12-31 确认期满前，为发改委猪粮比价找到可机读的来源；然后是当初建这套
 存储就是为了做的验证层 —— 只读 `published()` 的回测。

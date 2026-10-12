@@ -26,7 +26,11 @@ export function SeriesChart({ panel, start, end, locale }: Props) {
   const [range, setRange] = useState<Range>({ kind: "preset", preset: "all" });
   const [align, setAlign] = useState<"period" | "release">("period");
   const first = panel.points.find((p) => p.v != null)?.d ?? start;
-  const [min, max] = bounds(range, first > start ? first : start, end);
+  // A forecast runs past today; its last point is the reason to look.
+  const last = panel.points[panel.points.length - 1]?.d ?? end;
+  const until = last > end ? last : end;
+  const [min, max] = bounds(range, first > start ? first : start, until);
+  const marker = until > end ? { date: end, label: t.overview.today } : null;
 
   return (
     <div className="thesis">
@@ -65,6 +69,7 @@ export function SeriesChart({ panel, start, end, locale }: Props) {
           min={min}
           max={max}
           align={align}
+          marker={marker}
           size="hero"
           showAxisLabels
           locale={locale}

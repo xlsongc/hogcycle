@@ -22,7 +22,9 @@ import { Sparkline } from "./Sparkline";
 
 export type Role = "capacity" | "price" | "margin";
 
-export type Signal = { role: Role; reading: Reading; panel: Panel };
+/** `outlook` is another source's forecast of the same quantity, shown as
+ *  that source's statement and linked to its own page. */
+export type Signal = { role: Role; reading: Reading; panel: Panel; outlook?: Reading };
 
 type Props = { signals: Signal[]; end: string; locale: Locale };
 
@@ -36,7 +38,14 @@ export function Signals({ signals, end, locale }: Props) {
   );
 }
 
-function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: string; locale: Locale }) {
+function SignalCard({
+  role,
+  reading: r,
+  panel,
+  outlook,
+  end,
+  locale,
+}: Signal & { end: string; locale: Locale }) {
   const t = dict(locale);
   const o = t.overview;
   const g = granularityLetter(r.granularity ?? "");
@@ -70,6 +79,19 @@ function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: st
           </li>
         )}
         {context && <li className="muted">{context}</li>}
+        {outlook && (
+          <li className="signal-outlook">
+            <Link href={seriesPath(locale, outlook.id)}>
+              {o.outlook(
+                "USDA",
+                outlook.obs_date.slice(0, 4),
+                fmt(outlook.value, outlook.unit, locale),
+                unitOf(outlook.unit, locale),
+                outlook.published_on ? shortDate(outlook.published_on) : null
+              )}
+            </Link>
+          </li>
+        )}
       </ul>
       <Sparkline panel={panel} end={end} label={t.chart.panelLabel(name, r.unit, panel.points.length)} />
       <footer>

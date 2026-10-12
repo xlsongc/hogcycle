@@ -42,13 +42,17 @@ export function monoFont(): string {
  *  The digit count keys on the raw unit string, never on a localised label:
  *  the unit is part of the caliber and stays exactly as the source writes it.
  *  Only the grouping follows the locale. */
+/** Units counted in whole things, where decimals would claim a precision
+ *  the source never had. */
+const WHOLE = new Set(["万头", "CNY/tonne", "1000 head", "1000 t CWE"]);
+
 export function fmt(
   value: number | null | undefined,
   unit: string,
   locale: Locale = "en"
 ): string {
   if (value == null) return "—";
-  const digits = unit === "万头" || unit === "CNY/tonne" ? 0 : unit === "kg" ? 1 : 2;
+  const digits = WHOLE.has(unit) ? 0 : unit === "kg" ? 1 : 2;
   return value.toLocaleString(NUMBER_LOCALE[locale], {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,

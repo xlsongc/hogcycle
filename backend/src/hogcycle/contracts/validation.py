@@ -27,6 +27,7 @@ def validate(
     lo: float,
     hi: float,
     accept: tuple[str, ...] | None = None,
+    forecast: bool = False,
 ) -> list[Observation]:
     """Reject a batch outright rather than let bad rows into silver.
 
@@ -44,6 +45,29 @@ def validate(
             raise ValidationError(
                 f"no rows left after granularity filter {accept} — upstream "
                 "shape probably changed"
+            )
+
+    if not forecast:
+        # A measurement describes a period that has happened, reported after
+        # it ended. Either check failing means the period parser or the
+        # release-date parser misread something, and either would hand a
+        # backtest a value from the future. A forecast is the exception by
+        # definition, which the indicator has to declare.
+        today = dt.datetime.now(dt.UTC).date()
+        ahead = [o for o in obs if o.obs_date > today + dt.timedelta(days=1)]
+        if ahead:
+            raise ValidationError(
+                f"{len(ahead)} obs_date(s) in the future, e.g. {ahead[0].obs_date}; "
+                "only an indicator declared `forecast` may describe one"
+            )
+        early = [
+            o for o in obs if o.published_on is not None and o.published_on < o.obs_date
+        ]
+        if early:
+            o = early[0]
+            raise ValidationError(
+                f"published {o.published_on}, before the period it reports ends "
+                f"({o.obs_date}); {len(early)} such row(s)"
             )
 
     bad_unit = {o.unit for o in obs} - {unit}

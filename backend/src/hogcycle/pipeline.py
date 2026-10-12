@@ -69,7 +69,14 @@ def collect_one(
             # single day, which is precisely how a real red gets ignored.
             log.info("%s: retired — upstream no longer publishes this caliber", spec.id)
             return Result(spec.id, True, 0, snap.is_new)
-        obs = validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
+        obs = validate(
+            obs,
+            unit=spec.unit,
+            lo=spec.lo,
+            hi=spec.hi,
+            accept=spec.accept,
+            forecast=spec.forecast,
+        )
         written = silver.append_changes(obs)
 
         if written:
@@ -173,7 +180,14 @@ def replay_one(
         obs = [o for o in dated + undated if spec.covers(o.obs_date)]
         if not obs and spec.retired:
             return Result(spec.id, True, 0, False)
-        obs = validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
+        obs = validate(
+            obs,
+            unit=spec.unit,
+            lo=spec.lo,
+            hi=spec.hi,
+            accept=spec.accept,
+            forecast=spec.forecast,
+        )
         written = silver.append_changes(obs)
         if written:
             log.info("%s: replay wrote %d row(s)", spec.id, len(written))

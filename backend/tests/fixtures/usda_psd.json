@@ -1,0 +1,222 @@
+{
+ "url": "https://apps.fas.usda.gov/psdonline/downloads/psd_livestock_csv.zip",
+ "last_modified": "Fri, 09 Oct 2026 19:02:08 GMT",
+ "rows": [
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2020",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "565000.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2020",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "31000.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2021",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "655000.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2021",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "39500.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2022",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "712510.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2022",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "42000.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2023",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "717249.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2023",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "43000.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2024",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "704970.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2024",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "41420.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2025",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "731000.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2025",
+   "set_month": "04",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "40780.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2026",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "731000.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2026",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "39610.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2027",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "722000.0000"
+  },
+  {
+   "attribute": "Sow Beginning Stocks",
+   "commodity": "Animal Numbers, Swine",
+   "market_year": "2027",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 HEAD)",
+   "value": "37300.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2020",
+   "set_month": "12",
+   "set_year": "2025",
+   "unit": "(1000 MT CWE)",
+   "value": "36340.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2021",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "47500.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2022",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "55410.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2023",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "57940.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2024",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "57060.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2025",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "59380.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2026",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "59680.0000"
+  },
+  {
+   "attribute": "Production",
+   "commodity": "Meat, Swine",
+   "market_year": "2027",
+   "set_month": "10",
+   "set_year": "2026",
+   "unit": "(1000 MT CWE)",
+   "value": "58350.0000"
+  }
+ ]
+}
