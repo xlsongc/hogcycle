@@ -40,3 +40,5 @@
 {"fetched_at": "2026-10-10T06:30:53.918221+00:00", "snapshot_id": "5aaf9c59e3992d929ccd7a110ac4e1ea1458d81d9af09db9c4ffa9914ea9b2a6", "source": "akshare:futures_hog_supply:白条肉:白条肉平均出厂价格", "bytes": 45070, "new_content": false}
 {"fetched_at": "2026-10-11T06:37:00.923884+00:00", "snapshot_id": "5aaf9c59e3992d929ccd7a110ac4e1ea1458d81d9af09db9c4ffa9914ea9b2a6", "source": "akshare:futures_hog_supply:白条肉:白条肉平均出厂价格", "bytes": 45070, "new_content": false}
 {"fetched_at": "2026-10-11T18:19:44.830979+00:00", "snapshot_id": "5aaf9c59e3992d929ccd7a110ac4e1ea1458d81d9af09db9c4ffa9914ea9b2a6", "source": "akshare:futures_hog_supply:白条肉:白条肉平均出厂价格", "bytes": 45070, "new_content": false}
+{"fetched_at": "2026-10-12T07:59:05.548901+00:00", "snapshot_id": "594efc00a95cd725007d7fccd71ee06accca62b590af6dc1ae7781c71ad7acb3", "source": "moa_weekly:slaughter:全部定点:白条肉平均出厂价格", "bytes": 70680, "new_content": true}
+{"fetched_at": "2026-10-12T08:04:49.958715+00:00", "snapshot_id": "594efc00a95cd725007d7fccd71ee06accca62b590af6dc1ae7781c71ad7acb3", "source": "moa_weekly:slaughter:全部定点:白条肉平均出厂价格", "bytes": 70680, "new_content": false}
