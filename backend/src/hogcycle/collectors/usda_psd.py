@@ -92,6 +92,59 @@ class UsdaPsdAdapter:
         return {"url": URL, "last_modified": last_modified, "rows": rows}
 
 
+    def normalise(
+        self,
+        spec: IndicatorSpec,
+        payload: Any,
+        *,
+        snapshot_id: str,
+        fetched_at: dt.datetime,
+    ) -> list[Observation]:
+        commodity, unit, at = spec.call["commodity"], spec.call["unit"], spec.call["at"]
+        if at not in ("start", "end"):
+            raise KeyError(f"{spec.id}: call.at must be 'start' or 'end', got {at!r}")
+        released = _day(payload.get("last_modified"))
+
+        out: list[Observation] = []
+        for row in payload["rows"]:
+            if (row["commodity"], row["attribute"], row["unit"]) != (
+                commodity,
+                spec.extract.value,
+                unit,
+            ):
+                continue
+            year = int(row["market_year"])
+            value = float(row["value"])
+            if value == 0 and spec.zero_is_null:
+                continue
+            set_in = (int(row["set_year"]), int(row["set_month"]))
+            end = dt.date(year - 1, 12, 31) if at == "start" else dt.date(year, 12, 31)
+            out.append(
+                Observation(
+                    indicator=spec.id,
+                    obs_date=end,
+                    value=value,
+                    unit=spec.unit,
+                    granularity="annual",
+                    source=spec.source,
+                    snapshot_id=snapshot_id,
+                    fetched_at=fetched_at,
+                    published_on=released
+                    if released and set_in == (released.year, released.month)
+                    else None,
+                )
+            )
+        if not out:
+            seen = sorted(
+                {(r["commodity"], r["attribute"], r["unit"]) for r in payload["rows"]}
+            )
+            raise KeyError(
+                f"{spec.id}: no {commodity!r} / {spec.extract.value!r} / {unit!r} rows. "
+                f"Seen: {seen}"
+            )
+        return sorted(out, key=lambda o: o.obs_date)
+
+
 def download(url: str) -> tuple[bytes, str | None]:
     """The file and its Last-Modified, resolving the host over DNS-over-HTTPS
     when the system resolver cannot.
@@ -146,58 +199,6 @@ def _download_by_address(url: str) -> tuple[bytes, str | None]:
     if r.status != 200:
         raise ConnectionError(f"{url} via {addresses[0]}: HTTP {r.status}")
     return r.data, r.headers.get("Last-Modified")
-
-    def normalise(
-        self,
-        spec: IndicatorSpec,
-        payload: Any,
-        *,
-        snapshot_id: str,
-        fetched_at: dt.datetime,
-    ) -> list[Observation]:
-        commodity, unit, at = spec.call["commodity"], spec.call["unit"], spec.call["at"]
-        if at not in ("start", "end"):
-            raise KeyError(f"{spec.id}: call.at must be 'start' or 'end', got {at!r}")
-        released = _day(payload.get("last_modified"))
-
-        out: list[Observation] = []
-        for row in payload["rows"]:
-            if (row["commodity"], row["attribute"], row["unit"]) != (
-                commodity,
-                spec.extract.value,
-                unit,
-            ):
-                continue
-            year = int(row["market_year"])
-            value = float(row["value"])
-            if value == 0 and spec.zero_is_null:
-                continue
-            set_in = (int(row["set_year"]), int(row["set_month"]))
-            end = dt.date(year - 1, 12, 31) if at == "start" else dt.date(year, 12, 31)
-            out.append(
-                Observation(
-                    indicator=spec.id,
-                    obs_date=end,
-                    value=value,
-                    unit=spec.unit,
-                    granularity="annual",
-                    source=spec.source,
-                    snapshot_id=snapshot_id,
-                    fetched_at=fetched_at,
-                    published_on=released
-                    if released and set_in == (released.year, released.month)
-                    else None,
-                )
-            )
-        if not out:
-            seen = sorted(
-                {(r["commodity"], r["attribute"], r["unit"]) for r in payload["rows"]}
-            )
-            raise KeyError(
-                f"{spec.id}: no {commodity!r} / {spec.extract.value!r} / {unit!r} rows. "
-                f"Seen: {seen}"
-            )
-        return sorted(out, key=lambda o: o.obs_date)
 
 
 def _day(header: str | None) -> dt.date | None:
