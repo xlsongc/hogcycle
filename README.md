@@ -138,6 +138,9 @@ Each language has three pages:
   every panel at one date, drag to zoom, double-click to reset. The time
   axis stays pinned while the wall scrolls.
 - **Compare**: any series on one axis, with one shiftable to test a lead.
+- **A page per series** (`/series/<id>/`): what it is and who publishes it,
+  the full history, how late it becomes public, its revision trail, and a
+  CSV download. Every series name on the site links to its page.
 
 Every view (window, zoom, selection, shift) lives in the URL, so a view is a
 link. See [ADR-0016](docs/adr/0016-pages-and-a-crosshair-synced-by-time.md).

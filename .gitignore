@@ -22,3 +22,6 @@ site/
 
 # TypeScript incremental build cache
 frontend/tsconfig.tsbuildinfo
+
+# Derived at export time, like gold: one CSV per series, rebuilt on deploy.
+frontend/public/data/

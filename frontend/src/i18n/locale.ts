@@ -28,11 +28,31 @@ export function pathOf(locale: Locale, page: Page): string {
   return PATH[locale] + SLUG[page];
 }
 
-/** Which page a pathname is, from either locale. `usePathname` already has
- *  the basePath removed, so this only has to strip the language prefix. */
-export function pageOf(pathname: string): Page {
+/** Which nav page a pathname is, from either locale, or null for a page the
+ *  nav does not list (a series page). `usePathname` already has the basePath
+ *  removed, so this only has to strip the language prefix. */
+export function pageOf(pathname: string): Page | null {
   const rest = pathname.replace(/^\/zh(?=\/|$)/, "").replace(/\/+$/, "");
-  return PAGES.find((p) => SLUG[p] && rest === `/${SLUG[p].slice(0, -1)}`) ?? "overview";
+  if (rest === "") return "overview";
+  return PAGES.find((p) => SLUG[p] && rest === `/${SLUG[p].slice(0, -1)}`) ?? null;
+}
+
+/** A series' own page. Every series name on the site links here. */
+export function seriesPath(locale: Locale, id: string): string {
+  return `${PATH[locale]}series/${id}/`;
+}
+
+/** The same page in another language: swap the prefix, keep the rest. */
+export function inLocale(pathname: string, locale: Locale): string {
+  const rest = pathname.replace(/^\/zh(?=\/|$)/, "") || "/";
+  const path = rest.endsWith("/") ? rest : `${rest}/`;
+  return locale === "zh" ? `/zh${path}` : path;
+}
+
+/** A file under public/, with the deploy's base path. Next adds it to <Link>
+ *  and assets on its own, but not to a plain download link. */
+export function staticPath(path: string): string {
+  return `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${path}`;
 }
 
 /** For the <html lang> attribute. Chinese is region-tagged because zh alone

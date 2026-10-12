@@ -12,6 +12,7 @@ import "../globals.css";
 import "../nav.css";
 import "../wall.css";
 import "../overview.css";
+import "../series.css";
 import "../controls.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";

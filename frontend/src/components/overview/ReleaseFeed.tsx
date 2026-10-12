@@ -11,7 +11,7 @@
 import Link from "next/link";
 import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
-import { nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
+import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { periodLabel, shortDate } from "@/lib/period";
 
@@ -38,7 +38,7 @@ export function ReleaseFeed({ readings, locale }: { readings: Reading[]; locale:
               {shortDate(r.published_on)}
             </time>
             <span className="feed-name">
-              <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{nameOf(r, locale)}</Link>
+              <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link>
               <small>{periodLabel(r.obs_date, r.granularity ?? "", locale)}</small>
             </span>
             <span className="feed-value num">

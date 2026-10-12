@@ -243,7 +243,7 @@ def test_the_wall_says_when_each_value_became_public(tmp_path):
 
 
 def test_a_mirror_copy_filed_under_another_day_is_not_drawn_twice():
-    from hogcycle.gold.wall import drop_misdated_copies
+    from hogcycle.gold.series import drop_misdated_copies
 
     def r(day, v, published=None, g="weekly"):
         return {"obs_date": day, "value": v, "granularity": g, "published_on": published}

@@ -12,7 +12,7 @@
 import Link from "next/link";
 import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
-import { labelOf, nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
+import { labelOf, nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
 type Props = { readings: Reading[]; panels: Panel[]; locale: Locale };
@@ -26,7 +26,7 @@ export function Highlights({ readings, panels, locale }: Props) {
 
   const lead = (r: Reading) => (
     <>
-      <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{nameOf(r, locale)}</Link>{" "}
+      <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link>{" "}
       <b className="num">{fmt(r.value, r.unit, locale)}</b>{" "}
       <span className="muted">{unitOf(r.unit, locale)}</span>
       {r.stale && (
@@ -68,7 +68,7 @@ export function Highlights({ readings, panels, locale }: Props) {
       key: "stale",
       items: stale.map((r) => (
         <li key={r.id}>
-          <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{nameOf(r, locale)}</Link> ·{" "}
+          <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link> ·{" "}
           {o.staleFor(r.age_days ?? 0, r.obs_date)}
         </li>
       )),

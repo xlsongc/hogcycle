@@ -22,6 +22,7 @@
  * on a phone is a scroll, and hijacking it would trap the reader in a chart.
  */
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Panel } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
@@ -76,6 +77,8 @@ export type PanelChartProps = {
   marker?: { date: string; label: string } | null;
   /** Give the panel an id so /wall/#<id> lands on it. */
   anchor?: boolean;
+  /** Where the panel's name leads: the series' own page. */
+  href?: string;
   onZoom?: (min: string, max: string) => void;
   onReset?: () => void;
 };
@@ -93,6 +96,7 @@ export function PanelChart({
   title,
   marker = null,
   anchor = false,
+  href,
   onZoom,
   onReset,
 }: PanelChartProps) {
@@ -265,7 +269,13 @@ export function PanelChart({
       style={{ ["--tier" as string]: `var(--${panel.tier})` }}
     >
       <div className="panel-head">
-        <span className="panel-title">{name}</span>
+        {href ? (
+          <Link className="panel-title" href={href}>
+            {name}
+          </Link>
+        ) : (
+          <span className="panel-title">{name}</span>
+        )}
         <span className="panel-unit">{unitOf(panel.unit, locale)}</span>
         <span className={probe ? "num panel-readout live" : "num panel-readout"}>
           {shown ? (

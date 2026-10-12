@@ -12,7 +12,7 @@
 
 import { Fragment } from "react";
 import type { Panel } from "@/types/generated/wall";
-import type { Locale } from "@/i18n/locale";
+import { seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { PanelChart } from "./PanelChart";
 
@@ -52,6 +52,7 @@ export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) 
               showAxisLabels={last}
               size={last ? "tall" : "short"}
               anchor
+              href={seriesPath(locale, panel.id)}
               onZoom={onZoom}
               onReset={onReset}
             />

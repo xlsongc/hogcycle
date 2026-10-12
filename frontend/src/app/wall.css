@@ -22,7 +22,15 @@
   box-shadow: inset 2px 0 0 var(--tier, var(--muted));
 }
 
-.panel:target .panel-title {
+.panel:target a.panel-title {
+  text-decoration: none;
+}
+
+a.panel-title:hover {
+  text-decoration: underline;
+}
+
+.panel-title {
   text-decoration: underline;
   text-decoration-color: var(--tier, var(--muted));
   text-underline-offset: 4px;

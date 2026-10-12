@@ -1,0 +1,234 @@
+# What each series is, for a reader. Travels in the contract in both
+# languages, like the names (ADR-0014): a description written on the frontend
+# would be free to drift from the caliber the backend collects.
+#
+# `publisher` is who stands behind the number, and the source we reach when
+# that is a different party (a mirror). `url` is the page a reader can check;
+# null when the only address we have is an API, never a guessed page.
+# Collection details, quirks and history stay in sources.yaml `notes`.
+#
+# Every indicator in sources.yaml and every derived series in gold needs an
+# entry. A missing one fails the export.
+
+series:
+  sow_inventory:
+    publisher:
+      zh: 国家统计局季度调查，农业农村部等五部委月度联合发布
+      en: National Bureau of Statistics quarterly survey, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 正在生产仔猪的母猪头数。生物学把它和 10–12 个月后的生猪出栏钉在一起，是猪周期里唯一真正的先行指标。季末数来自统计局调查；2025 年底起只公开季末数。
+      en: The number of sows actively producing piglets. Biology ties it to hog supply 10–12 months later, which makes it the cycle's one real leading indicator. Quarter-end figures come from the statistics bureau's survey; since late 2025 only those are published.
+
+  hog_inventory:
+    publisher:
+      zh: 国家统计局季度调查，农业农村部等五部委月度联合发布
+      en: National Bureau of Statistics quarterly survey, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 季末存栏的全部生猪。它把十个月前的母猪决策和眼下的压栏行为混在一起，所以不是先行指标。
+      en: All hogs on hand at quarter end. It mixes sow decisions from ten months earlier with farmers holding hogs back now, so it does not lead.
+
+  slaughter:
+    publisher:
+      zh: 农业农村部定点屠宰企业统计，五部委月度联合发布
+      en: MARA designated-slaughterhouse statistics, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 全部定点屠宰企业当月屠宰的生猪头数，2025 年 7 月起的口径。是产能最终落地成供给的那一端。
+      en: Hogs slaughtered in a month by all designated plants, on the caliber in force since July 2025. It is where capacity finally lands as supply.
+
+  slaughter_above_scale:
+    publisher:
+      zh: 农业农村部定点屠宰企业统计，五部委月度联合发布
+      en: MARA designated-slaughterhouse statistics, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 规模以上定点屠宰企业的月屠宰量。2025 年 7 月统计扩大到全部定点企业后这个口径不再发布，作为历史保留。
+      en: Monthly slaughter by plants above designated size. The caliber stopped when the statistics widened to every designated plant in July 2025; it is kept as history.
+
+  piglet_price:
+    publisher:
+      zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly 500-county market survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 仔猪的全国平均价格，元/公斤。是养殖户补栏意愿的即时报价，比母猪存栏更早也更干净。
+      en: The national average piglet price per kilogram. It quotes farmers' willingness to restock in real time, sooner and more cleanly than the sow count.
+
+  piglet_price_monthly:
+    publisher:
+      zh: 农业农村部 500 个县集贸市场监测，五部委月度联合发布
+      en: MARA 500-county market survey, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 与周度仔猪价格同一套调查的月均值。粒度不同就是另一个指标，所以单独成格。
+      en: The monthly mean of the same survey as the weekly piglet price. A different granularity is a different indicator, so it has its own panel.
+
+  sow_binary_price:
+    publisher:
+      zh: 国家发展改革委价格监测中心，五部委月度联合发布
+      en: NDRC Price Monitoring Center, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 二元后备母猪的销售价格。母猪补栏的成本，也是行业对未来猪价预期的一个读数。
+      en: The sale price of crossbred replacement gilts. It is what restocking sows costs, and one reading of what the trade expects of future hog prices.
+
+  corn_price:
+    publisher:
+      zh: 玄田数据（第三方镜像，经 akshare）
+      en: Xuantian Data (a third-party mirror, via akshare)
+    url: null
+    about:
+      zh: 玉米日度价格，元/吨。上游只保留约一年的滚动窗口，更早的数据只存在于本仓库每天的采集里。
+      en: Daily corn price per tonne. Upstream keeps a rolling window of about a year; anything older exists only in this warehouse's daily collection.
+
+  hog_corn_ratio:
+    publisher:
+      zh: 国家发展改革委价格监测中心（经玄田数据镜像）
+      en: NDRC Price Monitoring Center (via the Xuantian Data mirror)
+    url: https://www.chinaprice.cn/
+    about:
+      zh: 生猪出场价与玉米批发价之比，官方调控预案的口径。镜像 2026 年 8 月停更；发改委只以图片发布，暂无可机读的一手来源。
+      en: Hog ex-farm price over corn wholesale price, the caliber the official regulation plan uses. The mirror stopped in August 2026, and the NDRC publishes only images, so there is no machine-readable primary source yet.
+
+  corn_price_county:
+    publisher:
+      zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly 500-county market survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 500 县集贸市场的玉米平均价格，元/公斤，和同一份周报里的生猪价同一个采集日。
+      en: Average corn price in the 500-county markets, per kilogram, collected on the same day as the hog price in the same weekly report.
+
+  feed_price_county:
+    publisher:
+      zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly 500-county market survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 育肥猪配合饲料的平均价格，元/公斤。养一头猪最大的一笔成本。
+      en: Average price of finishing-hog compound feed per kilogram, the largest single cost of raising a hog.
+
+  hog_corn_ratio_county:
+    publisher:
+      zh: 由本项目计算，分子分母均来自农业农村部 500 县集贸市场周报
+      en: Computed here, from two prices in MARA's weekly 500-county report
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 同一份周报、同一采集日的生猪价 ÷ 玉米价。与发改委口径相关 0.996，平均低 0.26，所以不画发改委的 5:1 线。
+      en: Hog price over corn price, from the same weekly report and the same collection day. It correlates 0.996 with the NDRC ratio but runs 0.26 lower on average, so the NDRC's 5:1 line is not drawn on it.
+
+  hog_price_index:
+    publisher:
+      zh: 行情宝平台成交数据（经 akshare）
+      en: Hangqingbao platform transactions (via akshare)
+    url: null
+    about:
+      zh: 行情宝平台上生猪的平均成交价，2015 年起，是本项目历史最长的猪价序列，周期定位以它为骨架。
+      en: The average price of hogs traded on the Hangqingbao platform since 2015. It is the longest hog-price history here, and the one the cycle is positioned against.
+
+  hog_price_wai3:
+    publisher:
+      zh: 玄田数据（第三方镜像，经 akshare）
+      en: Xuantian Data (a third-party mirror, via akshare)
+    url: null
+    about:
+      zh: 外三元生猪的日度出栏均价。与平台成交价、500 县集贸价是三种不同的测量，各自一格。上游只保留约一年。
+      en: The daily ex-farm price of three-way crossbred hogs. It, the platform transaction price and the 500-county price are three different measurements, each in its own panel. Upstream keeps about a year.
+
+  hog_price_county:
+    publisher:
+      zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly 500-county market survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 500 县集贸市场和采集点的生猪平均价格，元/公斤。政府自己的猪价口径，2021 年 12 月起有周度历史。
+      en: The average hog price across the 500-county markets and collection points, per kilogram. It is the government's own hog-price caliber, with weekly history from December 2021.
+
+  carcass_price:
+    publisher:
+      zh: 农业农村部畜牧兽医局，定点屠宰企业周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly designated-slaughterhouse survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 定点屠宰企业白条肉的平均出厂价。猪价从屠宰端出去时的价格；2024 年 1 月起覆盖全部定点企业。
+      en: The average ex-plant price of carcass pork at designated slaughterhouses, the price as it leaves slaughter. It covers every designated plant from January 2024.
+
+  carcass_price_above_scale:
+    publisher:
+      zh: 农业农村部屠宰监测（经玄田数据镜像）
+      en: MARA slaughter survey (via the Xuantian Data mirror)
+    url: null
+    about:
+      zh: 2024 年以前规模以上定点屠宰企业的白条肉出厂价。调查对象变了之后另成一个口径，作为历史保留。
+      en: The carcass ex-plant price at plants above designated size, before 2024. Once the survey changed whom it asks, this became a separate caliber, kept as history.
+
+  meat_price_index:
+    publisher:
+      zh: 玄田数据（第三方镜像，经 akshare）
+      en: Xuantian Data (a third-party mirror, via akshare)
+    url: null
+    about:
+      zh: 跨肉类的相对价格指数，用来判断猪肉是独立行情还是普涨。镜像 2025 年 10 月停更，已封存。
+      en: A cross-meat relative price index, for telling a pork-only move from a general one. The mirror stopped in October 2025, and the series is retired.
+
+  pork_retail_price:
+    publisher:
+      zh: 国家发展改革委 36 个大中城市监测，五部委月度联合发布
+      en: NDRC 36-city monitoring, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 36 个大中城市精瘦肉的零售价。它是零售端的猪肉，不是生猪，所以结构性地高于出厂价。
+      en: The retail price of lean pork in 36 large and mid-sized cities. It prices pork at retail, not live hogs, so it sits structurally above the ex-plant price.
+
+  hog_weight:
+    publisher:
+      zh: 行情宝平台成交数据（经 akshare）
+      en: Hangqingbao platform transactions (via akshare)
+    url: null
+    about:
+      zh: 平台成交生猪的平均体重。压栏和二次育肥让它短期起伏，影响股价多于影响周期。
+      en: The average weight of hogs traded on the platform. Holding hogs back and re-fattening move it in the short run; it moves share prices more than the cycle.
+
+  eq_muyuan:
+    publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 牧原股份的后复权日收盘价。股价是对周期的索取权，不是周期的一环，只出现在对比页。
+      en: Muyuan Foods' back-adjusted daily close. A share price is a claim on the cycle rather than a link in it, so it appears only in Compare.
+
+  eq_wens:
+    publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 温氏股份的后复权日收盘价，只出现在对比页。
+      en: Wens Foodstuff's back-adjusted daily close, in Compare only.
+
+  eq_newhope:
+    publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 新希望的后复权日收盘价，只出现在对比页。
+      en: New Hope Liuhe's back-adjusted daily close, in Compare only.
+
+  eq_shennong:
+    publisher: {zh: 上海证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shanghai Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 神农集团的后复权日收盘价，只出现在对比页。
+      en: Shennong Group's back-adjusted daily close, in Compare only.
+
+  eq_juxing:
+    publisher: {zh: 上海证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shanghai Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 巨星农牧的后复权日收盘价，只出现在对比页。
+      en: Juxing Agriculture's back-adjusted daily close, in Compare only.
+
+  eq_huatong:
+    publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
+    url: null
+    about:
+      zh: 华统股份的后复权日收盘价，只出现在对比页。
+      en: Huatong Meat's back-adjusted daily close, in Compare only.

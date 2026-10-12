@@ -12,13 +12,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ENDONYM, LOCALES, PAGES, pageOf, pathOf, type Locale } from "@/i18n/locale";
+import { ENDONYM, LOCALES, PAGES, inLocale, pageOf, pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function SiteNav({ locale }: { locale: Locale }) {
   const t = dict(locale).nav;
-  const page = pageOf(usePathname() ?? "/");
+  const pathname = usePathname() ?? "/";
+  const page = pageOf(pathname);
 
   return (
     <nav className="site-nav" aria-label={t.pages}>
@@ -43,7 +44,7 @@ export function SiteNav({ locale }: { locale: Locale }) {
                   {ENDONYM[l]}
                 </b>
               ) : (
-                <Link key={l} href={pathOf(l, page)} hrefLang={l}>
+                <Link key={l} href={inLocale(pathname, l)} hrefLang={l}>
                   {ENDONYM[l]}
                 </Link>
               )

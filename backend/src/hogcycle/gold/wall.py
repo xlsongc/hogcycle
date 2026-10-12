@@ -21,10 +21,8 @@ from typing import Any
 from ..registry.spec import IndicatorSpec, Registry
 from ..registry.staleness import check
 from ..storage.silver import SilverStore
-from .derived import DERIVED
 from .facts import change, extreme, first_seen_date, streak, threshold_run
-
-TIER_ORDER = ("capacity", "margin", "price", "noise", "equity")
+from .series import all_specs, first_seen_of, is_derived, rows_of
 
 # The causal wall shows the physical cycle. A share price is a claim on that
 # cycle rather than a link in it, so equities stay out of the wall by default
@@ -116,48 +114,6 @@ def percentile(values: list[float], target: float) -> int | None:
     return min(100, round(100 * below / (len(xs) - 1)))
 
 
-# How close a mirror's undated row may sit to a dated primary row of the same
-# value and still be the same observation filed under another day.
-_SAME_READING_DAYS = {
-    "daily": 0,
-    "weekly": 6,
-    "monthly": 20,
-    "quarterly": 45,
-    "annual": 180,
-}
-
-
-def drop_misdated_copies(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Leave out a mirror's copy of a primary reading that it filed under
-    another date.
-
-    When a series moved from a mirror to its primary source, silver keeps
-    both histories. Where the two agree on the date, the primary's dated row
-    simply supersedes. Where the mirror shifted the date — 玄田 put the
-    500-county 2月第3周 仔猪 price under 2026-02-19, the ministry's collection
-    day was 02-24 — the same number would be drawn twice. An undated row is
-    left out only when a dated row of the identical value sits within a
-    period of it: an undated row with no such twin is a real fill, like the
-    2025年2季度末 sow figure the primary's 202506 edition shipped without.
-    Silver still holds the row; this is what the wall shows, not a deletion.
-    """
-    dated = [r for r in rows if r.get("published_on") is not None]
-    if not dated:
-        return rows
-
-    def is_copy(r: dict[str, Any]) -> bool:
-        if r.get("published_on") is not None or r["value"] is None:
-            return False
-        window = _SAME_READING_DAYS.get(r["granularity"], 0)
-        return any(
-            d["value"] == r["value"]
-            and 0 < abs((d["obs_date"] - r["obs_date"]).days) <= window
-            for d in dated
-        )
-
-    return [r for r in rows if not is_copy(r)]
-
-
 def _iso(d: dt.date | None) -> str | None:
     return None if d is None else d.isoformat()
 
@@ -197,12 +153,35 @@ def release_lag(rows: list[dict[str, Any]]) -> dict[str, int] | None:
     return {"median_days": median, "max_days": lags[-1], "n": len(lags)}
 
 
+def revision_trail(
+    spec: IndicatorSpec, silver: SilverStore, start: dt.date | None
+) -> list[dict[str, Any]]:
+    """Every period whose value changed, with each value in the order it was
+    learned: what it was, when it was released if known, and when this
+    warehouse learned it. Inside the caliber and the window only."""
+    out: dict[str, dict[str, Any]] = {}
+    for obs_date, fetched_at, published_on, value in silver.revisions(spec.id):
+        if not spec.covers(obs_date) or (start is not None and obs_date < start):
+            continue
+        d = obs_date.isoformat()
+        entry = out.setdefault(d, {"d": d, "prints": []})
+        entry["prints"].append(
+            {
+                "v": value,
+                "p": _iso(published_on),
+                "learned": fetched_at.astimezone(dt.UTC).date().isoformat(),
+            }
+        )
+    return [out[k] for k in sorted(out)]
+
+
 def build_wall(
     registry: Registry,
     silver: SilverStore,
     *,
     start: dt.date | None = None,
     moment: dt.datetime | None = None,
+    about: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Assemble the full contract payload the frontend consumes.
 
@@ -211,33 +190,13 @@ def build_wall(
     dashboard rather than only from a notebook.
     """
     moment = moment or dt.datetime.now(dt.UTC)
-    derived = {d.spec.id: d for d in DERIVED}
-    # Derived series sit in their tier like any other: the wall is ordered by
-    # the causal chain, not by where a series came from.
-    specs = sorted(
-        [*registry, *(d.spec for d in DERIVED)],
-        key=lambda s: (TIER_ORDER.index(s.tier) if s.tier in TIER_ORDER else 99,),
-    )
-
-    def series(spec: IndicatorSpec) -> list[dict[str, Any]]:
-        if spec.id in derived:
-            return derived[spec.id].rows(silver, moment)
-        return silver.series(spec.id, moment=moment)
-
-    def seen(spec: IndicatorSpec, obs_date: dt.date) -> dt.datetime | None:
-        if spec.id in derived:
-            return derived[spec.id].first_seen(silver, obs_date, moment=moment)
-        return silver.first_seen(spec.id, obs_date, moment=moment)
+    specs = all_specs(registry)
 
     panels: list[dict[str, Any]] = []
     readings: list[dict[str, Any]] = []
 
     for spec in specs:
-        rows = drop_misdated_copies([
-            r
-            for r in series(spec)
-            if spec.covers(r["obs_date"]) and (start is None or r["obs_date"] >= start)
-        ])
+        rows = rows_of(spec, silver, moment=moment, start=start)
         if not rows:
             continue
 
@@ -259,6 +218,10 @@ def build_wall(
                 "in_wall": in_wall,
                 "threshold": THRESHOLDS.get(spec.id),
                 "release_lag": release_lag(rows),
+                "about": (about or {}).get(spec.id),
+                "revisions": (
+                    [] if is_derived(spec) else revision_trail(spec, silver, start)
+                ),
                 "points": points,
             }
         )
@@ -290,7 +253,9 @@ def build_wall(
                     "n": len(rows),
                     "stale": age.stale,
                     "age_days": age.age_days,
-                    "first_seen": first_seen_date(seen(spec, latest["obs_date"])),
+                    "first_seen": first_seen_date(
+                        first_seen_of(spec, silver, latest["obs_date"], moment=moment)
+                    ),
                     "extreme": extreme(
                         rows, latest, min_history=MIN_HISTORY_FOR_PERCENTILE
                     ),

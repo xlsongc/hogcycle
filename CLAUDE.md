@@ -107,7 +107,9 @@ are generated from that same schema — never hand-written.
 Phase 1 delivers that document as a build-time file. When an HTTP API arrives
 it serves the identical shape at the same path, and no frontend code changes.
 
-**Indicator names are contract data, in both languages.** `name_zh`/`name_en`
+**Indicator names and descriptions are contract data, in both languages.**
+A new indicator needs an entry in `config/about.yaml` (publisher, source
+page, what it is); the export fails without one. `name_zh`/`name_en`
 on every panel and reading, `label_zh`/`label_en` on every threshold, both
 required. The caliber lives in the name — 定点屠宰量（全口径） and
 定点屠宰量（规模以上） are different measurements — so a translation table on
@@ -204,3 +206,4 @@ so you do not have to re-derive them.
 | 0017 | The day a value became public is recorded, because that is what a backtest needs |
 | 0018 | Weekly prices come from the ministry's own reports; calibers get explicit bounds |
 | 0019 | The overview answers one question; the instrument panel is gone |
+| 0020 | Every series has its own page; its description travels in the contract |

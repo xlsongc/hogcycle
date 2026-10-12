@@ -11,7 +11,7 @@
 import Link from "next/link";
 import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
-import { nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
+import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
 const TIERS: Reading["tier"][] = ["capacity", "margin", "price", "noise"];
@@ -61,7 +61,7 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                   return (
                     <tr key={r.id} className={r.stale ? "stale" : undefined}>
                       <td>
-                        <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{nameOf(r, locale)}</Link>
+                        <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link>
                         {r.id === "sow_inventory" && (
                           <span className="row-note">{copy.movingBaseline}</span>
                         )}

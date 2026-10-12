@@ -11,6 +11,10 @@ from ..collectors.akshare import AkshareAdapter
 from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
+from ..export.series_csv import DEFAULT_DIR as CSV_DIR
+from ..export.series_csv import write_series_csv
+from ..gold.about import DEFAULT_ABOUT, load_about
+from ..gold.series import all_specs
 from ..gold.wall import build_wall
 from ..pipeline import collect_all, replay_one
 from ..registry.loader import DEFAULT_CONFIG, load_registry
@@ -231,15 +235,21 @@ def main(argv: list[str] | None = None) -> int:
         moment = None
         if args.as_of:
             moment = dt.datetime.fromisoformat(args.as_of).replace(tzinfo=dt.UTC)
-        payload = build_wall(registry, silver, start=WALL_START, moment=moment)
+        about = load_about(DEFAULT_ABOUT, ids=[s.id for s in all_specs(registry)])
+        payload = build_wall(
+            registry, silver, start=WALL_START, moment=moment, about=about
+        )
         if not payload["panels"]:
             print("no data in silver — run `hogcycle collect` first", file=sys.stderr)
             return 1
         path = write_contract(payload, args.out, schema_path=args.schema)
+        csvs = write_series_csv(
+            registry, silver, CSV_DIR, moment=moment or dt.datetime.now(dt.UTC)
+        )
         pts = sum(len(p["points"]) for p in payload["panels"])
         print(
             f"wrote {path} — {len(payload['panels'])} panel(s), {pts} points, "
-            f"{Path(path).stat().st_size / 1024:.1f} KB"
+            f"{Path(path).stat().st_size / 1024:.1f} KB; {csvs} series CSV(s) in {CSV_DIR}"
         )
         return 0
 

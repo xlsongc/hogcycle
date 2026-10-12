@@ -31,6 +31,10 @@ export interface Panel {
   revises?: boolean;
   /** A reference line that means something in the domain, not chart decoration. */
   threshold?: Threshold | null;
+  /** What the series is, for a reader, in both languages (config/about.yaml). Like the names, it travels in the contract because the caliber lives in it. The export fails if any series lacks one; null only in payloads built without config, such as tests. */
+  about: About | null;
+  /** Every period whose value changed, with each value in the order it was learned. Empty for most series: a restatement is rare, and this lists only real ones. */
+  revisions: Revision[];
   /** Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with. */
   release_lag?: ReleaseLag | null;
   /** Ascending by date. Each point keeps its own granularity: this series genuinely mixes annual, quarterly and monthly readings, and flattening them would claim they are equivalent measurements. */
@@ -41,6 +45,28 @@ export interface Threshold {
   value: number;
   label_zh: string;
   label_en: string;
+}
+
+export interface About {
+  publisher_zh: string;
+  publisher_en: string;
+  /** A page a reader can check, or null when the only address is an API. Never a guessed page. */
+  url: string | null;
+  about_zh: string;
+  about_en: string;
+}
+
+export interface Revision {
+  d: string;
+  prints: Print[];
+}
+
+export interface Print {
+  v: number | null;
+  /** Release date of this value, or null when the source did not say. */
+  p: string | null;
+  /** UTC date this warehouse learned the value (transaction time). */
+  learned: string;
 }
 
 export interface ReleaseLag {

@@ -25,7 +25,9 @@
       "description": "Ordered by the causal chain: capacity leads price by 10-12 months, margin decides whether a capacity move persists.",
       "items": {
         "type": "object",
-        "required": ["id", "name_zh", "name_en", "tier", "unit", "points"],
+        "required": [
+          "id", "name_zh", "name_en", "tier", "unit", "about", "revisions", "points"
+        ],
         "additionalProperties": false,
         "properties": {
           "id": { "type": "string" },
@@ -54,6 +56,53 @@
               "value": { "type": "number" },
               "label_zh": { "type": "string" },
               "label_en": { "type": "string" }
+            }
+          },
+          "about": {
+            "type": ["object", "null"],
+            "description": "What the series is, for a reader, in both languages (config/about.yaml). Like the names, it travels in the contract because the caliber lives in it. The export fails if any series lacks one; null only in payloads built without config, such as tests.",
+            "required": ["publisher_zh", "publisher_en", "url", "about_zh", "about_en"],
+            "additionalProperties": false,
+            "properties": {
+              "publisher_zh": { "type": "string" },
+              "publisher_en": { "type": "string" },
+              "url": {
+                "type": ["string", "null"],
+                "description": "A page a reader can check, or null when the only address is an API. Never a guessed page."
+              },
+              "about_zh": { "type": "string" },
+              "about_en": { "type": "string" }
+            }
+          },
+          "revisions": {
+            "type": "array",
+            "description": "Every period whose value changed, with each value in the order it was learned. Empty for most series: a restatement is rare, and this lists only real ones.",
+            "items": {
+              "type": "object",
+              "required": ["d", "prints"],
+              "additionalProperties": false,
+              "properties": {
+                "d": { "type": "string" },
+                "prints": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["v", "p", "learned"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "v": { "type": ["number", "null"] },
+                      "p": {
+                        "type": ["string", "null"],
+                        "description": "Release date of this value, or null when the source did not say."
+                      },
+                      "learned": {
+                        "type": "string",
+                        "description": "UTC date this warehouse learned the value (transaction time)."
+                      }
+                    }
+                  }
+                }
+              }
             }
           },
           "release_lag": {

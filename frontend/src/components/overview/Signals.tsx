@@ -14,9 +14,10 @@
 import Link from "next/link";
 import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
-import { nameOf, pathOf, unitOf, type Locale } from "@/i18n/locale";
+import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { granularityLetter, lagDays, periodLabel, shortDate } from "@/lib/period";
+import { arrow, contextOf, trendOf } from "@/lib/readingFacts";
 import { Sparkline } from "./Sparkline";
 
 export type Role = "capacity" | "price" | "margin";
@@ -41,19 +42,8 @@ function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: st
   const g = granularityLetter(r.granularity ?? "");
   const name = nameOf(r, locale);
 
-  // The headline fact: a run beats a single move, which beats a year-on-year,
-  // because each says strictly more about direction than the next.
-  const trend = r.streak
-    ? o.streak(r.streak.dir, r.streak.n, g)
-    : r.change
-      ? o.change(r.change.pct, r.change.since)
-      : null;
-  const dir = r.streak?.dir ?? (r.change ? (r.change.pct < 0 ? "down" : "up") : null);
-  const context = r.extreme
-    ? o.extreme(r.extreme.kind, r.extreme.since, r.extreme.all)
-    : r.percentile != null
-      ? o.position(r.percentile)
-      : null;
+  const trend = trendOf(r, locale);
+  const context = contextOf(r, locale);
 
   return (
     <article
@@ -65,7 +55,7 @@ function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: st
         <span className="signal-note">{o.role[role]}</span>
       </header>
       <h3>
-        <Link href={`${pathOf(locale, "wall")}#${r.id}`}>{name}</Link>
+        <Link href={seriesPath(locale, r.id)}>{name}</Link>
       </h3>
       <p className="signal-value">
         <b className="num">{fmt(r.value, r.unit, locale)}</b>
@@ -74,9 +64,8 @@ function SignalCard({ role, reading: r, panel, end, locale }: Signal & { end: st
       {r.stale && <p className="signal-stale">{o.staleBadge(r.age_days ?? 0)}</p>}
       <ul className="signal-facts">
         {trend && (
-          <li className={dir ? `dir-${dir}` : undefined}>
-            <span aria-hidden="true">{dir === "down" ? "▼" : dir === "up" ? "▲" : "•"}</span>{" "}
-            {trend}
+          <li className={trend.dir ? `dir-${trend.dir}` : undefined}>
+            <span aria-hidden="true">{arrow(trend.dir)}</span> {trend.text}
             {r.streak && r.yoy != null && <span className="muted"> · {o.yoy(r.yoy)}</span>}
           </li>
         )}
