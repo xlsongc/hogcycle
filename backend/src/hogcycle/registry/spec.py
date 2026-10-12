@@ -123,6 +123,15 @@ class IndicatorSpec:
     # The caliber is alive but the source we reach went dark, and someone has
     # acknowledged it with a deadline. See UpstreamDark.
     upstream_dark: UpstreamDark | None = None
+    # The obs_dates this indicator's caliber covers, when a source's history
+    # runs across a caliber change. 白条肉出厂价 averaged 规模以上 plants until
+    # the week of 2024-01-01 and every designated plant after it; the mirror
+    # served both as one table. Each caliber is its own indicator, and these
+    # bounds say which stretch of a shared history belongs to which. Rows
+    # outside are another indicator's, so they are left out at ingest and at
+    # read rather than being an error.
+    caliber_from: dt.date | None = None
+    caliber_until: dt.date | None = None
     notes: str = ""
 
     def __post_init__(self) -> None:
@@ -140,11 +149,23 @@ class IndicatorSpec:
                 raise ValueError(f"{self.id}: unknown granularity in accept: {unknown}")
         if self.max_age_days is not None and self.max_age_days < 1:
             raise ValueError(f"{self.id}: max_age_days must be >= 1")
+        if (
+            self.caliber_from is not None
+            and self.caliber_until is not None
+            and self.caliber_from > self.caliber_until
+        ):
+            raise ValueError(f"{self.id}: caliber_from is after caliber_until")
         if self.retired and self.upstream_dark is not None:
             raise ValueError(
                 f"{self.id}: retired and upstream_dark contradict each other — "
                 "a closed caliber has nothing left to wait for"
             )
+
+    def covers(self, obs_date: dt.date) -> bool:
+        """Whether an observation of this date belongs to this caliber."""
+        if self.caliber_from is not None and obs_date < self.caliber_from:
+            return False
+        return self.caliber_until is None or obs_date <= self.caliber_until
 
     @property
     def call_key(self) -> str:

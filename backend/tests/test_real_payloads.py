@@ -37,7 +37,12 @@ def registry():
 
 # Indicators that share one upstream call share its fixture — the same way
 # they share a single fetch at runtime.
-FIXTURE_ALIAS = {"hog_weight": "hog_price_index"}
+FIXTURE_ALIAS = {
+    "hog_weight": "hog_price_index",
+    # The 玄田 白条肉 table is now read only for its 规模以上 stretch; the
+    # current caliber comes from 农业农村部 (test_moa_weekly.py).
+    "carcass_price_above_scale": "carcass_price",
+}
 
 
 def payload(name: str) -> dict:
@@ -140,7 +145,7 @@ def test_corn_under_the_old_kg_bounds_would_still_abort(registry):
 # --------------------------------------------------------------------------
 
 def test_carcass_price_parses_chinese_week_labels(registry):
-    spec, obs = normalise(registry, "carcass_price")
+    spec, obs = normalise(registry, "carcass_price_above_scale")
     assert {o.granularity for o in obs} == {"weekly"}
     assert obs[0].obs_date == dt.date(2018, 1, 7)  # 2018年第01周 -> ISO week end
     assert validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi)
@@ -195,7 +200,7 @@ def test_zero_weight_is_missing_data_not_a_reading(registry):
 def test_wrong_column_name_fails_loudly_naming_what_it_saw(registry):
     """A silent zero-row collection is the failure mode this project cannot
     afford; the error has to say which columns were actually present."""
-    spec = registry["carcass_price"]
+    spec = registry["carcass_price_above_scale"]
     broken = {"columns": ["dt", "px"], "records": [{"dt": "2026-01", "px": 1}]}
     with pytest.raises(KeyError) as exc:
         AkshareAdapter().normalise(

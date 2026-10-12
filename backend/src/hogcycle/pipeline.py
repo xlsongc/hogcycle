@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .collectors.base import Adapter, with_retry
+from .contracts.schema import Observation
 from .contracts.validation import ValidationError, validate
 from .registry.periods import PeriodParseError
 from .registry.spec import IndicatorSpec, Registry
@@ -58,6 +59,7 @@ def collect_one(
         obs = adapter.normalise(
             spec, payload, snapshot_id=snap.snapshot_id, fetched_at=now
         )
+        obs = [o for o in obs if spec.covers(o.obs_date)]
         if not obs and spec.retired:
             # `validate` rejects an empty batch, and rightly so — a silently
             # empty collection is the failure this project fears most. But a
@@ -122,6 +124,63 @@ def collect_all(
             collect_one(spec, adapter, bronze, silver, now=now, payload=payload)
         )
     return results
+
+
+def replay_one(
+    spec: IndicatorSpec,
+    adapter: Adapter,
+    bronze: BronzeStore,
+    silver: SilverStore,
+    *,
+    now: dt.datetime | None = None,
+) -> Result:
+    """Run every bronze snapshot of one indicator through today's parser.
+
+    This is the promise bronze immutability makes: a parser fix, or a field
+    the parser did not read before, reaches silver with zero HTTP requests.
+    Rows land with `now` as fetched_at, because that is when the warehouse
+    learned them; history is appended to, never rewritten.
+
+    Dated rows are safe to take from every snapshot: a release read twice is
+    the same release, and silver keys on it. An undated row is not — an old
+    snapshot holds what upstream said *then*, and replaying it today would
+    make a superseded value current again. So for those only the newest
+    snapshot counts, which is what a fresh fetch would have returned.
+    """
+    now = now or dt.datetime.now(dt.UTC)
+    seen: list[str] = []
+    for entry in bronze.history(spec.id):
+        # A series that changed source keeps the old source's snapshots under
+        # the same id; those are another publisher's payload shape, and
+        # another caliber, so they are not this parser's to read.
+        if entry["source"] == spec.source and entry["snapshot_id"] not in seen:
+            seen.append(entry["snapshot_id"])
+    if not seen:
+        return Result(
+            spec.id, False, 0, False, f"no bronze snapshot from {spec.source} to replay"
+        )
+
+    try:
+        dated: list[Observation] = []
+        undated: list[Observation] = []
+        for snapshot_id in seen:
+            payload = bronze.read(spec.id, snapshot_id)
+            obs = adapter.normalise(spec, payload, snapshot_id=snapshot_id, fetched_at=now)
+            dated += [o for o in obs if o.published_on is not None]
+            fresh = [o for o in obs if o.published_on is None]
+            if fresh:
+                undated = fresh
+        obs = [o for o in dated + undated if spec.covers(o.obs_date)]
+        if not obs and spec.retired:
+            return Result(spec.id, True, 0, False)
+        obs = validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi, accept=spec.accept)
+        written = silver.append_changes(obs)
+        if written:
+            log.info("%s: replay wrote %d row(s)", spec.id, len(written))
+        return Result(spec.id, True, len(written), False)
+    except COLLECT_ERRORS as exc:
+        log.error("%s: %s", spec.id, _message(exc))
+        return Result(spec.id, False, 0, False, _message(exc))
 
 
 def _message(exc: Exception) -> str:

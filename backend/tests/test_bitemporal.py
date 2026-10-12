@@ -79,7 +79,7 @@ def test_revision_is_appended_not_overwritten(tmp_path):
     assert known_now[march] == 3904.0
 
     trail = silver.revisions("sow_inventory")
-    assert [v for _, _, v in trail] == [3920.0, 3904.0]
+    assert [v for _, _, _, v in trail] == [3920.0, 3904.0]
 
 
 def test_unchanged_reruns_write_nothing(tmp_path):

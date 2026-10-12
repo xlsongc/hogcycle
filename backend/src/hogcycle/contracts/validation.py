@@ -74,19 +74,26 @@ def _dedupe(obs: list[Observation]) -> list[Observation]:
     quarter-end and a month-end both landing on 09-30, say) or upstream
     changed shape. Silently keeping whichever row came last would let an
     arbitrary choice into the store, so that one aborts the batch.
+
+    The exception is two *releases* of one period. An edition restating an
+    earlier edition's number is exactly the revision this store exists to
+    keep, so rows are keyed by (obs_date, published_on): two values are a
+    conflict only when the same release printed both.
     """
-    seen: dict[dt.date, Observation] = {}
+    seen: dict[tuple[dt.date, dt.date | None], Observation] = {}
     out: list[Observation] = []
     for o in obs:
-        prior = seen.get(o.obs_date)
+        key = (o.obs_date, o.published_on)
+        prior = seen.get(key)
         if prior is None:
-            seen[o.obs_date] = o
+            seen[key] = o
             out.append(o)
             continue
         if prior.value == o.value and prior.granularity == o.granularity:
             continue  # exact repeat — upstream noise
+        released = "" if o.published_on is None else f" released {o.published_on}"
         raise ValidationError(
-            f"conflicting rows for obs_date {o.obs_date}: "
+            f"conflicting rows for obs_date {o.obs_date}{released}: "
             f"{prior.value!r} ({prior.granularity}) vs {o.value!r} "
             f"({o.granularity}) — period parsing or upstream shape changed"
         )

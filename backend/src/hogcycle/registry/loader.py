@@ -19,7 +19,7 @@ DEFAULT_CONFIG = "config/sources.yaml"
 _KNOWN_KEYS = {
     "id", "name_zh", "name_en", "tier", "freq", "unit", "lo", "hi", "adapter",
     "call", "extract", "accept", "revises", "zero_is_null", "max_age_days",
-    "retired", "upstream_dark", "notes",
+    "retired", "upstream_dark", "caliber_from", "caliber_until", "notes",
 }
 
 _DARK_KEYS = {"acknowledged", "review_by", "reason"}
@@ -33,9 +33,7 @@ def _date(owner: str, key: str, raw: Any) -> dt.date:
     try:
         return dt.date.fromisoformat(str(raw))
     except ValueError:
-        raise ValueError(
-            f"{owner}: upstream_dark.{key} {raw!r} is not a YYYY-MM-DD date"
-        ) from None
+        raise ValueError(f"{owner}: {key} {raw!r} is not a YYYY-MM-DD date") from None
 
 
 def _dark(owner: str, raw: Any) -> UpstreamDark:
@@ -44,8 +42,8 @@ def _dark(owner: str, raw: Any) -> UpstreamDark:
             f"{owner}: upstream_dark needs exactly {sorted(_DARK_KEYS)}, got {raw!r}"
         )
     return UpstreamDark(
-        acknowledged=_date(owner, "acknowledged", raw["acknowledged"]),
-        review_by=_date(owner, "review_by", raw["review_by"]),
+        acknowledged=_date(owner, "upstream_dark.acknowledged", raw["acknowledged"]),
+        review_by=_date(owner, "upstream_dark.review_by", raw["review_by"]),
         reason=str(raw["reason"]),
     )
 
@@ -64,6 +62,9 @@ def _build(entry: dict[str, Any]) -> IndicatorSpec:
         data["accept"] = tuple(accept)
     if (dark := data.get("upstream_dark")) is not None:
         data["upstream_dark"] = _dark(owner, dark)
+    for key in ("caliber_from", "caliber_until"):
+        if data.get(key) is not None:
+            data[key] = _date(owner, key, data[key])
     return IndicatorSpec(**data)
 
 

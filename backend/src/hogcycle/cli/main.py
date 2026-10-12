@@ -9,9 +9,10 @@ from pathlib import Path
 
 from ..collectors.akshare import AkshareAdapter
 from ..collectors.moa import MoaAdapter
+from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
 from ..gold.wall import build_wall
-from ..pipeline import collect_all
+from ..pipeline import collect_all, replay_one
 from ..registry.loader import DEFAULT_CONFIG, load_registry
 from ..registry.spec import Registry
 from ..registry.staleness import check_all
@@ -23,12 +24,14 @@ WALL_START = dt.date(2015, 1, 1)  # the deepest window every panel can fill
 
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="hogcycle")
-    p.add_argument("command", choices=["collect", "status", "revisions", "export"])
+    p.add_argument(
+        "command", choices=["collect", "replay", "status", "revisions", "export"]
+    )
     p.add_argument("--config", default=DEFAULT_CONFIG)
     p.add_argument(
         "--indicator",
-        help="collect: restrict the run to one indicator id; revisions: which "
-        "series to show (default sow_inventory)",
+        help="collect/replay: restrict the run to these indicator ids "
+        "(comma-separated); revisions: which series to show (default sow_inventory)",
     )
     p.add_argument("--out", default=DEFAULT_OUT, help="export: contract path")
     p.add_argument("--schema", default=SCHEMA_PATH)
@@ -42,6 +45,13 @@ def _parser() -> argparse.ArgumentParser:
         default=6,
         help="collect: how many 农业农村部 monthly editions to re-read "
         "(default 6; raise it to backfill, e.g. 60 reaches 2021-12)",
+    )
+    p.add_argument(
+        "--weekly-pages",
+        type=int,
+        default=2,
+        help="collect: how many 畜牧兽医局 监测预警 list pages to read "
+        "(default 2, about eight weeks; 25 is the whole list, back to 2021-12)",
     )
     p.add_argument(
         "--fail-on-stale",
@@ -90,11 +100,14 @@ def main(argv: list[str] | None = None) -> int:
         adapters = {
             "akshare": AkshareAdapter(),
             "moa": MoaAdapter(months_back=args.months_back),
+            "moa_weekly": MoaWeeklyAdapter(pages=args.weekly_pages),
         }
         if args.indicator:
             # `registry[...]` raises naming every known id, which is what you
-            # want when backfilling one series and mistyping it.
-            registry = Registry({args.indicator: registry[args.indicator]})
+            # want when backfilling one series and mistyping it. Several ids
+            # in one run share a fetch when they read the same report.
+            ids = args.indicator.split(",")
+            registry = Registry({i: registry[i] for i in ids})
         results = collect_all(registry, adapters, bronze, silver)
         for r in results:
             mark = "ok  " if r.ok else "FAIL"
@@ -117,6 +130,21 @@ def main(argv: list[str] | None = None) -> int:
                 )
             return 1
         return 0
+
+    if args.command == "replay":
+        # No network: the adapters are only asked to parse.
+        adapters = {
+            "akshare": AkshareAdapter(),
+            "moa": MoaAdapter(),
+            "moa_weekly": MoaWeeklyAdapter(),
+        }
+        ids = args.indicator.split(",") if args.indicator else None
+        specs = [registry[i] for i in ids] if ids else list(registry)
+        results = [replay_one(s, adapters[s.adapter], bronze, silver) for s in specs]
+        for r in results:
+            mark = "ok  " if r.ok else "FAIL"
+            print(f"{mark} {r.indicator:<22} {r.rows_written:>5} row(s)  {r.error or ''}")
+        return 0 if all(r.ok for r in results) else 1
 
     if args.command == "status":
         rows = {r["indicator"]: r for r in silver.coverage()}
@@ -192,8 +220,11 @@ def main(argv: list[str] | None = None) -> int:
                 "fills up going forward, never retroactively."
             )
             return 0
-        for obs_date, fetched_at, value in trail:
-            print(f"{obs_date}  learned {fetched_at:%Y-%m-%d}  {value}")
+        for obs_date, fetched_at, published_on, value in trail:
+            released = "release date unknown" if published_on is None else (
+                f"released {published_on}"
+            )
+            print(f"{obs_date}  {released:<22} learned {fetched_at:%Y-%m-%d}  {value}")
         return 0
 
     if args.command == "export":

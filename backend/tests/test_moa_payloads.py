@@ -22,7 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from hogcycle.collectors.moa import MoaAdapter, months_ending
+from hogcycle.collectors.moa import BASE, MoaAdapter, months_ending
 from hogcycle.contracts.validation import validate
 from hogcycle.registry.loader import load_registry
 
@@ -143,7 +143,11 @@ def test_a_live_series_that_vanishes_still_fails_loudly(registry, payload):
     a missing 指标 means upstream renamed something and must abort."""
     spec = registry["sow_inventory"]
     assert not spec.retired
-    empty = {"editions": [{"ym": "202607", "rows": [["x", "y"]]}], "skipped": []}
+    empty = {
+        "editions": [{"ym": "202607", "xlsx": f"{BASE}/P020260827816323530438.xlsx",
+                      "rows": [["x", "y"]]}],
+        "skipped": [],
+    }
     with pytest.raises(KeyError, match="能繁母猪存栏"):
         MoaAdapter().normalise(spec, empty, snapshot_id="x", fetched_at=NOW)
 

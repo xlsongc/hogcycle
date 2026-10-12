@@ -113,3 +113,40 @@ def test_first_seen_is_the_first_fetch_even_after_a_revision(tmp_path):
     # ...and as of a moment before anything was learned, nothing.
     before = dt.datetime(2026, 7, 1, tzinfo=dt.UTC)
     assert silver.first_seen("sow_inventory", D(2026, 6, 30), moment=before) is None
+
+
+def test_streak_counts_moves_among_readings_of_one_granularity():
+    """Quarter-end survey figures are not compared with the extrapolated
+    month before them; the run is read among quarterly readings only."""
+    from hogcycle.gold.facts import streak
+
+    def r(y, m, d, v, g):
+        return {"obs_date": D(y, m, d), "value": v, "granularity": g}
+
+    rows = [
+        r(2024, 9, 30, 4062.0, "quarterly"),
+        r(2024, 12, 31, 4078.0, "quarterly"),
+        r(2025, 1, 31, 4066.0, "monthly"),
+        r(2025, 3, 31, 4039.0, "quarterly"),
+        # 2025年2季度 was never published; the run continues across it.
+        r(2025, 9, 30, 4035.0, "quarterly"),
+        r(2025, 12, 31, 3961.0, "quarterly"),
+        r(2026, 6, 30, 3780.0, "quarterly"),
+    ]
+    assert streak(rows) == {"dir": "down", "n": 4, "since": "2024-12-31"}
+    # One move is just the latest change, not a run.
+    assert streak(rows[:4]) is None
+    # A flat latest move ends it outright.
+    assert streak([*rows, r(2026, 9, 30, 3780.0, "quarterly")]) is None
+
+
+def test_change_is_against_the_previous_reading_of_the_same_kind():
+    from hogcycle.gold.facts import change
+
+    rows = [
+        {"obs_date": D(2026, 3, 31), "value": 3904.0, "granularity": "quarterly"},
+        {"obs_date": D(2026, 4, 30), "value": 3850.0, "granularity": "monthly"},
+        {"obs_date": D(2026, 6, 30), "value": 3780.0, "granularity": "quarterly"},
+    ]
+    assert change(rows) == {"pct": -3.2, "since": "2026-03-31"}
+    assert change(rows[:1]) is None

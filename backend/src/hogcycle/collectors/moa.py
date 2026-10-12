@@ -38,6 +38,17 @@ level up. A substring match would have quietly welded two calibers into one
 line, which is the single easiest way to produce a confident wrong answer.
 They are two indicators here, each with one caliber.
 
+Each edition's release date is read from its workbook's file name. The
+site runs TRS WCM, which names an upload `P0<yyyymmdd><digits>.xlsx`;
+202607's is `P020260827…`, the day that release is known to have appeared.
+Checked against all 55 editions from 202112 on: the server's Last-Modified
+falls on the same Beijing day for 51 of them and one to three days later
+for the other four (re-saves), and the workbook's own save time is never
+later. So the name is the upload day, a lower bound on when the page went
+live. The page itself prints no date. A release is how a backtest knows
+when a number became usable, so a name without the stamp fails the batch
+instead of quietly losing that axis.
+
 Quarter-end months (03/06/09/12) carry the 统计局 quarterly stock figures;
 other months carried a 农业农村部 monthly print up to 2025年10月, after which
 the public cadence for 能繁母猪存栏 became quarterly only. That change is
@@ -74,6 +85,16 @@ _HEADERS = {
 }
 
 _XLSX_HREF = re.compile(r'href="([^"]+\.xlsx)"')
+
+# TRS WCM's upload name: P0, the upload day, then a per-file counter.
+_RELEASE_STAMP = re.compile(r"/P0(\d{8})\d*\.xlsx$")
+
+# Observed lags run 20-59 days (median 28) across every series in 55
+# editions; the long ones are months published together after a holiday.
+# Twice the longest is a parser tripwire, not a forecast of upstream: a
+# release dated a year after its period means the stamp or the period was
+# misread, and either would put a value at the wrong place in a backtest.
+MAX_RELEASE_LAG_DAYS = 120
 
 # The trailing unit, e.g. （万头）. Stripped before the name is compared, so
 # a unit containing digits or slashes (（元/公斤）) never reaches the matcher.
@@ -188,7 +209,15 @@ class MoaAdapter:
                 blob = _get(session, xlsx_url)
                 blob.raise_for_status()
                 editions.append(
-                    {"ym": ym, "page": page, "xlsx": xlsx_url, "rows": _rows(blob.content)}
+                    {
+                        "ym": ym,
+                        "page": page,
+                        "xlsx": xlsx_url,
+                        # Kept as evidence for the release date read from
+                        # the name, not used to derive it: re-saves move it.
+                        "last_modified": blob.headers.get("Last-Modified"),
+                        "rows": _rows(blob.content),
+                    }
                 )
             except Exception as exc:
                 skipped.append({"ym": ym, "why": f"{type(exc).__name__}: {exc}"[:160]})
@@ -209,15 +238,18 @@ class MoaAdapter:
         fetched_at: dt.datetime,
     ) -> list[Observation]:
         label = spec.extract.value
-        # Keyed by obs_date, and editions arrive oldest first, so when two
-        # editions print the same period the later one wins. That is the
-        # restatement case this project exists for: silver then sees a value
-        # that differs from what it knew and records a revision, rather than
-        # us pinning the original print forever.
-        found: dict[dt.date, Observation] = {}
+        # One row per *release* of a value. Editions are read in release
+        # order, and a period gets a new row only when an edition prints a
+        # value different from the last one seen for it: a restatement is a
+        # second row with a later published_on, so the first print survives
+        # and a backtest standing between the two releases sees the number
+        # that was public then. In 55 editions so far no period has been
+        # printed twice, but this is the case the store exists for.
+        found: dict[dt.date, list[Observation]] = {}
         names_seen: set[str] = set()
 
-        for edition in payload["editions"]:
+        for edition in sorted(payload["editions"], key=lambda e: (released(e), e["ym"])):
+            published_on = released(edition)
             for row in edition["rows"]:
                 for i, cell in enumerate(row):
                     parsed = _label(cell)
@@ -232,18 +264,32 @@ class MoaAdapter:
                     if value is None:
                         continue
                     period = parse_period(period_token, default=spec.freq)
-                    found[period.date] = Observation(
-                        indicator=spec.id,
-                        obs_date=period.date,
-                        value=value,
-                        unit=spec.unit,
-                        granularity=period.granularity,
-                        source=spec.source,
-                        snapshot_id=snapshot_id,
-                        fetched_at=fetched_at,
+                    lag = (published_on - period.date).days
+                    if lag > MAX_RELEASE_LAG_DAYS:
+                        raise ValueError(
+                            f"{spec.id}: edition {edition['ym']} is dated "
+                            f"{published_on} but prints {period_token} "
+                            f"({period.date}), {lag} days earlier; the longest "
+                            f"plausible lag is {MAX_RELEASE_LAG_DAYS}"
+                        )
+                    prints = found.setdefault(period.date, [])
+                    if prints and prints[-1].value == value:
+                        continue  # a reprint; the first release made it public
+                    prints.append(
+                        Observation(
+                            indicator=spec.id,
+                            obs_date=period.date,
+                            value=value,
+                            unit=spec.unit,
+                            granularity=period.granularity,
+                            source=spec.source,
+                            snapshot_id=snapshot_id,
+                            fetched_at=fetched_at,
+                            published_on=published_on,
+                        )
                     )
 
-        out = [found[d] for d in sorted(found)]
+        out = [o for d in sorted(found) for o in found[d]]
         if not out and spec.retired:
             # A closed caliber is absent from every recent edition by
             # definition. Failing here daily would train the reader to ignore
@@ -258,6 +304,19 @@ class MoaAdapter:
                 "so add an indicator rather than widening this match."
             )
         return out
+
+
+def released(edition: dict[str, Any]) -> dt.date:
+    """The day an edition was uploaded, from its workbook's file name."""
+    m = _RELEASE_STAMP.search(edition["xlsx"])
+    if m is None:
+        raise ValueError(
+            f"edition {edition['ym']}: no P0<yyyymmdd> release stamp in "
+            f"{edition['xlsx']!r}. The site's upload naming changed; find the "
+            "release date another way before collecting, or every row loses it"
+        )
+    stamp = m.group(1)
+    return dt.date(int(stamp[:4]), int(stamp[4:6]), int(stamp[6:]))
 
 
 def _rows(blob: bytes) -> list[list[str | None]]:

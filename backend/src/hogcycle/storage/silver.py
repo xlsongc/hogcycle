@@ -26,17 +26,24 @@ import pyarrow.parquet as pq
 
 from ..contracts.schema import SILVER_SCHEMA, Observation
 
-_COLUMNS = ", ".join(f.name for f in SILVER_SCHEMA)
+# Columns the schema gained after files were already written. Parquet files are
+# never rewritten, so an old file simply lacks the column; `union_by_name`
+# fills it with NULL as long as *some* file has it, and this fills it when
+# none does yet. NULL is the honest reading either way — those rows were
+# written before anyone recorded the fact.
+_ADDED_LATER = {"published_on": "DATE"}
 
 # hive_partitioning is deliberately OFF. The parquet files already carry an
 # `indicator` column, and the directory layout repeats it as `indicator=...`;
 # with hive partitioning on, one name resolves to two sources. The directories
 # stay for human navigation and cheap file-level selection, not for the reader.
-_VIEW = """
-CREATE OR REPLACE VIEW silver AS
-SELECT {columns}
-FROM read_parquet('{glob}', hive_partitioning := false, union_by_name := true)
-"""
+_SOURCE = "read_parquet('{glob}', hive_partitioning := false, union_by_name := true)"
+
+# Which row is "the" value for an obs_date: the latest we learned, and among
+# rows learned at once — a backfill reads every edition in one run — the
+# latest the publisher released. NULLS LAST so a dated print outranks an
+# undated row of the same fetch, and DESC puts the winner first.
+_LATEST = "ORDER BY fetched_at DESC, published_on DESC NULLS LAST"
 
 
 def _sql_literal(path: str) -> str:
@@ -60,7 +67,15 @@ class SilverStore:
 
     def _connect(self) -> duckdb.DuckDBPyConnection:
         con = duckdb.connect()
-        con.execute(_VIEW.format(columns=_COLUMNS, glob=_sql_literal(self._glob)))
+        source = _SOURCE.format(glob=_sql_literal(self._glob))
+        described = con.execute(f"DESCRIBE SELECT * FROM {source}").fetchall()
+        present = {r[0] for r in described}
+        columns = ", ".join(
+            f.name if f.name in present
+            else f"CAST(NULL AS {_ADDED_LATER[f.name]}) AS {f.name}"
+            for f in SILVER_SCHEMA
+        )
+        con.execute(f"CREATE OR REPLACE VIEW silver AS SELECT {columns} FROM {source}")
         return con
 
     def query(self, sql: str, params: dict[str, Any] | None = None) -> list[tuple]:
@@ -78,17 +93,32 @@ class SilverStore:
 
         Returns the rows actually written, so the caller can log a real
         changelog instead of "job succeeded" every morning.
+
+        A dated print is recorded once per release. Re-reading an edition
+        writes nothing, and neither does a later edition repeating a value
+        unchanged, because the earliest release is the one that made it
+        knowable. A value we already hold but had no release date for *is*
+        written again with its date: the number has not moved, but when it
+        became public is something we did not know before.
         """
         if not obs:
             return []
 
         indicator = obs[0].indicator
-        known = self.as_of(dt.datetime.now(dt.UTC), indicator=indicator)
-        changed = [
-            o
-            for o in obs
-            if o.obs_date not in known or not _same(known[o.obs_date], o.value)
-        ]
+        current = self._current(indicator)
+        printed = self._prints(indicator)
+        # Judged one row at a time against what is held *including* the rows
+        # already accepted from this batch, in release order, so a batch that
+        # carries a period's first release and a reprint of it — a replay
+        # across several bronze snapshots does — keeps only the first.
+        changed: list[Observation] = []
+        for o in sorted(obs, key=lambda o: (o.obs_date, o.published_on or dt.date.min)):
+            if not _is_news(o, current.get(o.obs_date), printed):
+                continue
+            changed.append(o)
+            current[o.obs_date] = (o.value, o.published_on)
+            if o.published_on is not None:
+                printed[(o.obs_date, o.published_on)] = o.value
         if not changed:
             return []
 
@@ -106,6 +136,38 @@ class SilverStore:
         pq.write_table(table, part / f"part-{seq:03d}.parquet", compression="zstd")
         return changed
 
+    def _current(
+        self, indicator: str
+    ) -> dict[dt.date, tuple[float | None, dt.date | None]]:
+        rows = self.query(
+            f"""
+            SELECT obs_date, value, published_on FROM (
+                SELECT obs_date, value, published_on,
+                       ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
+                FROM silver WHERE indicator = $indicator
+            ) WHERE rn = 1
+            """,
+            {"indicator": indicator},
+        )
+        return {r[0]: (r[1], r[2]) for r in rows}
+
+    def _prints(self, indicator: str) -> dict[tuple[dt.date, dt.date], float | None]:
+        """Every dated release recorded, latest reading of each."""
+        rows = self.query(
+            """
+            SELECT obs_date, published_on, value FROM (
+                SELECT obs_date, published_on, value,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY obs_date, published_on ORDER BY fetched_at DESC
+                       ) AS rn
+                FROM silver
+                WHERE indicator = $indicator AND published_on IS NOT NULL
+            ) WHERE rn = 1
+            """,
+            {"indicator": indicator},
+        )
+        return {(r[0], r[1]): r[2] for r in rows}
+
     # ---------- reads ----------
 
     def as_of(
@@ -118,12 +180,10 @@ class SilverStore:
         let two indicators that share a date silently overwrite each other.
         """
         rows = self.query(
-            """
+            f"""
             SELECT obs_date, value FROM (
                 SELECT obs_date, value,
-                       ROW_NUMBER() OVER (
-                           PARTITION BY obs_date ORDER BY fetched_at DESC
-                       ) AS rn
+                       ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
                 FROM silver
                 WHERE indicator = $indicator AND fetched_at <= $moment
             ) WHERE rn = 1
@@ -136,15 +196,13 @@ class SilverStore:
         self, indicator: str, *, moment: dt.datetime | None = None
     ) -> list[dict[str, Any]]:
         """The indicator's time series as known at `moment` (default: now),
-        ordered by obs_date, with each row's granularity preserved."""
+        ordered by obs_date, with each row's granularity and release date."""
         moment = moment or dt.datetime.now(dt.UTC)
         rows = self.query(
-            """
-            SELECT obs_date, value, granularity, unit FROM (
-                SELECT obs_date, value, granularity, unit,
-                       ROW_NUMBER() OVER (
-                           PARTITION BY obs_date ORDER BY fetched_at DESC
-                       ) AS rn
+            f"""
+            SELECT obs_date, value, granularity, unit, published_on FROM (
+                SELECT obs_date, value, granularity, unit, published_on,
+                       ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
                 FROM silver
                 WHERE indicator = $indicator AND fetched_at <= $moment
             ) WHERE rn = 1
@@ -153,7 +211,54 @@ class SilverStore:
             {"indicator": indicator, "moment": moment},
         )
         return [
-            {"obs_date": r[0], "value": r[1], "granularity": r[2], "unit": r[3]}
+            {
+                "obs_date": r[0],
+                "value": r[1],
+                "granularity": r[2],
+                "unit": r[3],
+                "published_on": r[4],
+            }
+            for r in rows
+        ]
+
+    def published(
+        self, indicator: str, *, by: dt.date, moment: dt.datetime | None = None
+    ) -> list[dict[str, Any]]:
+        """The series as anyone could have known it on `by`: for each period,
+        the latest release on or before that day, out of what this warehouse
+        holds at `moment` (default: now).
+
+        This is the backtest's view and the reason published_on exists. It
+        reaches back before collection began, because a release date is a
+        fact about the release rather than about when we read it. Periods
+        whose source does not date its releases are absent, not guessed —
+        `series()` still has them.
+        """
+        moment = moment or dt.datetime.now(dt.UTC)
+        rows = self.query(
+            """
+            SELECT obs_date, value, granularity, unit, published_on FROM (
+                SELECT obs_date, value, granularity, unit, published_on,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY obs_date
+                           ORDER BY published_on DESC, fetched_at DESC
+                       ) AS rn
+                FROM silver
+                WHERE indicator = $indicator AND fetched_at <= $moment
+                  AND published_on IS NOT NULL AND published_on <= $by
+            ) WHERE rn = 1
+            ORDER BY obs_date
+            """,
+            {"indicator": indicator, "moment": moment, "by": by},
+        )
+        return [
+            {
+                "obs_date": r[0],
+                "value": r[1],
+                "granularity": r[2],
+                "unit": r[3],
+                "published_on": r[4],
+            }
             for r in rows
         ]
 
@@ -191,8 +296,15 @@ class SilverStore:
             for r in rows
         ]
 
-    def revisions(self, indicator: str) -> list[tuple[dt.date, dt.datetime, float | None]]:
-        """Every obs_date that was ever restated, with its full trail.
+    def revisions(
+        self, indicator: str
+    ) -> list[tuple[dt.date, dt.datetime, dt.date | None, float | None]]:
+        """Every obs_date whose value was ever restated, with its full trail:
+        (obs_date, fetched_at, published_on, value), oldest first.
+
+        A restatement is a *value* that changed. A row that only added the
+        release date to a value we already had is not one, so periods with a
+        single distinct value are left out even when they have several rows.
 
         For 能繁母猪 this is the interesting table in the whole warehouse: it
         shows how much the number moves after the fact, which bounds how much
@@ -201,14 +313,15 @@ class SilverStore:
         return self.query(
             """
             WITH t AS (
-                SELECT obs_date, fetched_at, value FROM silver
+                SELECT obs_date, fetched_at, published_on, value FROM silver
                 WHERE indicator = $indicator
             )
-            SELECT obs_date, fetched_at, value FROM t
+            SELECT obs_date, fetched_at, published_on, value FROM t
             WHERE obs_date IN (
-                SELECT obs_date FROM t GROUP BY obs_date HAVING count(*) > 1
+                SELECT obs_date FROM t GROUP BY obs_date
+                HAVING count(DISTINCT value) > 1
             )
-            ORDER BY obs_date, fetched_at
+            ORDER BY obs_date, published_on NULLS FIRST, fetched_at
             """,
             {"indicator": indicator},
         )
@@ -218,3 +331,26 @@ def _same(a: float | None, b: float | None) -> bool:
     if a is None or b is None:
         return a is b
     return abs(a - b) < 1e-9
+
+
+def _is_news(
+    o: Observation,
+    current: tuple[float | None, dt.date | None] | None,
+    printed: dict[tuple[dt.date, dt.date], float | None],
+) -> bool:
+    """Whether `o` tells silver something it does not already hold."""
+    if current is None:
+        return True
+    value, published_on = current
+    if o.published_on is None:
+        return not _same(value, o.value)
+    release = (o.obs_date, o.published_on)
+    if release in printed:
+        # The same release read again. Only a different reading of it — a
+        # parser fix replayed from bronze — is news.
+        return not _same(printed[release], o.value)
+    # A later release repeating the value adds nothing: the earliest one is
+    # when it became knowable. An earlier one, or a first date for a value
+    # held undated, does.
+    dated_earlier = published_on is not None and published_on <= o.published_on
+    return not (_same(value, o.value) and dated_earlier)

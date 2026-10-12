@@ -43,7 +43,7 @@
           },
           "revises": {
             "type": "boolean",
-            "description": "Whether upstream restates this series after the fact. True only for 能繁母猪存栏, which is also the only real leading indicator — the coincidence that justifies bitemporal storage."
+            "description": "Whether this series is watched for restatement after the fact. Set for 能繁母猪存栏, the only real leading indicator. No period has been restated in the 55 primary-source editions held (2021-12 to 2026-07); its release lag is what a backtest has to respect today."
           },
           "threshold": {
             "type": ["object", "null"],
@@ -54,6 +54,17 @@
               "value": { "type": "number" },
               "label_zh": { "type": "string" },
               "label_en": { "type": "string" }
+            }
+          },
+          "release_lag": {
+            "type": ["object", "null"],
+            "description": "Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with.",
+            "required": ["median_days", "max_days", "n"],
+            "additionalProperties": false,
+            "properties": {
+              "median_days": { "type": "integer" },
+              "max_days": { "type": "integer" },
+              "n": { "type": "integer" }
             }
           },
           "points": {
@@ -70,6 +81,10 @@
                   "type": "string",
                   "enum": ["D", "W", "M", "Q", "A"],
                   "description": "daily / weekly / monthly / quarterly / annual"
+                },
+                "p": {
+                  "type": "string",
+                  "description": "The day the publisher released this value, ISO date. Absent when the source does not date its releases: unknown, never assumed to equal d. Present, it is when the value became usable, which for a monthly print is three to nine weeks after d."
                 }
               }
             }
@@ -84,7 +99,8 @@
         "type": "object",
         "required": [
           "id", "name_zh", "name_en", "tier", "unit", "value", "obs_date",
-          "stale", "first_seen", "extreme", "threshold_run"
+          "published_on", "stale", "first_seen", "extreme", "change", "streak",
+          "threshold_run"
         ],
         "additionalProperties": false,
         "properties": {
@@ -99,6 +115,10 @@
           "unit": { "type": "string" },
           "value": { "type": ["number", "null"] },
           "obs_date": { "type": "string" },
+          "published_on": {
+            "type": ["string", "null"],
+            "description": "The day the publisher released the latest value, or null when the source does not say."
+          },
           "granularity": { "type": "string" },
           "percentile": { "type": ["integer", "null"] },
           "yoy": {
@@ -127,6 +147,27 @@
               "kind": { "type": "string", "enum": ["low", "high"] },
               "since": { "type": "string" },
               "all": { "type": "boolean" }
+            }
+          },
+          "change": {
+            "type": ["object", "null"],
+            "description": "Percent change from the previous reading of the same granularity, and that reading's date. Null when there is no previous one.",
+            "required": ["pct", "since"],
+            "additionalProperties": false,
+            "properties": {
+              "pct": { "type": "number" },
+              "since": { "type": "string" }
+            }
+          },
+          "streak": {
+            "type": ["object", "null"],
+            "description": "Consecutive moves in one direction ending at the latest reading, among readings of its granularity: n moves (at least 2) since the reading where the run began. Null when the latest move is flat or the run is shorter. A count of moves, not a trend call.",
+            "required": ["dir", "n", "since"],
+            "additionalProperties": false,
+            "properties": {
+              "dir": { "type": "string", "enum": ["up", "down"] },
+              "n": { "type": "integer" },
+              "since": { "type": "string" }
             }
           },
           "threshold_run": {
