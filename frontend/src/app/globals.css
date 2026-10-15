@@ -11,7 +11,9 @@
   --page: #f9f9f7;
   --ink: #0b0b0b;
   --ink-2: #52514e;
-  --muted: #898781;
+  /* Secondary text. 4.65:1 on the page: the first value, #898781, was
+     3.4:1 and carried most of the notes a reader needs (WCAG AA is 4.5). */
+  --muted: #72716c;
   --grid: #e1e0d9;
   --axis: #c3c2b7;
   --border: rgba(11, 11, 11, 0.1);
@@ -36,6 +38,15 @@
   --price: #1baf7a;
   --noise: #898781;
   --critical: #d03b3b;
+
+  /* The tier hues are validated as marks (lines, swatches, rules), not as
+     type: as text on the light page the green was 2.7:1. Text that names a
+     tier uses its -ink twin, the same hue darkened to at least 4.6:1 on both
+     surfaces. In dark mode the hues already clear AA, bar margin by a hair. */
+  --capacity-ink: #2871ca;
+  --margin-ink: #b7532b;
+  --price-ink: #17815b;
+  --noise-ink: #72716c;
 
   /* Overlay categorical order — validated adjacent-pairs in both modes. */
   --slot-1: #2a78d6;
@@ -74,6 +85,12 @@
     --margin: #d95926;
     --price: #199e70;
     --noise: #898781;
+    --capacity-ink: #3987e5;
+    --margin-ink: #da5c2a;
+    --price-ink: #199e70;
+    --noise-ink: #898781;
+    /* 4.66:1 on a card; the light value is 3.6:1 here. */
+    --critical: #d85c5c;
     --slot-1: #3987e5;
     --slot-2: #d95926;
     --slot-3: #199e70;
@@ -100,6 +117,11 @@
   --margin: #d95926;
   --price: #199e70;
   --noise: #898781;
+  --capacity-ink: #3987e5;
+  --margin-ink: #da5c2a;
+  --price-ink: #199e70;
+  --noise-ink: #898781;
+  --critical: #d85c5c;
   --slot-1: #3987e5;
   --slot-2: #d95926;
   --slot-3: #199e70;

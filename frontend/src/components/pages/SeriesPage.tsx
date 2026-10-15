@@ -17,6 +17,7 @@ import { nameOf, pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { granularityLetter, lagDays, periodLabel } from "@/lib/period";
 import { arrow, contextOf, trendOf } from "@/lib/readingFacts";
+import { tierVars } from "@/lib/tier";
 
 const RECENT = 12;
 
@@ -41,7 +42,7 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
   const recent = panel.points.filter((p) => p.v != null).slice(-RECENT).reverse();
 
   return (
-    <main className="wrap series" style={{ ["--tier" as string]: `var(--${panel.tier})` }}>
+    <main className="wrap series" style={tierVars(panel.tier)}>
       <p className="crumbs">
         <Link href={pathOf(locale, "overview")}>{t.nav.overview}</Link>
         <span aria-hidden="true"> / </span>

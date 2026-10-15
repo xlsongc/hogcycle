@@ -90,7 +90,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
     const chart = echarts.init(el, null, { renderer: "canvas" });
 
     const render = () => {
-      const muted = cssVar("--muted", "#898781");
+      const muted = cssVar("--muted", "#72716c");
       const grid = cssVar("--grid", "#e1e0d9");
       const ink = cssVar("--ink", "#0b0b0b");
       const surface = cssVar("--surface-1", "#fcfcfb");

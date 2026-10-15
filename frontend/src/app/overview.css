@@ -53,7 +53,7 @@
 }
 
 .signal-role {
-  color: var(--tier, var(--ink-2));
+  color: var(--tier-ink, var(--ink-2));
 }
 
 .signal h3 {
@@ -279,7 +279,7 @@ table.readings td b {
 
 table.readings .tier-row th {
   text-align: left;
-  color: var(--tier, var(--muted));
+  color: var(--tier-ink, var(--muted));
   letter-spacing: 0.06em;
   border-bottom: 1px solid var(--grid);
   border-top: 1px solid var(--grid);

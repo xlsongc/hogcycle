@@ -28,7 +28,7 @@ export function TimeRuler({ group, min, max }: Props) {
     const chart = echarts.init(el, null, { renderer: "canvas" });
 
     const render = () => {
-      const muted = cssVar("--muted", "#898781");
+      const muted = cssVar("--muted", "#72716c");
       const grid = cssVar("--grid", "#e1e0d9");
       chart.setOption({
         animation: false,

@@ -24,7 +24,7 @@
 
 .panel:target .panel-title {
   text-decoration: underline;
-  text-decoration-color: var(--tier, var(--muted));
+  text-decoration-color: var(--tier-ink, var(--muted));
   text-underline-offset: 4px;
 }
 
@@ -71,14 +71,14 @@ a.panel-title:hover {
 }
 
 .panel-readout.live b {
-  color: var(--tier, var(--ink));
+  color: var(--tier-ink, var(--ink));
 }
 
 .panel-tier {
   margin-left: auto;
   font-family: var(--mono);
   font-size: var(--type);
-  color: var(--tier, var(--muted));
+  color: var(--tier-ink, var(--muted));
   letter-spacing: 0.04em;
   cursor: help;
 }
@@ -178,7 +178,7 @@ a.panel-title:hover {
   padding: 7px 14px;
   font-size: var(--type);
   font-weight: 400;
-  color: var(--tier, var(--ink-2));
+  color: var(--tier-ink, var(--ink-2));
   background: var(--page);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--grid);

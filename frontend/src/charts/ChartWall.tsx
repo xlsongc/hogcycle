@@ -15,6 +15,7 @@ import type { Panel } from "@/types/generated/wall";
 import { seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { PanelChart } from "./PanelChart";
+import { tierVars } from "@/lib/tier";
 
 export const WALL_GROUP = "hogcycle-wall";
 
@@ -39,7 +40,7 @@ export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) 
         return (
           <Fragment key={panel.id}>
             {opens && (
-              <h2 className="wall-tier" style={{ ["--tier" as string]: `var(--${panel.tier})` }}>
+              <h2 className="wall-tier" style={tierVars(panel.tier)}>
                 {t.chart.tierNote[panel.tier]}
               </h2>
             )}

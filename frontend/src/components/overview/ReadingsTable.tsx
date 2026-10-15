@@ -13,6 +13,7 @@ import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { tierVars } from "@/lib/tier";
 
 const TIERS: Reading["tier"][] = ["capacity", "margin", "price", "noise"];
 
@@ -50,7 +51,7 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
             const rows = readings.filter((r) => r.tier === tier);
             if (!rows.length) return null;
             return (
-              <tbody key={tier} style={{ ["--tier" as string]: `var(--${tier})` }}>
+              <tbody key={tier} style={tierVars(tier)}>
                 <tr className="tier-row">
                   <th colSpan={6} title={t.chart.tierNote[tier]}>
                     {t.tier[tier]}

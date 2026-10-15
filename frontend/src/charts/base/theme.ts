@@ -153,7 +153,7 @@ export function panelOption(
   const name = nameOf(panel, locale);
   const color = tierColor(panel.tier);
   const ink = cssVar("--ink", "#0b0b0b");
-  const muted = cssVar("--muted", "#898781");
+  const muted = cssVar("--muted", "#72716c");
   const grid = cssVar("--grid", "#e1e0d9");
   const surface = cssVar("--surface-1", "#fcfcfb");
   const critical = cssVar("--critical", "#d03b3b");

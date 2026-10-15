@@ -31,6 +31,7 @@ import { syncPointer } from "./base/pointerSync";
 import { shiftMonths, toIso, toTime } from "@/lib/dates";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { tierVars } from "@/lib/tier";
 
 const DAY = 86_400_000;
 
@@ -266,7 +267,7 @@ export function PanelChart({
       // A var() reference rather than the resolved colour: the server cannot
       // read computed styles, so resolving here rendered a different colour
       // on each side of hydration.
-      style={{ ["--tier" as string]: `var(--${panel.tier})` }}
+      style={tierVars(panel.tier)}
     >
       <div className="panel-head">
         {href ? (

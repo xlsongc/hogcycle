@@ -7,7 +7,7 @@
 }
 
 .series-tier {
-  color: var(--tier, var(--muted));
+  color: var(--tier-ink, var(--muted));
 }
 
 .series-head h1 {

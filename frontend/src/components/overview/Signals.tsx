@@ -19,6 +19,7 @@ import { dict } from "@/i18n/dict";
 import { granularityLetter, lagDays, periodLabel, shortDate } from "@/lib/period";
 import { arrow, contextOf, trendOf } from "@/lib/readingFacts";
 import { Sparkline } from "./Sparkline";
+import { tierVars } from "@/lib/tier";
 
 export type Role = "capacity" | "price" | "margin";
 
@@ -57,7 +58,7 @@ function SignalCard({
   return (
     <article
       className={r.stale ? "signal stale" : "signal"}
-      style={{ ["--tier" as string]: `var(--${r.tier})` }}
+      style={tierVars(r.tier)}
     >
       <header>
         <span className="signal-role">{t.tier[role]}</span>
