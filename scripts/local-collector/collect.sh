@@ -20,6 +20,12 @@ PY="${HOGCYCLE_PYTHON:-python3}"
 
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 
+if ! "$PY" -c 'import sys; sys.exit(sys.version_info < (3, 11))' 2>/dev/null; then
+  log "need Python 3.11 or later, got $("$PY" --version 2>&1 || echo "no $PY");" \
+    "set HOGCYCLE_PYTHON or rerun install.sh from a shell that has one"
+  exit 2
+fi
+
 if [[ ! -d "$HOME_DIR/.git" ]]; then
   log "cloning $REPO into $HOME_DIR"
   git clone --quiet "$REPO" "$HOME_DIR"

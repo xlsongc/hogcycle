@@ -15,6 +15,17 @@ PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/collect.sh"
 LOG="$HOME/Library/Logs/hogcycle-collect.log"
 
+# launchd runs the job with a bare PATH, where `python3` is the system's 3.9
+# and the backend needs 3.11. Resolve the interpreter here, from the shell
+# that is installing, and write it into the job: a collector that cannot
+# install itself fails every morning in a log nobody reads.
+PY="${HOGCYCLE_PYTHON:-$(command -v python3 || true)}"
+if [[ -z "$PY" ]] || ! "$PY" -c 'import sys; sys.exit(sys.version_info < (3, 11))'; then
+  echo "need Python 3.11 or later; found ${PY:-none}. Set HOGCYCLE_PYTHON=/path/to/python3." >&2
+  exit 2
+fi
+PY="$("$PY" -c 'import sys; print(sys.executable)')"
+
 launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || true
 if [[ "${1:-}" == "-u" ]]; then
   rm -f "$PLIST"
@@ -31,6 +42,8 @@ cat > "$PLIST" <<PLIST
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key>
   <array><string>/bin/bash</string><string>-lc</string><string>"$SCRIPT"</string></array>
+  <key>EnvironmentVariables</key>
+  <dict><key>HOGCYCLE_PYTHON</key><string>$PY</string></dict>
   <key>StartCalendarInterval</key>
   <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
   <key>StandardOutPath</key><string>$LOG</string>
@@ -40,4 +53,4 @@ cat > "$PLIST" <<PLIST
 PLIST
 
 launchctl bootstrap "gui/$(id -u)" "$PLIST"
-echo "installed $LABEL: daily at 09:30, log at $LOG"
+echo "installed $LABEL: daily at 09:30 with $PY, log at $LOG"
