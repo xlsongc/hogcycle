@@ -52,7 +52,7 @@ a.panel-title:hover {
 
 .panel-unit {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   color: var(--muted);
 }
 
@@ -77,7 +77,7 @@ a.panel-title:hover {
 .panel-tier {
   margin-left: auto;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   color: var(--tier, var(--muted));
   letter-spacing: 0.04em;
   cursor: help;
@@ -112,7 +112,7 @@ a.panel-title:hover {
   color: var(--page);
   border-radius: 3px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   line-height: 16px;
   white-space: nowrap;
 }

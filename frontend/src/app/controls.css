@@ -4,7 +4,7 @@
 
 h2.section {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   font-weight: 400;
   letter-spacing: 0.08em;
   color: var(--ink-2);
@@ -29,13 +29,13 @@ h2.section {
 
 .filter-label {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   color: var(--muted);
   letter-spacing: 0.04em;
 }
 
 select {
-  font: 11px var(--mono);
+  font: var(--type) var(--mono);
   color: var(--ink-2);
   background: var(--surface-1);
   border: 1px solid var(--border);
@@ -64,7 +64,7 @@ button:disabled {
 
 .picker-tier {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   color: var(--muted);
   /* Wide enough for "Capacity" in Departure Mono; 3.4em fitted only 产能. */
   width: 9ch;

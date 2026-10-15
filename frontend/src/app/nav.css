@@ -74,6 +74,13 @@
   letter-spacing: 0.08em;
 }
 
+/* Each endonym is drawn in its own script, so each takes its own face's
+   grid whichever page it sits on: 中文 is zpix at 12px even on the English
+   page, where everything else is 11px. */
+.lang :lang(zh) {
+  font-size: 12px;
+}
+
 .lang a,
 .lang b {
   color: var(--muted);

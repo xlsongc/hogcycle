@@ -159,10 +159,10 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
                   {panel.revisions.flatMap((rev) =>
                     rev.prints.map((p, i) => (
                       <tr key={`${rev.d}-${i}`}>
-                        <td>{i === 0 ? rev.d : ""}</td>
-                        <td>{fmt(p.v, panel.unit, locale)}</td>
-                        <td>{p.p ?? s.unknown}</td>
-                        <td>{p.learned}</td>
+                        <td className="num">{i === 0 ? rev.d : ""}</td>
+                        <td className="num">{fmt(p.v, panel.unit, locale)}</td>
+                        <td className={p.p ? "num" : undefined}>{p.p ?? s.unknown}</td>
+                        <td className="num">{p.learned}</td>
                       </tr>
                     ))
                   )}
@@ -194,8 +194,10 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
               {recent.map((p) => (
                 <tr key={p.d}>
                   <td>{periodLabel(p.d, p.g, locale)}</td>
-                  <td>{fmt(p.v, panel.unit, locale)}</td>
-                  <td>{p.p ?? <span className="muted">{s.unknown}</span>}</td>
+                  <td className="num">{fmt(p.v, panel.unit, locale)}</td>
+                  <td className={p.p ? "num" : undefined}>
+                    {p.p ?? <span className="muted">{s.unknown}</span>}
+                  </td>
                 </tr>
               ))}
             </tbody>

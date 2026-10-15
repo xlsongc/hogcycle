@@ -37,6 +37,15 @@ export function monoFont(): string {
   return faces.length ? `${faces.join(", ")}, monospace` : "ui-monospace, monospace";
 }
 
+/** Canvas text that can carry Chinese — a threshold's label, "today", the
+ *  coverage note, a legend of series names — sits on zpix's 12px grid on the
+ *  Chinese page. Numerals and dates stay on Departure Mono's 11px in both:
+ *  either face drawn off its own grid is resampled and goes soft. */
+export const NUM_PX = 11;
+export function labelPx(locale: Locale): number {
+  return locale === "zh" ? 12 : NUM_PX;
+}
+
 /** Formats a value the way its unit wants to be read.
  *
  *  The digit count keys on the raw unit string, never on a localised label:
@@ -187,7 +196,7 @@ export function panelOption(
         show: showAxisLabels,
         color: muted,
         fontFamily: monoFont(),
-        fontSize: 11,
+        fontSize: NUM_PX,
       },
       splitLine: { show: false },
       axisPointer: {
@@ -214,7 +223,7 @@ export function panelOption(
       axisLabel: {
         color: muted,
         fontFamily: monoFont(),
-        fontSize: 11,
+        fontSize: NUM_PX,
         formatter: (v: number) => fmt(v, panel.unit, locale),
       },
     },
@@ -244,7 +253,7 @@ export function panelOption(
                           label: {
                             formatter: labelOf(panel.threshold, locale),
                             color: critical,
-                            fontSize: 11,
+                            fontSize: labelPx(locale),
                             fontFamily: monoFont(),
                             position: "insideEndTop" as const,
                           },
@@ -262,7 +271,7 @@ export function panelOption(
                           label: {
                             formatter: marker.label,
                             color: muted,
-                            fontSize: 11,
+                            fontSize: labelPx(locale),
                             fontFamily: monoFont(),
                             position: "end" as const,
                             distance: 2,
@@ -281,7 +290,7 @@ export function panelOption(
                 show: share >= START_LABEL_MIN_SHARE,
                 position: "insideRight",
                 color: muted,
-                fontSize: 11,
+                fontSize: labelPx(locale),
                 fontFamily: monoFont(),
                 formatter: dict(locale).chart.startsAt(before.slice(0, 7)),
               },
@@ -298,7 +307,7 @@ export function panelOption(
             position: "right",
             distance: 8,
             color: ink,
-            fontSize: 11,
+            fontSize: NUM_PX,
             fontFamily: monoFont(),
             formatter: (p: { value?: unknown }) =>
               fmt(typeof p.value === "number" ? p.value : null, panel.unit, locale),

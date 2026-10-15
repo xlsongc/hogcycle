@@ -65,7 +65,7 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
     <main className="wrap overview">
       <header className="ov-head">
         <h1>{o.heading}</h1>
-        <p className="ov-stamp num">
+        <p className="ov-stamp">
           {o.stamp(asOf)}
           {lastRelease && <> · {o.lastRelease(lastRelease)}</>}
         </p>

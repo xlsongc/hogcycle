@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "npm run types && next dev",
-    "build": "npm run types && next build",
+    "build": "npm run types && node scripts/check-type-grid.mjs && next build",
     "start": "next start",
     "types": "node scripts/generate-types.mjs",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit && node scripts/check-type-grid.mjs"
   },
   "dependencies": {
     "next": "16.3.4",

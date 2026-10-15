@@ -12,7 +12,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ENDONYM, LOCALES, PAGES, inLocale, pageOf, pathOf, type Locale } from "@/i18n/locale";
+import {
+  ENDONYM,
+  HTML_LANG,
+  LOCALES,
+  PAGES,
+  inLocale,
+  pageOf,
+  pathOf,
+  type Locale,
+} from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -40,11 +49,11 @@ export function SiteNav({ locale }: { locale: Locale }) {
           <span className="lang" aria-label={t.language}>
             {LOCALES.map((l) =>
               l === locale ? (
-                <b key={l} aria-current="true">
+                <b key={l} aria-current="true" lang={HTML_LANG[l]}>
                   {ENDONYM[l]}
                 </b>
               ) : (
-                <Link key={l} href={inLocale(pathname, l)} hrefLang={l}>
+                <Link key={l} href={inLocale(pathname, l)} hrefLang={l} lang={HTML_LANG[l]}>
                   {ENDONYM[l]}
                 </Link>
               )

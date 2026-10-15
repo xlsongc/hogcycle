@@ -41,8 +41,8 @@ export function ReleaseFeed({ readings, locale }: { readings: Reading[]; locale:
               <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link>
               <small>{periodLabel(r.obs_date, r.granularity ?? "", locale)}</small>
             </span>
-            <span className="feed-value num">
-              {fmt(r.value, r.unit, locale)}
+            <span className="feed-value">
+              <span className="num">{fmt(r.value, r.unit, locale)}</span>
               <span className="muted"> {unitOf(r.unit, locale)}</span>
             </span>
             <span

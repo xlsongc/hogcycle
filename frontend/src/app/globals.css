@@ -150,7 +150,7 @@ html:lang(en) {
 
 header h1 {
   font-family: var(--mono);
-  font-size: 22px;
+  font-size: var(--type-2x);
   font-weight: 400;
   letter-spacing: 0.02em;
   margin: 0 0 8px;
@@ -203,8 +203,10 @@ header .sub {
   flex-wrap: wrap;
 }
 
+/* Every control can carry Chinese, so it sits on the page's grid (--type),
+   not on Departure Mono's 11px: zpix at 11px is resampled and goes soft. */
 button {
-  font: 11px var(--mono);
+  font: var(--type) var(--mono);
   color: var(--ink-2);
   background: var(--surface-1);
   border: 1px solid var(--border);
@@ -224,7 +226,7 @@ button[aria-pressed="true"] {
 }
 
 .hint {
-  font-size: 11px;
+  font-size: var(--type);
   color: var(--muted);
 }
 
@@ -237,11 +239,13 @@ button[aria-pressed="true"] {
   background: var(--surface-1);
 }
 
+/* Cells carry names, units and period labels as well as numbers, so the
+   table is on the page's grid; a cell holding only a number takes .num. */
 table {
   border-collapse: collapse;
   width: 100%;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: var(--type);
   font-variant-numeric: tabular-nums;
 }
 
@@ -312,6 +316,21 @@ footer li {
 
 .muted {
   color: var(--muted);
+}
+
+/* Neither pixel face has a bold or an italic, so the browser would smear
+   one in and knock every glyph off its lattice. Emphasis is ink on a
+   lighter line instead. */
+b,
+strong {
+  font-weight: 400;
+  color: var(--ink);
+}
+
+i,
+em {
+  font-style: normal;
+  color: var(--ink);
 }
 
 a {

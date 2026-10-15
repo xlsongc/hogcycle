@@ -277,12 +277,12 @@ export function PanelChart({
           <span className="panel-title">{name}</span>
         )}
         <span className="panel-unit">{unitOf(panel.unit, locale)}</span>
-        <span className={probe ? "num panel-readout live" : "num panel-readout"}>
+        <span className={probe ? "panel-readout live" : "panel-readout"}>
           {shown ? (
             <>
-              <b>{fmt(shown.v, panel.unit, locale)}</b>
+              <b className="num">{fmt(shown.v, panel.unit, locale)}</b>
               <span title={granName(shown.g)}>
-                {shown.d}
+                <span className="num">{shown.d}</span>
                 {gran(shown.g) ? ` · ${gran(shown.g)}` : ""}
               </span>
             </>

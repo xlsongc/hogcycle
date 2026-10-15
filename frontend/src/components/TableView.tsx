@@ -61,9 +61,11 @@ export function TableView({ panels, locale }: { panels: Panel[]; locale: Locale 
             <tbody>
               {rows.map(([month, values]) => (
                 <tr key={month}>
-                  <td>{month}</td>
+                  <td className="num">{month}</td>
                   {panels.map((p) => (
-                    <td key={p.id}>{fmt(values[p.id] ?? null, p.unit, locale)}</td>
+                    <td key={p.id} className="num">
+                      {fmt(values[p.id] ?? null, p.unit, locale)}
+                    </td>
                   ))}
                 </tr>
               ))}

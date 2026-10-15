@@ -143,7 +143,7 @@ export function CompareView({ panels, start, end, locale }: Props) {
             value={lag.months}
             onChange={(e) => setLag({ id: lag.id, months: Number(e.target.value) })}
           />
-          <output htmlFor="lag-months" className="num">
+          <output htmlFor="lag-months">
             {t.compare.months(lag.months)}
           </output>
         </div>

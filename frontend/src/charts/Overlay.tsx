@@ -29,7 +29,7 @@ import { shiftMonths } from "@/lib/dates";
 
 import type { Panel } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
-import { cssVar, fmt, monoFont, slotColor } from "./base/theme";
+import { NUM_PX, cssVar, fmt, labelPx, monoFont, slotColor } from "./base/theme";
 
 export type LagSpec = { id: string; months: number };
 
@@ -146,7 +146,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
             icon: "roundRect",
             itemWidth: 12,
             itemHeight: 2,
-            textStyle: { color: muted, fontSize: 11, fontFamily: monoFont() },
+            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: monoFont() },
             formatter: (name: string) => {
               const v = finals.get(name);
               return v == null ? name : `${name}  ${fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale)}`;
@@ -156,7 +156,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: 11, fontFamily: monoFont() },
+            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             valueFormatter: (v: unknown) =>
               typeof v === "number" ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale) : "—",
@@ -167,7 +167,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
             max,
             axisLine: { lineStyle: { color: grid } },
             axisTick: { show: false },
-            axisLabel: { color: muted, fontSize: 11, fontFamily: monoFont() },
+            axisLabel: { color: muted, fontSize: NUM_PX, fontFamily: monoFont() },
           },
           yAxis: {
             type: log ? "log" : "value",
@@ -177,7 +177,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
             axisTick: { show: false },
             axisLabel: {
               color: muted,
-              fontSize: 11,
+              fontSize: NUM_PX,
               fontFamily: monoFont(),
               formatter: (v: number) => fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale),
             },
