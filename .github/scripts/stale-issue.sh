@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Keep exactly one open `stale-series` issue while any series fails the
-# staleness guard, and close it once none does.
+# staleness guard, or any source group has gone unfetched (ADR-0023), and
+# close it once none does.
 #
 # A red run was not enough. The guard caught three 玄田 tables freezing in
 # 2026-08 on the first day it could, and the run then stayed red for 26 days
@@ -34,21 +35,38 @@ trap 'rm -f "$body"' EXIT
 {
   # Read back on the next run to decide whether anything changed.
   echo "<!-- failing: $failing -->"
-  echo "These series have stopped advancing, and nobody has acknowledged it or the"
-  echo "acknowledgement has lapsed. An upstream that keeps serving its last payload"
-  echo "looks identical to a quiet day; see docs/adr/0013."
-  echo
-  echo "| series | latest | age | limit | acknowledgement |"
-  echo "|---|---|---|---|---|"
-  jq -r 'select(.failing)
-    | "| `\(.indicator)` | \(.latest) | \(.age_days)d | \(.limit)d | \(
-        if .review_by then "lapsed \(.review_by)" else "none" end) |"' "$JSONL"
-  echo
-  echo "**Fix:** move the series to its primary source. If you own that fix but it is"
-  echo "not built yet, add \`upstream_dark\` with a \`review_by\` (at most 92 days) to"
-  echo "\`config/sources.yaml\`. Do not loosen \`max_age_days\`: that is for a cadence"
-  echo "that is genuinely slow, not for a source that stopped."
-  echo
+  if jq -e -s 'any(.[]; .failing and .kind == "heartbeat")' "$JSONL" >/dev/null; then
+    echo "### Source groups nobody has fetched"
+    echo
+    echo "No successful fetch within the limit. The collector that reaches these"
+    echo "hosts has stopped, or cannot reach them from where it runs; see"
+    echo "docs/adr/0023. For \`cn/*\` that is scripts/local-collector."
+    echo
+    echo "| group | last fetched | age | limit |"
+    echo "|---|---|---|---|"
+    jq -r 'select(.failing and .kind == "heartbeat")
+      | "| `\(.indicator)` | \(.latest // "never") | \(.age_hours // "—")h | \(.limit_hours)h |"' "$JSONL"
+    echo
+  fi
+  if jq -e -s 'any(.[]; .failing and .kind == "series")' "$JSONL" >/dev/null; then
+    echo "### Series that stopped advancing"
+    echo
+    echo "Nobody has acknowledged these, or the acknowledgement has lapsed. An"
+    echo "upstream that keeps serving its last payload looks identical to a quiet"
+    echo "day; see docs/adr/0013."
+    echo
+    echo "| series | latest | age | limit | acknowledgement |"
+    echo "|---|---|---|---|---|"
+    jq -r 'select(.failing and .kind == "series")
+      | "| `\(.indicator)` | \(.latest) | \(.age_days)d | \(.limit)d | \(
+          if .review_by then "lapsed \(.review_by)" else "none" end) |"' "$JSONL"
+    echo
+    echo "**Fix:** move the series to its primary source. If you own that fix but it is"
+    echo "not built yet, add \`upstream_dark\` with a \`review_by\` (at most 92 days) to"
+    echo "\`config/sources.yaml\`. Do not loosen \`max_age_days\`: that is for a cadence"
+    echo "that is genuinely slow, not for a source that stopped."
+    echo
+  fi
   echo "Last checked: $RUN_URL"
   echo
   echo "<details><summary>hogcycle status</summary>"
@@ -59,7 +77,7 @@ trap 'rm -f "$body"' EXIT
   echo "</details>"
 } > "$body"
 
-title="Stale series: $failing"
+title="Stale: $failing"
 if [[ -z "$open" ]]; then
   gh label create "$LABEL" --color d03b3b \
     --description "A series stopped advancing (hogcycle status --fail-on-stale)" --force >/dev/null

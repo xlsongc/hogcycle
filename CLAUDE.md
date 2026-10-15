@@ -67,6 +67,12 @@ with zero HTTP requests.
   months. `hogcycle status --fail-on-stale` is the guard. When a series is
   genuinely finished because upstream closed a caliber, mark it `retired` in
   config; do not silence the guard by loosening a threshold.
+- **A collector that stops is a failure too, on a clock of hours.** The
+  `reach: cn` collector was never installed and nothing said so; the first
+  staleness alarm was three weeks out. `status` now judges each source group
+  by its newest bronze fetch (36h `anywhere`, 72h `cn`, ADR-0023). A failed
+  fetch leaves no manifest line, so a job that runs and reaches nothing is
+  as dead as one that never runs.
 - **A known outage gets an owner and a deadline, not silence.** When the
   caliber is alive but the source we reach went dark, and the primary-source
   fix is not built yet, mark it `upstream_dark` with a `review_by` at most 92
@@ -219,3 +225,4 @@ so you do not have to re-derive them.
 | 0020 | Every series has its own page; its description travels in the contract |
 | 0021 | USDA's estimates of China come in; a forecast is a kind of indicator |
 | 0022 | Each source is collected from where it answers; GitHub watches all of them |
+| 0023 | A collector that stops is a failure within days, judged from what it fetched |

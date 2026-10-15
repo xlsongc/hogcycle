@@ -203,7 +203,8 @@ def test_a_wall_rebuilt_as_of_a_past_date_judges_staleness_then(tmp_path):
 
 def test_status_json_tells_the_workflow_which_series_fail(tmp_path, monkeypatch, capsys):
     """The workflow files its issue from this output, so its shape is a
-    contract too: one object per series, `failing` deciding the issue."""
+    contract too: one object per series, `failing` deciding the issue. Source
+    groups follow as `kind: heartbeat` lines (ADR-0023)."""
     from hogcycle.cli import main as cli
 
     # The CLI reads data/silver relative to where it runs, as in the workflow.
@@ -212,7 +213,8 @@ def test_status_json_tells_the_workflow_which_series_fail(tmp_path, monkeypatch,
     monkeypatch.chdir(tmp_path)
 
     code = cli.main(["status", "--json", "--fail-on-stale", "--config", str(config)])
-    (row,) = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
+    lines = [json.loads(line) for line in capsys.readouterr().out.splitlines()]
+    (row,) = [r for r in lines if r["kind"] == "series"]
     assert row["indicator"] == "piglet_price"
     assert row["stale"] is True and row["failing"] is True
     assert row["acknowledged"] is False and row["review_by"] is None
