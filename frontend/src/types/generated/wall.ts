@@ -2,7 +2,12 @@
 // Source: contracts/wall.schema.json
 // Regenerate: npm run types
 
+/** The contract shape this frontend was built against. */
+export const CONTRACT_VERSION = "1.0.0";
+
 export interface WallContract {
+  /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
+  contract_version: "1.0.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   window: Window;

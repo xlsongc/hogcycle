@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import wall from "@/data/wall.json";
-import type { WallContract } from "@/types/generated/wall";
+import { contract } from "@/lib/contract";
 import { SeriesPage } from "@/components/pages/SeriesPage";
 import { nameOf } from "@/i18n/locale";
 import { en } from "@/i18n/en";
 
 // One page per series, prerendered at build time: the static export cannot
 // render a path it did not generate, so an id outside the contract is a 404.
-const data = wall as WallContract;
+const data = contract;
 
 export const dynamicParams = false;
 

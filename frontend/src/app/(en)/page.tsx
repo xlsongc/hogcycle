@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import wall from "@/data/wall.json";
-import type { WallContract } from "@/types/generated/wall";
+import { contract } from "@/lib/contract";
 import { OverviewPage } from "@/components/pages/OverviewPage";
 import { en } from "@/i18n/en";
 
-// The contract is the only thing crossing the boundary. It is imported at
-// build time now and will be fetched from an API later; the shape, and so
-// this file, does not change. See docs/adr/0007.
-const data = wall as WallContract;
+// The contract is the only thing crossing the boundary, loaded and checked
+// in one place (lib/contract.ts; docs/adr/0007, 0024).
+const data = contract;
 
 export const metadata: Metadata = {
   title: en.meta.title,

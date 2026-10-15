@@ -226,3 +226,4 @@ so you do not have to re-derive them.
 | 0021 | USDA's estimates of China come in; a forecast is a kind of indicator |
 | 0022 | Each source is collected from where it answers; GitHub watches all of them |
 | 0023 | A collector that stops is a failure within days, judged from what it fetched |
+| 0024 | The contract carries a version, and every export is validated against the schema |

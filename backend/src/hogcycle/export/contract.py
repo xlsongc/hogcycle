@@ -8,6 +8,10 @@ same schema generates its TypeScript types.
 Phase 1 writes that document to a file the frontend imports at build time.
 When an HTTP API arrives it serves this identical shape at the same path, so
 nothing on the frontend changes.
+
+Every export is validated against the schema itself (docs/adr/0024). An
+earlier hand-written check covered required keys only, so a misspelled tier
+or a value exported as a string would have reached the page.
 """
 
 from __future__ import annotations
@@ -15,6 +19,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft7Validator
 
 DEFAULT_OUT = "frontend/src/data/wall.json"
 SCHEMA_PATH = "contracts/wall.schema.json"
@@ -24,35 +30,32 @@ class ContractError(Exception):
     """The payload does not match the published contract."""
 
 
-def _check(payload: dict[str, Any], schema: dict[str, Any]) -> None:
-    """Structural check against the published schema.
+def contract_version(schema: dict[str, Any]) -> str:
+    """The version is declared once, as a const in the schema, and stamped
+    from there; the type generator reads the same const."""
+    return schema["properties"]["contract_version"]["const"]
 
-    Deliberately dependency-free: this validates the handful of invariants
-    the frontend actually relies on, rather than pulling in a full JSON Schema
-    engine for a document we generate ourselves.
-    """
-    for key in schema.get("required", []):
-        if key not in payload:
-            raise ContractError(f"missing required key {key!r}")
 
-    panel_required = (
-        schema["properties"]["panels"]["items"].get("required", [])
+def validate_contract(payload: dict[str, Any], schema: dict[str, Any]) -> None:
+    errors = sorted(
+        Draft7Validator(schema).iter_errors(payload),
+        key=lambda e: [str(x) for x in e.absolute_path],
     )
+    if errors:
+        shown = "; ".join(
+            f"{'/'.join(map(str, e.absolute_path)) or '<root>'}: {e.message}"
+            for e in errors[:5]
+        )
+        more = f" (and {len(errors) - 5} more)" if len(errors) > 5 else ""
+        raise ContractError(f"{len(errors)} schema violation(s): {shown}{more}")
+
+    # What JSON Schema cannot say: a panel with nothing to draw, and order.
     for panel in payload["panels"]:
-        missing = [k for k in panel_required if k not in panel]
-        if missing:
-            raise ContractError(f"panel {panel.get('id')!r} missing {missing}")
         if not panel["points"]:
             raise ContractError(f"panel {panel['id']!r} has no points")
         dates = [p["d"] for p in panel["points"]]
         if dates != sorted(dates):
             raise ContractError(f"panel {panel['id']!r} points are not ordered by date")
-
-    reading_required = schema["properties"]["readings"]["items"].get("required", [])
-    for reading in payload["readings"]:
-        missing = [k for k in reading_required if k not in reading]
-        if missing:
-            raise ContractError(f"reading {reading.get('id')!r} missing {missing}")
 
 
 def write_contract(
@@ -62,7 +65,8 @@ def write_contract(
     schema_path: Path | str = SCHEMA_PATH,
 ) -> Path:
     schema = json.loads(Path(schema_path).read_text(encoding="utf-8"))
-    _check(payload, schema)
+    payload = {"contract_version": contract_version(schema), **payload}
+    validate_contract(payload, schema)
 
     path = Path(out)
     path.parent.mkdir(parents=True, exist_ok=True)

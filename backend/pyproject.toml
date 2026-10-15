@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "akshare>=1.18",
     "duckdb>=1.0",
+    "jsonschema>=4.18",  # every export is validated against contracts/ (ADR-0024)
     "openpyxl>=3.1",  # the 农业农村部 joint release ships as .xlsx
     "pyarrow>=16",
     "pyyaml>=6",

@@ -27,6 +27,7 @@ const pascal = (s) =>
   s.replace(/(^\w|[-_ ]\w)/g, (m) => m.replace(/[-_ ]/, "").toUpperCase());
 
 function typeOf(node, name) {
+  if (node.const !== undefined) return JSON.stringify(node.const);
   if (node.enum) return node.enum.map((v) => JSON.stringify(v)).join(" | ");
 
   const kinds = Array.isArray(node.type) ? node.type : [node.type];
@@ -86,8 +87,17 @@ const header = `// GENERATED — do not edit.
 // Regenerate: npm run types
 `;
 
+// The version is declared once, as the schema's const, so the page can refuse
+// a payload of another major at build time (docs/adr/0024).
+const version = schema.properties?.contract_version?.const;
+if (typeof version !== "string") throw new Error("schema has no contract_version const");
+const versionLine = `/** The contract shape this frontend was built against. */\nexport const CONTRACT_VERSION = ${JSON.stringify(version)};`;
+
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, `${header}\n${interfaces.map((i) => i.body).join("\n\n")}\n`);
+writeFileSync(
+  OUT,
+  `${header}\n${versionLine}\n\n${interfaces.map((i) => i.body).join("\n\n")}\n`
+);
 console.log(
   `types: ${interfaces.length} interface(s) -> ${OUT.replace(process.cwd() + "/", "")}`
 );

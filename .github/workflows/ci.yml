@@ -16,6 +16,9 @@ jobs:
       - run: cd backend && ruff check .
       # Fixtures are real captured payloads, so these run without network.
       - run: cd backend && pytest -q
+      # Export the committed silver and validate it against the schema, so a
+      # change that breaks the contract fails the push that made it (ADR-0024).
+      - run: hogcycle export --out "$RUNNER_TEMP/wall.json"
 
   frontend:
     runs-on: ubuntu-latest

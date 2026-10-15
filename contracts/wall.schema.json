@@ -4,9 +4,14 @@
   "title": "WallContract",
   "description": "The only interface between the Python pipeline and the frontend. Phase 1 delivers this as a build-time JSON file; a later HTTP API serves the identical shape at the same path, so the frontend does not change.",
   "type": "object",
-  "required": ["generated_at", "window", "panels", "readings"],
+  "required": ["contract_version", "generated_at", "window", "panels", "readings"],
   "additionalProperties": false,
   "properties": {
+    "contract_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
+    },
     "generated_at": {
       "type": "string",
       "description": "The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date."
