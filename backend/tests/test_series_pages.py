@@ -75,6 +75,10 @@ def test_the_trail_and_the_file_show_the_same_series(tmp_path):
     rows = list(csv.reader((tmp_path / "csv" / "piglet_price.csv").open(encoding="utf-8")))
     assert tuple(rows[0]) == HEADER
     assert rows[1:] == [
-        ["2023-10-25", "25.63", "CNY/kg", "weekly", "2023-10-30"],
-        ["2023-11-01", "25.0", "CNY/kg", "weekly", ""],
+        ["2023-10-25", "25.63", "CNY/kg", "weekly", "2023-10-30", "2026-10-12"],
+        ["2023-11-01", "25.0", "CNY/kg", "weekly", "", "2026-09-05"],
     ]
+    # The page needs the same fact to stand on a past day (ADR-0025): the
+    # undated week carries no date of its own beyond the panel's default.
+    assert panel["learned"] == "2026-09-05"
+    assert panel["points"][1] == {"d": "2023-11-01", "v": 25.0, "g": "W"}

@@ -77,6 +77,9 @@ type BaseArgs = {
   /** A vertical line at a date that means something, e.g. today on a chart
    *  whose shifted series runs past it. */
   marker?: { date: string; label: string } | null;
+  /** The note on the shaded band before the first point. On a past day the
+   *  band holds data that exists but was not yet knowable (docs/adr/0025). */
+  startNote?: (month: string) => string;
 };
 
 /** Series ids, so a single series can be updated without resending the
@@ -148,7 +151,7 @@ function niceUnit(x: number): number {
  * would invent a correlation the data does not contain.
  */
 export function panelOption(
-  { panel, min, max, showAxisLabels, locale, marker }: BaseArgs
+  { panel, min, max, showAxisLabels, locale, marker, startNote }: BaseArgs
 ): EChartsOption {
   const name = nameOf(panel, locale);
   const color = tierColor(panel.tier);
@@ -292,7 +295,7 @@ export function panelOption(
                 color: muted,
                 fontSize: labelPx(locale),
                 fontFamily: monoFont(),
-                formatter: dict(locale).chart.startsAt(before.slice(0, 7)),
+                formatter: (startNote ?? dict(locale).chart.startsAt)(before.slice(0, 7)),
               },
               data: [[{ xAxis: min }, { xAxis: before }]],
             }

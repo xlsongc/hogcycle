@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.0.0",
+      "const": "1.1.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -114,6 +114,10 @@
               }
             }
           },
+          "learned": {
+            "type": ["string", "null"],
+            "description": "UTC date this warehouse learned the panel's undated points (those without p), unless a point carries its own l. For a source that does not date its releases this is the only bound on when a value was knowable, and the page never assumes an earlier one (docs/adr/0025). Null when every point is dated. Added in 1.1.0."
+          },
           "release_lag": {
             "type": ["object", "null"],
             "description": "Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with.",
@@ -143,6 +147,10 @@
                 "p": {
                   "type": "string",
                   "description": "The day the publisher released this value, ISO date. Absent when the source does not date its releases: unknown, never assumed to equal d. Present, it is when the value became usable, which for a monthly print is three to nine weeks after d."
+                },
+                "l": {
+                  "type": "string",
+                  "description": "On an undated point only: the UTC date this warehouse learned it, when that differs from the panel's learned. Added in 1.1.0."
                 }
               }
             }

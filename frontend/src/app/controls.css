@@ -120,3 +120,24 @@ button.pick[aria-pressed="true"] {
 .lag-slider + .section-note {
   margin-top: 8px;
 }
+
+/* The day a page stands on (docs/adr/0025). Native date input, dressed like
+   the buttons beside it and on the same grid. */
+input[type="date"] {
+  font: var(--type) var(--mono);
+  color: var(--ink);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 8px;
+}
+
+input[type="date"]:hover,
+input[type="date"]:focus-visible {
+  border-color: var(--axis);
+}
+
+.as-of .hint {
+  flex: 1 1 32ch;
+  max-width: 76ch;
+}

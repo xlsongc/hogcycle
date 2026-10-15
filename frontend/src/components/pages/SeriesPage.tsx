@@ -12,34 +12,27 @@
 import Link from "next/link";
 import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
-import { SeriesChart } from "@/components/series/SeriesChart";
-import { nameOf, pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
+import { SeriesBody } from "@/components/series/SeriesBody";
+import { nameOf, pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-import { granularityLetter, lagDays, periodLabel } from "@/lib/period";
-import { arrow, contextOf, trendOf } from "@/lib/readingFacts";
 import { tierVars } from "@/lib/tier";
-
-const RECENT = 12;
 
 type Props = {
   panel: Panel;
   reading: Reading | undefined;
   start: string;
   end: string;
+  /** The day the contract was generated: the latest a reader can stand on. */
+  today: string;
   locale: Locale;
 };
 
-export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
+export function SeriesPage({ panel, reading: r, start, end, today, locale }: Props) {
   const t = dict(locale);
   const s = t.series;
-  const o = t.overview;
   const zh = locale === "zh";
   const name = nameOf(panel, locale);
   const about = panel.about;
-  const unit = unitOf(panel.unit, locale);
-  const trend = r ? trendOf(r, locale) : null;
-  const context = r ? contextOf(r, locale) : null;
-  const recent = panel.points.filter((p) => p.v != null).slice(-RECENT).reverse();
 
   return (
     <main className="wrap series" style={tierVars(panel.tier)}>
@@ -73,138 +66,68 @@ export function SeriesPage({ panel, reading: r, start, end, locale }: Props) {
         ) : null}
       </header>
 
-      {r && (
-        <section className="series-latest" aria-label={s.latest}>
-          <p className="signal-value">
-            <b className="num">{fmt(r.value, r.unit, locale)}</b>
-            <span className="signal-unit">{unit}</span>
-          </p>
-          <p>
-            {periodLabel(r.obs_date, granularityLetter(r.granularity ?? ""), locale)}
-            {r.published_on && (
-              <span className="muted">
-                {" · "}
-                {lagDays(r.obs_date, r.published_on) < 0
-                  ? s.ahead(r.published_on, -lagDays(r.obs_date, r.published_on))
-                  : o.released(r.published_on, lagDays(r.obs_date, r.published_on))}
-              </span>
+      <SeriesBody
+        panel={panel}
+        reading={r}
+        start={start}
+        end={end}
+        today={today}
+        locale={locale}
+      >
+        <div className="ov-two">
+          <section aria-labelledby="release-h">
+            <h2 className="section" id="release-h">
+              {s.releaseHeading}
+            </h2>
+            <p className="section-note">
+              {panel.forecast
+                ? s.releaseForecast
+                : panel.release_lag
+                ? s.releaseBody(
+                    panel.release_lag.median_days,
+                    panel.release_lag.max_days,
+                    panel.release_lag.n
+                  )
+                : s.releaseNone}
+            </p>
+          </section>
+
+          <section aria-labelledby="revisions-h">
+            <h2 className="section" id="revisions-h">
+              {s.revisionsHeading}
+            </h2>
+            {panel.revisions.length ? (
+              <>
+                <p className="section-note">{s.revisionsNote}</p>
+                <table className="series-table">
+                  <thead>
+                    <tr>
+                      <th>{s.cols.period}</th>
+                      <th>{s.cols.value}</th>
+                      <th>{s.cols.released}</th>
+                      <th>{s.cols.learned}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {panel.revisions.flatMap((rev) =>
+                      rev.prints.map((p, i) => (
+                        <tr key={`${rev.d}-${i}`}>
+                          <td className="num">{i === 0 ? rev.d : ""}</td>
+                          <td className="num">{fmt(p.v, panel.unit, locale)}</td>
+                          <td className={p.p ? "num" : undefined}>{p.p ?? s.unknown}</td>
+                          <td className="num">{p.learned}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className="section-note">{s.revisionsNone}</p>
             )}
-            {r.stale && <span className="stale-tag">{o.staleBadge(r.age_days ?? 0)}</span>}
-          </p>
-          <ul className="signal-facts">
-            {trend && (
-              <li className={trend.dir ? `dir-${trend.dir}` : undefined}>
-                <span aria-hidden="true">{arrow(trend.dir)}</span> {trend.text}
-                {r.yoy != null && <span className="muted"> · {o.yoy(r.yoy)}</span>}
-              </li>
-            )}
-            {context && <li className="muted">{context}</li>}
-          </ul>
-        </section>
-      )}
-
-      <section aria-labelledby="history-h">
-        <h2 className="section" id="history-h">
-          {s.chartHeading}
-        </h2>
-        <SeriesChart panel={panel} start={start} end={end} locale={locale} />
-        <p className="series-links">
-          <a href={staticPath(`/data/series/${panel.id}.csv`)} download>
-            {s.download}
-          </a>
-          <span className="muted"> · {s.downloadNote}</span>
-          <br />
-          {panel.in_wall !== false ? (
-            <Link href={`${pathOf(locale, "wall")}#${panel.id}`}>{s.onWall}</Link>
-          ) : (
-            <Link href={`${pathOf(locale, "compare")}?s=${panel.id}`}>{s.inCompare}</Link>
-          )}
-        </p>
-      </section>
-
-      <div className="ov-two">
-        <section aria-labelledby="release-h">
-          <h2 className="section" id="release-h">
-            {s.releaseHeading}
-          </h2>
-          <p className="section-note">
-            {panel.forecast
-              ? s.releaseForecast
-              : panel.release_lag
-              ? s.releaseBody(
-                  panel.release_lag.median_days,
-                  panel.release_lag.max_days,
-                  panel.release_lag.n
-                )
-              : s.releaseNone}
-          </p>
-        </section>
-
-        <section aria-labelledby="revisions-h">
-          <h2 className="section" id="revisions-h">
-            {s.revisionsHeading}
-          </h2>
-          {panel.revisions.length ? (
-            <>
-              <p className="section-note">{s.revisionsNote}</p>
-              <table className="series-table">
-                <thead>
-                  <tr>
-                    <th>{s.cols.period}</th>
-                    <th>{s.cols.value}</th>
-                    <th>{s.cols.released}</th>
-                    <th>{s.cols.learned}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {panel.revisions.flatMap((rev) =>
-                    rev.prints.map((p, i) => (
-                      <tr key={`${rev.d}-${i}`}>
-                        <td className="num">{i === 0 ? rev.d : ""}</td>
-                        <td className="num">{fmt(p.v, panel.unit, locale)}</td>
-                        <td className={p.p ? "num" : undefined}>{p.p ?? s.unknown}</td>
-                        <td className="num">{p.learned}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </>
-          ) : (
-            <p className="section-note">{s.revisionsNone}</p>
-          )}
-        </section>
-      </div>
-
-      <section aria-labelledby="recent-h">
-        <h2 className="section" id="recent-h">
-          {s.recentHeading}
-        </h2>
-        <div className="readings-wrap">
-          <table className="series-table">
-            <thead>
-              <tr>
-                <th>{s.cols.period}</th>
-                <th>
-                  {s.cols.value} <span className="muted">{unit}</span>
-                </th>
-                <th>{s.cols.released}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recent.map((p) => (
-                <tr key={p.d}>
-                  <td>{periodLabel(p.d, p.g, locale)}</td>
-                  <td className="num">{fmt(p.v, panel.unit, locale)}</td>
-                  <td className={p.p ? "num" : undefined}>
-                    {p.p ?? <span className="muted">{s.unknown}</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          </section>
         </div>
-      </section>
+      </SeriesBody>
     </main>
   );
 }

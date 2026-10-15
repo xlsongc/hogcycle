@@ -10,9 +10,10 @@
  * of different frequencies on different dates (see base/pointerSync.ts).
  */
 
+import Link from "next/link";
 import { Fragment } from "react";
 import type { Panel } from "@/types/generated/wall";
-import { seriesPath, type Locale } from "@/i18n/locale";
+import { nameOf, seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { PanelChart } from "./PanelChart";
 import { tierVars } from "@/lib/tier";
@@ -23,12 +24,25 @@ type Props = {
   panels: Panel[];
   min: string;
   max: string;
+  /** The day the wall stands on; its panels are already cut to it. */
+  asOf?: string | null;
+  /** When each panel first became knowable, to say why one is empty. */
+  first?: Record<string, { date: string; basis: "published" | "learned" } | null>;
   locale: Locale;
   onZoom: (min: string, max: string) => void;
   onReset: () => void;
 };
 
-export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) {
+export function ChartWall({
+  panels,
+  min,
+  max,
+  asOf = null,
+  first = {},
+  locale,
+  onZoom,
+  onReset,
+}: Props) {
   const t = dict(locale);
   return (
     <div className="wall">
@@ -44,6 +58,20 @@ export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) 
                 {t.chart.tierNote[panel.tier]}
               </h2>
             )}
+            {asOf && !panel.points.length ? (
+              // Not yet knowable: say so in the panel's place rather than
+              // draw an empty chart that reads as "no data" (docs/adr/0025).
+              <div className="panel panel-unknown" id={panel.id} style={tierVars(panel.tier)}>
+                <div className="panel-head">
+                  <Link className="panel-title" href={seriesPath(locale, panel.id)}>
+                    {nameOf(panel, locale)}
+                  </Link>
+                  <span className="panel-readout">
+                    {t.asOf.panelNone(first[panel.id] ?? null)}
+                  </span>
+                </div>
+              </div>
+            ) : (
             <PanelChart
               panel={panel}
               group={WALL_GROUP}
@@ -56,7 +84,9 @@ export function ChartWall({ panels, min, max, locale, onZoom, onReset }: Props) 
               href={seriesPath(locale, panel.id)}
               onZoom={onZoom}
               onReset={onReset}
+              startNote={asOf ? t.asOf.startsAt : undefined}
             />
+            )}
           </Fragment>
         );
       })}

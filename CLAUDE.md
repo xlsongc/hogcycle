@@ -186,8 +186,9 @@ hogcycle status                      # coverage, latest obs_date, and age per se
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
 hogcycle status --json               # one object per series; the stale-series issue reads it
 hogcycle revisions --indicator sow_inventory
+hogcycle published --indicator sow_inventory --by 2024-03-15   # what was public that day
 hogcycle export                      # gold → frontend/src/data/wall.json
-hogcycle export --as-of 2026-01-01   # rebuild the wall as it stood that day
+hogcycle export --as-of 2026-01-01   # the wall as this warehouse knew it (cuts on fetched_at)
 
 cd backend && pytest -q && ruff check .
 
@@ -227,3 +228,4 @@ so you do not have to re-derive them.
 | 0022 | Each source is collected from where it answers; GitHub watches all of them |
 | 0023 | A collector that stops is a failure within days, judged from what it fetched |
 | 0024 | The contract carries a version, and every export is validated against the schema |
+| 0025 | The page can stand on any past day, and shows only what was knowable then |

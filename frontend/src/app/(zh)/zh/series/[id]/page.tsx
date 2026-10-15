@@ -36,6 +36,7 @@ export default async function Page({ params }: Params) {
       reading={data.readings.find((r) => r.id === id)}
       start={data.window.start ?? "2015-01-01"}
       end={data.window.end ?? data.generated_at.slice(0, 10)}
+      today={data.generated_at.slice(0, 10)}
       locale="zh"
     />
   );

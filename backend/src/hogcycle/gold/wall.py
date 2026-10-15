@@ -23,6 +23,7 @@ from ..registry.staleness import check
 from ..storage.silver import SilverStore
 from .facts import change, extreme, first_seen_date, streak, threshold_run
 from .series import all_specs, first_seen_of, is_derived, rows_of
+from .vintage import learned_on, stamp_learned
 
 # The causal wall shows the physical cycle. A share price is a claim on that
 # cycle rather than a link in it, so equities stay out of the wall by default
@@ -129,6 +130,11 @@ def _point(r: dict[str, Any]) -> dict[str, Any]:
     # day it describes.
     if r.get("published_on") is not None:
         point["p"] = r["published_on"].isoformat()
+    else:
+        # When this warehouse learned it, which is all an undated source lets
+        # anyone say about when it was knowable. Folded into the panel's
+        # default by stamp_learned (docs/adr/0025).
+        point["_l"] = learned_on(r)
     return point
 
 
@@ -201,6 +207,7 @@ def build_wall(
             continue
 
         points = _downsample([_point(r) for r in rows])
+        learned = stamp_learned(points)
         # A retired caliber is history, not a current reading. It stays
         # available in the overlay — comparing 规模以上 against 全口径 屠宰量
         # is a legitimate thing to want — but it is kept off the wall, whose
@@ -222,6 +229,7 @@ def build_wall(
                 # be negative and mean nothing a backtest can use.
                 "release_lag": None if spec.forecast else release_lag(rows),
                 "about": (about or {}).get(spec.id),
+                "learned": learned,
                 "revisions": (
                     [] if is_derived(spec) else revision_trail(spec, silver, start)
                 ),

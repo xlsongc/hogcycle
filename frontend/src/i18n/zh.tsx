@@ -240,6 +240,34 @@ export const zh: Dict = {
       `知识时点 ${known} · 数据窗口 ${start} → ${end}`,
   },
 
+  asOf: {
+    label: "站在",
+    clear: "回到今天",
+    hint: "选一个过去的日子，只看那天能知道的数据。有发布日期的，从发布方公开那天算；源头没写发布日期的，从本仓库获知那天算，绝不按「通常滞后」去推。",
+    banner: (day: string) => (
+      <>
+        站在 <b className="num">{day}</b>：只显示那天能知道的数据。连续涨跌、多年极值、历史分位和同比描述的是今天的序列，这里不显示。
+      </>
+    ),
+    latest: "当时最新可知的读数",
+    released: (date: string) => `${date} 发布`,
+    learned: (date: string) => `源头没写发布日期；本仓库 ${date} 获知`,
+    nothing: (day: string) => `${day} 这一天，这条序列还没有任何可知的数据。`,
+    firstPublished: (date: string) => `本仓库里它最早的一次发布是 ${date}。`,
+    firstLearned: (date: string) =>
+      `源头不写发布日期，本仓库 ${date} 才首次获知。发布日期从不推算，所以此前不显示。`,
+    marker: "站在此日",
+    panelNone: (first: { date: string; basis: "published" | "learned" } | null) =>
+      first == null
+        ? "这一天还不可知"
+        : first.basis === "published"
+        ? `这一天还不可知：最早一次发布是 ${first.date}`
+        : `这一天还不可知：源头没写发布日期，本仓库 ${first.date} 首次获知`,
+    startsAt: (month: string) => `可知的期间始于 ${month}`,
+    knownFrom: "从何时可知",
+    overviewLink: "看某个过去日子里的因果链图表墙",
+  },
+
   compare: {
     heading: "对比",
     sub: (

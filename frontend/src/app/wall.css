@@ -187,3 +187,9 @@ a.panel-title:hover {
 .wall-tier:first-child {
   border-top: 0;
 }
+
+/* A panel with nothing knowable on the day the wall stands on: its name and
+   why, in the panel's place (docs/adr/0025). */
+.panel-unknown .panel-head {
+  padding-bottom: 10px;
+}

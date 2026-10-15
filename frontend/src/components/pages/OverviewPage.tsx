@@ -18,7 +18,8 @@ import { ThesisChart } from "@/components/overview/ThesisChart";
 import { ReleaseFeed } from "@/components/overview/ReleaseFeed";
 import { Highlights } from "@/components/overview/Highlights";
 import { ReadingsTable } from "@/components/overview/ReadingsTable";
-import type { Locale } from "@/i18n/locale";
+import Link from "next/link";
+import { pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
 // The reading each card shows, first available wins. 行情宝 platform
@@ -36,7 +37,8 @@ const CAPACITY = "sow_inventory";
 const PRICE = "hog_price_index";
 
 export function OverviewPage({ data, locale }: { data: WallContract; locale: Locale }) {
-  const o = dict(locale).overview;
+  const t = dict(locale);
+  const o = t.overview;
   const cycle = data.readings.filter((r) => r.in_wall !== false);
   const panelOf = (id: string) => data.panels.find((p) => p.id === id);
   const readingOf = (id: string) => data.readings.find((r) => r.id === id);
@@ -68,6 +70,10 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
         <p className="ov-stamp">
           {o.stamp(asOf)}
           {lastRelease && <> · {o.lastRelease(lastRelease)}</>}
+          {" · "}
+          {/* The overview stays on today; standing on a past day is the
+              wall's job (docs/adr/0025). */}
+          <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
         </p>
         <p className="ov-lede">{o.lede}</p>
       </header>

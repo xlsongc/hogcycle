@@ -23,7 +23,13 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
         <p className="section-note how-to">{w.howTo}</p>
       </header>
 
-      <WallView panels={panels} start={start} end={end} locale={locale} />
+      <WallView
+        panels={panels}
+        start={start}
+        end={end}
+        today={data.generated_at.slice(0, 10)}
+        locale={locale}
+      />
 
       <footer>
         <b>{w.footerHeading}</b>

@@ -17,12 +17,16 @@ import datetime as dt
 from pathlib import Path
 
 from ..gold.series import all_specs, rows_of
+from ..gold.vintage import learned_on
 from ..registry.spec import Registry
 from ..storage.silver import SilverStore
 
 DEFAULT_DIR = "frontend/public/data/series"
 
-HEADER = ("obs_date", "value", "unit", "granularity", "published_on")
+# `learned` is the day this warehouse first held the value: for a source that
+# does not date its releases, the only honest bound on when it was knowable
+# (docs/adr/0025).
+HEADER = ("obs_date", "value", "unit", "granularity", "published_on", "learned")
 
 
 def write_series_csv(
@@ -57,6 +61,7 @@ def write_series_csv(
                         spec.unit,
                         r["granularity"],
                         "" if released is None else released.isoformat(),
+                        learned_on(r),
                     )
                 )
         written += 1

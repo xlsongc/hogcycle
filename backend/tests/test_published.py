@@ -231,9 +231,12 @@ def test_the_wall_says_when_each_value_became_public(tmp_path):
     dated = {"obs_date": D(2026, 6, 30), "value": 3780.0, "granularity": "quarterly",
              "published_on": D(2026, 7, 23)}
     undated = {"obs_date": D(2026, 6, 30), "value": 3780.0, "granularity": "quarterly",
-               "published_on": None}
+               "published_on": None,
+               "fetched_at": dt.datetime(2026, 9, 5, 22, 41, tzinfo=dt.UTC)}
     assert _point(dated)["p"] == "2026-07-23"
     assert "p" not in _point(undated), "unknown is absent, never assumed to equal d"
+    # What it carries instead is when the warehouse learned it (ADR-0025).
+    assert _point(undated)["_l"] == "2026-09-05"
 
     rows = [
         {"obs_date": D(2026, 1, 31), "published_on": D(2026, 3, 20)},  # 48 days

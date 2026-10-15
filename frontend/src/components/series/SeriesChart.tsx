@@ -19,9 +19,16 @@ import { dict } from "@/i18n/dict";
 
 const GROUP = "hogcycle-series";
 
-type Props = { panel: Panel; start: string; end: string; locale: Locale };
+type Props = {
+  panel: Panel;
+  start: string;
+  end: string;
+  /** The day the page stands on, marked on the chart (docs/adr/0025). */
+  asOf?: string | null;
+  locale: Locale;
+};
 
-export function SeriesChart({ panel, start, end, locale }: Props) {
+export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
   const t = dict(locale);
   const [range, setRange] = useState<Range>({ kind: "preset", preset: "all" });
   const [align, setAlign] = useState<"period" | "release">("period");
@@ -30,7 +37,11 @@ export function SeriesChart({ panel, start, end, locale }: Props) {
   const last = panel.points[panel.points.length - 1]?.d ?? end;
   const until = last > end ? last : end;
   const [min, max] = bounds(range, first > start ? first : start, until);
-  const marker = until > end ? { date: end, label: t.overview.today } : null;
+  const marker = asOf
+    ? { date: asOf, label: t.asOf.marker }
+    : until > end
+    ? { date: end, label: t.overview.today }
+    : null;
 
   return (
     <div className="thesis">
@@ -70,6 +81,7 @@ export function SeriesChart({ panel, start, end, locale }: Props) {
           max={max}
           align={align}
           marker={marker}
+          startNote={asOf ? t.asOf.startsAt : undefined}
           size="hero"
           showAxisLabels
           locale={locale}

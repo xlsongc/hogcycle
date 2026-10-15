@@ -76,6 +76,8 @@ export type PanelChartProps = {
   align?: "period" | "release";
   title?: string;
   marker?: { date: string; label: string } | null;
+  /** Overrides the "data from" note on the band before the first point. */
+  startNote?: (month: string) => string;
   /** Give the panel an id so /wall/#<id> lands on it. */
   anchor?: boolean;
   /** Where the panel's name leads: the series' own page. */
@@ -96,6 +98,7 @@ export function PanelChart({
   align = "period",
   title,
   marker = null,
+  startNote,
   anchor = false,
   href,
   onZoom,
@@ -145,7 +148,7 @@ export function PanelChart({
     const mark = markerDate && markerLabel ? { date: markerDate, label: markerLabel } : null;
     const render = () =>
       chart.setOption(
-        panelOption({ panel: plotted, min, max, showAxisLabels, locale, marker: mark })
+        panelOption({ panel: plotted, min, max, showAxisLabels, locale, marker: mark, startNote })
       );
     render();
 

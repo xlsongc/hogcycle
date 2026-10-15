@@ -3,11 +3,11 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.0.0";
+export const CONTRACT_VERSION = "1.1.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.0.0";
+  contract_version: "1.1.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   window: Window;
@@ -42,6 +42,8 @@ export interface Panel {
   about: About | null;
   /** Every period whose value changed, with each value in the order it was learned. Empty for most series: a restatement is rare, and this lists only real ones. */
   revisions: Revision[];
+  /** UTC date this warehouse learned the panel's undated points (those without p), unless a point carries its own l. For a source that does not date its releases this is the only bound on when a value was knowable, and the page never assumes an earlier one (docs/adr/0025). Null when every point is dated. Added in 1.1.0. */
+  learned?: string | null;
   /** Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with. */
   release_lag?: ReleaseLag | null;
   /** Ascending by date. Each point keeps its own granularity: this series genuinely mixes annual, quarterly and monthly readings, and flattening them would claim they are equivalent measurements. */
@@ -90,6 +92,8 @@ export interface Point {
   g: "D" | "W" | "M" | "Q" | "A";
   /** The day the publisher released this value, ISO date. Absent when the source does not date its releases: unknown, never assumed to equal d. Present, it is when the value became usable, which for a monthly print is three to nine weeks after d. */
   p?: string;
+  /** On an undated point only: the UTC date this warehouse learned it, when that differs from the panel's learned. Added in 1.1.0. */
+  l?: string;
 }
 
 export interface Reading {

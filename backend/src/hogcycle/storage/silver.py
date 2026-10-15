@@ -196,12 +196,13 @@ class SilverStore:
         self, indicator: str, *, moment: dt.datetime | None = None
     ) -> list[dict[str, Any]]:
         """The indicator's time series as known at `moment` (default: now),
-        ordered by obs_date, with each row's granularity and release date."""
+        ordered by obs_date, with each row's granularity, release date, and
+        when this warehouse learned it."""
         moment = moment or dt.datetime.now(dt.UTC)
         rows = self.query(
             f"""
-            SELECT obs_date, value, granularity, unit, published_on FROM (
-                SELECT obs_date, value, granularity, unit, published_on,
+            SELECT obs_date, value, granularity, unit, published_on, fetched_at FROM (
+                SELECT obs_date, value, granularity, unit, published_on, fetched_at,
                        ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
                 FROM silver
                 WHERE indicator = $indicator AND fetched_at <= $moment
@@ -217,6 +218,30 @@ class SilverStore:
                 "granularity": r[2],
                 "unit": r[3],
                 "published_on": r[4],
+                "fetched_at": r[5],
+            }
+            for r in rows
+        ]
+
+    def prints(self, indicator: str) -> list[dict[str, Any]]:
+        """Every row ever written for the indicator, oldest first: each value
+        with its release date and when it was learned. The raw material for
+        asking what was knowable on a day (gold/vintage.py)."""
+        rows = self.query(
+            """
+            SELECT obs_date, value, granularity, published_on, fetched_at FROM silver
+            WHERE indicator = $indicator
+            ORDER BY obs_date, fetched_at
+            """,
+            {"indicator": indicator},
+        )
+        return [
+            {
+                "obs_date": r[0],
+                "value": r[1],
+                "granularity": r[2],
+                "published_on": r[3],
+                "fetched_at": r[4],
             }
             for r in rows
         ]

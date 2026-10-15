@@ -21,6 +21,7 @@ from ..registry.loader import DEFAULT_CONFIG, load_registry
 from ..registry.spec import Registry
 from ..storage.bronze import BronzeStore
 from ..storage.silver import SilverStore
+from .published import run_published
 from .status import run_status
 
 WALL_START = dt.date(2015, 1, 1)  # the deepest window every panel can fill
@@ -29,7 +30,8 @@ WALL_START = dt.date(2015, 1, 1)  # the deepest window every panel can fill
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="hogcycle")
     p.add_argument(
-        "command", choices=["collect", "replay", "status", "revisions", "export"]
+        "command",
+        choices=["collect", "replay", "status", "revisions", "export", "published"],
     )
     p.add_argument("--config", default=DEFAULT_CONFIG)
     p.add_argument(
@@ -41,7 +43,13 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--schema", default=SCHEMA_PATH)
     p.add_argument(
         "--as-of",
-        help="export: rebuild the wall as it stood on this date (YYYY-MM-DD)",
+        help="export: rebuild the wall as this warehouse knew it on this date "
+        "(YYYY-MM-DD); the audit view, cut on when rows were learned",
+    )
+    p.add_argument(
+        "--by",
+        help="published: the day to ask about (YYYY-MM-DD); what anyone could "
+        "have known then, cut on release dates (docs/adr/0025)",
     )
     p.add_argument(
         "--months-back",
@@ -185,6 +193,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{obs_date}  {released:<22} learned {fetched_at:%Y-%m-%d}  {value}")
         return 0
 
+    if args.command == "published":
+        if not (args.indicator and args.by):
+            print("published needs --indicator <id> --by <YYYY-MM-DD>", file=sys.stderr)
+            return 2
+        return run_published(
+            registry[args.indicator], silver, dt.date.fromisoformat(args.by)
+        )
+
     if args.command == "export":
         moment = None
         if args.as_of:
@@ -194,7 +210,18 @@ def main(argv: list[str] | None = None) -> int:
             registry, silver, start=WALL_START, moment=moment, about=about
         )
         if not payload["panels"]:
-            print("no data in silver — run `hogcycle collect` first", file=sys.stderr)
+            if moment is not None:
+                # The audit view: nothing had been *learned* by then. Usually
+                # the question meant was the backtest's, which reaches back
+                # before collection began.
+                print(
+                    f"this warehouse had learned nothing by {args.as_of}: --as-of "
+                    "cuts on when rows were fetched. For what was public then, "
+                    "ask `hogcycle published --indicator <id> --by <date>`.",
+                    file=sys.stderr,
+                )
+            else:
+                print("no data in silver — run `hogcycle collect` first", file=sys.stderr)
             return 1
         path = write_contract(payload, args.out, schema_path=args.schema)
         csvs = write_series_csv(

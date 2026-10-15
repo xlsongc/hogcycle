@@ -56,6 +56,7 @@ class Ratio:
                     # Knowable once both halves were out; for one article,
                     # the same day.
                     "published_on": max(released) if len(released) == 2 else None,
+                    "fetched_at": max(a["fetched_at"], b["fetched_at"]),
                 }
             )
         return out
