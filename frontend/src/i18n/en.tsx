@@ -214,6 +214,8 @@ export const en = {
         Hover to read every panel at one date; <b>drag</b> across a panel to
         zoom, <b>double-click</b> to reset. Hollow points are annual or
         quarterly readings: a different measurement, not a smoother sample.
+        Where readings are more than a month apart, the line between them is
+        dashed: nothing was measured in between.
       </>
     ),
     zoomed: "custom window",

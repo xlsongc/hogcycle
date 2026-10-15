@@ -10,6 +10,7 @@ import type { EChartsOption } from "echarts";
 import type { Panel } from "@/types/generated/wall";
 import { NUMBER_LOCALE, labelOf, nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { splitByGap } from "./segments";
 
 export type Tier = Panel["tier"];
 
@@ -84,7 +85,12 @@ type BaseArgs = {
 
 /** Series ids, so a single series can be updated without resending the
  *  whole option — the probe dot moves on every pointer move. */
-export const SERIES = { line: "line", coarse: "coarse", probe: "probe" } as const;
+export const SERIES = {
+  line: "line",
+  join: "join",
+  coarse: "coarse",
+  probe: "probe",
+} as const;
 
 /** Below this share of the window, a "data starts here" label would not fit
  *  inside its shaded band, so the band is drawn bare. */
@@ -161,13 +167,14 @@ export function panelOption(
   const surface = cssVar("--surface-1", "#fcfcfb");
   const critical = cssVar("--critical", "#d03b3b");
 
-  const data = panel.points.map((p) => [p.d, p.v] as [string, number | null]);
+  // Solid where readings are close enough to be a measured path, dashed
+  // across longer gaps (base/segments.ts).
+  const { solid: data, dashed } = splitByGap(panel.points);
 
-  // Annual readings in a series that is monthly elsewhere are a different kind
-  // of measurement, not a smoother sample of the same one. Marking them keeps
-  // that visible instead of letting one line imply uniform resolution.
+  // Annual and quarterly readings are a different kind of measurement, not a
+  // smoother sample of the same one, so they are always marked: hollow, which
+  // keeps the distinction off colour alone.
   const sparse = panel.points.filter((p) => p.g === "A" || p.g === "Q");
-  const mixed = new Set(panel.points.map((p) => p.g)).size > 1;
 
   const endpoint = [...panel.points].reverse().find(
     (p): p is typeof p & { v: number } => p.v != null
@@ -329,9 +336,23 @@ export function panelOption(
             : [],
         },
       },
+      // The joins across long gaps: same hue, dashed, nothing to hover.
+      ...(dashed.length
+        ? [
+            {
+              id: SERIES.join,
+              type: "line" as const,
+              silent: true,
+              data: dashed,
+              showSymbol: false,
+              connectNulls: false,
+              lineStyle: { width: 2, color, type: [3, 3] as number[] },
+            },
+          ]
+        : []),
       // Hollow markers for the coarser readings — secondary encoding, so the
       // distinction never rests on colour alone.
-      ...(mixed
+      ...(sparse.length
         ? [
             {
               id: SERIES.coarse,
