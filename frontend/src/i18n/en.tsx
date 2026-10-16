@@ -13,6 +13,8 @@
  * more code than the emphasis is worth.
  */
 
+import type { ReactNode } from "react";
+
 /** 1st, 2nd, 3rd, 4th … 11th, 21st. The teens are the exception that makes a
  *  naive `n + "th"` produce "1th" and "43th", which is what it did. */
 function ordinal(n: number): string {
@@ -144,6 +146,18 @@ export const en = {
     sourcePage: "Source page",
     noUrl: "No public page: collected through an API.",
     retired: "This caliber is closed upstream. The page keeps its history.",
+    caliberEarlier: (from: string | null, link: ReactNode) => (
+      <>
+        {from ? `A new caliber from ${from}. ` : ""}The caliber before it is a
+        separate series: {link}.
+      </>
+    ),
+    caliberLater: (until: string | null, link: ReactNode) => (
+      <>
+        {until ? `This caliber ends ${until}. ` : ""}The caliber after it is a
+        separate series: {link}.
+      </>
+    ),
     equity: "A share price is a claim on the cycle, not a link in it, so it is not on the wall.",
     forecast:
       "This is USDA's estimate and forecast, not a measurement, so it is kept off the wall.",
@@ -215,7 +229,8 @@ export const en = {
         zoom, <b>double-click</b> to reset. Hollow points are annual or
         quarterly readings: a different measurement, not a smoother sample.
         Where readings are more than a month apart, the line between them is
-        dashed: nothing was measured in between.
+        dashed: nothing was measured in between. A labelled dotted line marks
+        where a series changes how often it is read.
       </>
     ),
     zoomed: "custom window",
@@ -375,6 +390,15 @@ export const en = {
     noneNear: "nothing near this date",
     published: (date: string) => `published ${date}`,
     startsAt: (month: string) => `data from ${month}`,
+    caliberFrom: (month: string) => `new caliber from ${month}`,
+    cadence: {
+      D: "daily",
+      W: "weekly",
+      M: "monthly",
+      Q: "quarterly",
+      A: "annual",
+    },
+    cadenceBreak: (from: string, to: string) => `${from} → ${to}`,
     granularityName: {
       D: "daily reading",
       W: "weekly reading",

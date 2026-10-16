@@ -13,7 +13,7 @@
 
 import { useEffect, useRef } from "react";
 import { echarts } from "./base/echarts";
-import { NUM_PX, cssVar, monoFont } from "./base/theme";
+import { NUM_PX, cssVar, monoFont } from "./base/ink";
 import { syncPointer } from "./base/pointerSync";
 import { toIso } from "@/lib/dates";
 

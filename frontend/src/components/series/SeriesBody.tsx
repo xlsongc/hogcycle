@@ -19,7 +19,7 @@ import { SeriesChart } from "@/components/series/SeriesChart";
 import { AsOfControl } from "@/components/AsOfControl";
 import { pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-import { firstKnowable, knownOn, type Known } from "@/lib/asOf";
+import { firstKnowable, knownOn, panelOn, type Known } from "@/lib/asOf";
 import { granularityLetter, lagDays, periodLabel } from "@/lib/period";
 import { arrow, contextOf, trendOf } from "@/lib/readingFacts";
 import { useAsOf } from "@/lib/useAsOf";
@@ -42,7 +42,7 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
   const [day, setDay] = useAsOf();
   const known = day ? knownOn(panel, day) : null;
   const first = firstKnowable(panel);
-  const shown = known ? { ...panel, points: known } : panel;
+  const shown = panelOn(panel, day);
   const recent = (known ?? panel.points).filter((p) => p.v != null).slice(-RECENT).reverse();
   const unit = unitOf(panel.unit, locale);
 

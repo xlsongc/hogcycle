@@ -21,6 +21,7 @@ from typing import Any
 from ..registry.spec import IndicatorSpec, Registry
 from ..registry.staleness import check
 from ..storage.silver import SilverStore
+from .breaks import cadence_breaks, caliber_of
 from .facts import change, extreme, first_seen_date, streak, threshold_run
 from .series import all_specs, first_seen_of, is_derived, rows_of
 from .vintage import learned_on, stamp_learned
@@ -230,6 +231,10 @@ def build_wall(
                 "release_lag": None if spec.forecast else release_lag(rows),
                 "about": (about or {}).get(spec.id),
                 "learned": learned,
+                "caliber": None if is_derived(spec) else caliber_of(spec, registry),
+                "breaks": cadence_breaks(
+                    [r["obs_date"] for r in rows if r["value"] is not None]
+                ),
                 "revisions": (
                     [] if is_derived(spec) else revision_trail(spec, silver, start)
                 ),

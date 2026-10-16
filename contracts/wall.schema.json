@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.1.0",
+      "const": "1.2.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -117,6 +117,33 @@
           "learned": {
             "type": ["string", "null"],
             "description": "UTC date this warehouse learned the panel's undated points (those without p), unless a point carries its own l. For a source that does not date its releases this is the only bound on when a value was knowable, and the page never assumes an earlier one (docs/adr/0025). Null when every point is dated. Added in 1.1.0."
+          },
+          "caliber": {
+            "type": ["object", "null"],
+            "description": "Where this caliber begins and ends, and the indicators it continues or is continued by: two indicators, never one line, but the chart says at the seam where the other history is (docs/adr/0026). Null when the series has no caliber boundary. Added in 1.2.0.",
+            "required": ["from", "until", "earlier", "later"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": ["string", "null"] },
+              "until": { "type": ["string", "null"] },
+              "earlier": { "type": ["string", "null"], "description": "Id of the indicator whose earlier caliber this continues." },
+              "later": { "type": ["string", "null"], "description": "Id of the indicator that continues this caliber." }
+            }
+          },
+          "breaks": {
+            "type": "array",
+            "description": "Where the series settles into a new cadence, classed by the gap between readings: D, W, M, Q or A. A computed fact, like a streak (docs/adr/0026). Added in 1.2.0.",
+            "items": {
+              "type": "object",
+              "required": ["d", "from", "to", "settled"],
+              "additionalProperties": false,
+              "properties": {
+                "d": { "type": "string", "description": "The reading the new cadence starts from." },
+                "from": { "type": "string", "enum": ["D", "W", "M", "Q", "A"] },
+                "to": { "type": "string", "enum": ["D", "W", "M", "Q", "A"] },
+                "settled": { "type": "string", "description": "The reading that made the new cadence count. Before it was knowable the break was not, so a page standing on an earlier day leaves it out (docs/adr/0025)." }
+              }
+            }
           },
           "release_lag": {
             "type": ["object", "null"],

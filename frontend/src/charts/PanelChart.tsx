@@ -27,6 +27,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Panel } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
 import { SERIES, fmt, panelOption } from "./base/theme";
+import { PLOT_INSET } from "./base/marks";
 import { syncPointer } from "./base/pointerSync";
 import { shiftMonths, toIso, toTime } from "@/lib/dates";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
@@ -46,8 +47,6 @@ const TOLERANCE_MS: Record<string, number> = {
   A: 250 * DAY,
 };
 
-/** The grid's horizontal inset in panelOption; a drag is clamped to the plot. */
-const PLOT_INSET = 58;
 /** Below this, a press-and-release is a click, not a selection. */
 const DRAG_MIN_PX = 6;
 
@@ -127,16 +126,22 @@ export function PanelChart({
     () => (align === "release" ? panel.points.filter((p) => p.p) : panel.points),
     [panel, align]
   );
-  const plotted = useMemo(
-    () => ({
+  const plotted = useMemo(() => {
+    const at = (d: string, p?: string) =>
+      shiftMonths(align === "release" && p ? p : d, shift);
+    const byDate = new Map(panel.points.map((p) => [p.d, p]));
+    return {
       ...panel,
-      points: source.map((p) => ({
-        ...p,
-        d: shiftMonths(align === "release" && p.p ? p.p : p.d, shift),
-      })),
-    }),
-    [panel, source, align, shift]
-  );
+      points: source.map((p) => ({ ...p, d: at(p.d, p.p) })),
+      // A break sits at the reading its new cadence starts from, so it moves
+      // with that reading; placed by release, a reading with no release date
+      // has no place, and neither does its break.
+      breaks: (panel.breaks ?? []).flatMap((b) => {
+        const p = byDate.get(b.d)?.p;
+        return align === "release" && !p ? [] : [{ ...b, d: at(b.d, p) }];
+      }),
+    };
+  }, [panel, source, align, shift]);
   const markerDate = marker?.date;
   const markerLabel = marker?.label;
 
@@ -148,7 +153,16 @@ export function PanelChart({
     const mark = markerDate && markerLabel ? { date: markerDate, label: markerLabel } : null;
     const render = () =>
       chart.setOption(
-        panelOption({ panel: plotted, min, max, showAxisLabels, locale, marker: mark, startNote })
+        panelOption({
+          panel: plotted,
+          min,
+          max,
+          showAxisLabels,
+          locale,
+          width: el.clientWidth,
+          marker: mark,
+          startNote,
+        })
       );
     render();
 
@@ -235,7 +249,12 @@ export function PanelChart({
       setBand(null);
     });
 
-    const ro = new ResizeObserver(() => chart.resize());
+    // Re-rendered as well as resized: labels above the plot are kept apart
+    // in pixels, and a narrower panel has fewer of them.
+    const ro = new ResizeObserver(() => {
+      chart.resize();
+      render();
+    });
     ro.observe(el);
     // Colours come from CSS custom properties, so a theme change means
     // re-reading them rather than recomputing any data.

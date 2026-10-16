@@ -20,7 +20,7 @@ _KNOWN_KEYS = {
     "id", "name_zh", "name_en", "tier", "freq", "unit", "lo", "hi", "adapter",
     "call", "extract", "accept", "revises", "zero_is_null", "max_age_days",
     "retired", "upstream_dark", "caliber_from", "caliber_until", "forecast",
-    "reach", "notes",
+    "reach", "continues", "notes",
 }
 
 _DARK_KEYS = {"acknowledged", "review_by", "reason"}
@@ -80,4 +80,11 @@ def load_registry(path: Path | str = DEFAULT_CONFIG) -> Registry:
         if spec.id in specs:
             raise ValueError(f"duplicate indicator id {spec.id!r} in {path}")
         specs[spec.id] = spec
+    for spec in specs.values():
+        # A lineage that points nowhere would put a dead link at the seam.
+        if spec.continues is not None and spec.continues not in specs:
+            raise ValueError(
+                f"{spec.id}: continues {spec.continues!r}, which is not an indicator "
+                f"in {path}"
+            )
     return Registry(specs)

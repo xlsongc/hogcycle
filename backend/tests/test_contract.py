@@ -66,7 +66,7 @@ def test_a_value_exported_as_text_fails(tmp_path):
 
 def test_a_field_the_schema_does_not_know_fails(tmp_path):
     with pytest.raises(ContractError, match="Additional properties"):
-        write(tmp_path, payload(caliber="统计局"))
+        write(tmp_path, payload(verdict="去化阶段"))
 
 
 def test_order_and_emptiness_are_still_checked_by_hand(tmp_path):

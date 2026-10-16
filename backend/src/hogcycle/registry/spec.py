@@ -134,6 +134,10 @@ class IndicatorSpec:
     # read rather than being an error.
     caliber_from: dt.date | None = None
     caliber_until: dt.date | None = None
+    # The indicator whose earlier caliber this one continues: two indicators,
+    # never one line, but a reader at the seam should be told where the
+    # earlier history is (ADR-0026). Checked against the registry at load.
+    continues: str | None = None
     # A source's projection rather than a measurement: its obs_dates may lie
     # in the future and its releases precede the periods they describe. Kept
     # off the wall, whose every panel reads as "what happened", and out of the
@@ -169,6 +173,8 @@ class IndicatorSpec:
             and self.caliber_from > self.caliber_until
         ):
             raise ValueError(f"{self.id}: caliber_from is after caliber_until")
+        if self.continues == self.id:
+            raise ValueError(f"{self.id}: continues itself")
         if self.reach not in REACHES:
             raise ValueError(f"{self.id}: reach {self.reach!r} must be one of {REACHES}")
         if self.retired and self.upstream_dark is not None:

@@ -6,6 +6,7 @@
  * 因为口径就写在名字里。
  */
 
+import type { ReactNode } from "react";
 import type { Dict } from "./en";
 
 /** 一段连续读数的期间量词（「连续 4 个季度下降」）。 */
@@ -120,6 +121,16 @@ export const zh: Dict = {
     sourcePage: "源页面",
     noUrl: "没有公开页面：通过接口采集。",
     retired: "上游已关闭这个口径，本页只保留历史。",
+    caliberEarlier: (from: string | null, link: ReactNode) => (
+      <>
+        {from ? `新口径始于 ${from}。` : ""}此前的口径是另一个序列：{link}。
+      </>
+    ),
+    caliberLater: (until: string | null, link: ReactNode) => (
+      <>
+        {until ? `此口径止于 ${until}。` : ""}此后的口径是另一个序列：{link}。
+      </>
+    ),
     equity: "股价是对周期的索取权，不是周期的一环，所以不在图表墙上。",
     forecast: "这是 USDA 的估计与预测，不是测量，所以不放在图表墙上。",
     releaseForecast: "预测在它描述的时期结束之前发布，并随时期临近而修订。USDA 每年 4 月和 10 月设定中国的数字。",
@@ -182,6 +193,7 @@ export const zh: Dict = {
         悬停读出所有格同一天的数值；在任一格上<b>拖选</b>缩放，<b>双击</b>复原。
         空心点是年度或季度读数，是另一种测量，不是更平滑的采样。
         相邻读数隔了一个多月的地方用虚线相连：中间没有测量。
+        带标注的竖点线标出序列读数频率改变之处。
       </>
     ),
     zoomed: "自定义窗口",
@@ -311,6 +323,15 @@ export const zh: Dict = {
     noneNear: "该日期附近无数据",
     published: (date: string) => `${date} 发布`,
     startsAt: (month: string) => `数据始于 ${month}`,
+    caliberFrom: (month: string) => `新口径始于 ${month}`,
+    cadence: {
+      D: "日度",
+      W: "周度",
+      M: "月度",
+      Q: "季度",
+      A: "年度",
+    },
+    cadenceBreak: (from: string, to: string) => `${from} → ${to}`,
     granularityName: {
       D: "日度读数",
       W: "周度读数",

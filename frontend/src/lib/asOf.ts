@@ -102,7 +102,16 @@ export function firstKnowable(panel: Panel): { date: string; basis: Basis } | nu
   return first;
 }
 
-/** The panel cut down to what was knowable on `day`, for a chart. */
+/** The panel cut down to what was knowable on `day`, for a chart: its
+ *  points, and the cadence breaks with knowable readings on both sides. One
+ *  needs a reading before it, or there is no old cadence to change from, and
+ *  its settling reading, or a new cadence cannot be told from a gap. Compared
+ *  by date, because a thinned daily series need not carry the readings. */
 export function panelOn(panel: Panel, day: string | null): Panel {
-  return day ? { ...panel, points: knownOn(panel, day) } : panel;
+  if (!day) return panel;
+  const points = knownOn(panel, day);
+  const first = points[0]?.d ?? "";
+  const last = points[points.length - 1]?.d ?? "";
+  const breaks = (panel.breaks ?? []).filter((b) => first < b.d && b.settled <= last);
+  return { ...panel, points, breaks };
 }

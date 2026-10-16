@@ -13,12 +13,18 @@ import Link from "next/link";
 import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { SeriesBody } from "@/components/series/SeriesBody";
-import { nameOf, pathOf, type Locale } from "@/i18n/locale";
+import { nameOf, pathOf, seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { tierVars } from "@/lib/tier";
 
+type Named = { id: string; name_zh: string; name_en: string };
+
 type Props = {
   panel: Panel;
+  /** The series this caliber continues, and the one that continues it
+   *  (docs/adr/0026): two indicators, and each page says where the other is. */
+  earlier?: Named;
+  later?: Named;
   reading: Reading | undefined;
   start: string;
   end: string;
@@ -27,7 +33,7 @@ type Props = {
   locale: Locale;
 };
 
-export function SeriesPage({ panel, reading: r, start, end, today, locale }: Props) {
+export function SeriesPage({ panel, earlier, later, reading: r, start, end, today, locale }: Props) {
   const t = dict(locale);
   const s = t.series;
   const zh = locale === "zh";
@@ -64,6 +70,22 @@ export function SeriesPage({ panel, reading: r, start, end, today, locale }: Pro
         ) : panel.in_wall === false ? (
           <p className="muted">{s.retired}</p>
         ) : null}
+        {earlier && (
+          <p className="muted">
+            {s.caliberEarlier(
+              panel.caliber?.from?.slice(0, 7) ?? null,
+              <Link href={seriesPath(locale, earlier.id)}>{nameOf(earlier, locale)}</Link>
+            )}
+          </p>
+        )}
+        {later && (
+          <p className="muted">
+            {s.caliberLater(
+              panel.caliber?.until?.slice(0, 7) ?? null,
+              <Link href={seriesPath(locale, later.id)}>{nameOf(later, locale)}</Link>
+            )}
+          </p>
+        )}
       </header>
 
       <SeriesBody

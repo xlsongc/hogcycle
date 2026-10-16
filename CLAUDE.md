@@ -229,3 +229,4 @@ so you do not have to re-derive them.
 | 0023 | A collector that stops is a failure within days, judged from what it fetched |
 | 0024 | The contract carries a version, and every export is validated against the schema |
 | 0025 | The page can stand on any past day, and shows only what was knowable then |
+| 0026 | Breaks in a series are drawn where they happen: cadence changes from gold, caliber lineage from config |

@@ -3,11 +3,11 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.1.0";
+export const CONTRACT_VERSION = "1.2.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.1.0";
+  contract_version: "1.2.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   window: Window;
@@ -44,6 +44,10 @@ export interface Panel {
   revisions: Revision[];
   /** UTC date this warehouse learned the panel's undated points (those without p), unless a point carries its own l. For a source that does not date its releases this is the only bound on when a value was knowable, and the page never assumes an earlier one (docs/adr/0025). Null when every point is dated. Added in 1.1.0. */
   learned?: string | null;
+  /** Where this caliber begins and ends, and the indicators it continues or is continued by: two indicators, never one line, but the chart says at the seam where the other history is (docs/adr/0026). Null when the series has no caliber boundary. Added in 1.2.0. */
+  caliber?: Caliber | null;
+  /** Where the series settles into a new cadence, classed by the gap between readings: D, W, M, Q or A. A computed fact, like a streak (docs/adr/0026). Added in 1.2.0. */
+  breaks?: Break[];
   /** Days from a period's end to its release, over the points that carry p. Null when the source does not date releases. The median is what to subtract from a lead read off the chart; the max is the oldest a reader acting on the latest release has had to work with. */
   release_lag?: ReleaseLag | null;
   /** Ascending by date. Each point keeps its own granularity: this series genuinely mixes annual, quarterly and monthly readings, and flattening them would claim they are equivalent measurements. */
@@ -76,6 +80,24 @@ export interface Print {
   p: string | null;
   /** UTC date this warehouse learned the value (transaction time). */
   learned: string;
+}
+
+export interface Caliber {
+  from: string | null;
+  until: string | null;
+  /** Id of the indicator whose earlier caliber this continues. */
+  earlier: string | null;
+  /** Id of the indicator that continues this caliber. */
+  later: string | null;
+}
+
+export interface Break {
+  /** The reading the new cadence starts from. */
+  d: string;
+  from: "D" | "W" | "M" | "Q" | "A";
+  to: "D" | "W" | "M" | "Q" | "A";
+  /** The reading that made the new cadence count. Before it was knowable the break was not, so a page standing on an earlier day leaves it out (docs/adr/0025). */
+  settled: string;
 }
 
 export interface ReleaseLag {

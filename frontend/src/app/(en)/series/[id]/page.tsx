@@ -30,9 +30,12 @@ export default async function Page({ params }: Params) {
   const { id } = await params;
   const panel = data.panels.find((p) => p.id === id);
   if (!panel) return null;
+  const byId = (other: string | null | undefined) => data.panels.find((p) => p.id === other);
   return (
     <SeriesPage
       panel={panel}
+      earlier={byId(panel.caliber?.earlier)}
+      later={byId(panel.caliber?.later)}
       reading={data.readings.find((r) => r.id === id)}
       start={data.window.start ?? "2015-01-01"}
       end={data.window.end ?? data.generated_at.slice(0, 10)}

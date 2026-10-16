@@ -29,7 +29,8 @@ import { shiftMonths } from "@/lib/dates";
 
 import type { Panel } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
-import { NUM_PX, cssVar, fmt, labelPx, monoFont, slotColor } from "./base/theme";
+import { fmt, slotColor } from "./base/theme";
+import { NUM_PX, cssVar, labelPx, monoFont } from "./base/ink";
 
 export type LagSpec = { id: string; months: number };
 

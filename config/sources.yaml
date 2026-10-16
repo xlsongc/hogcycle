@@ -95,6 +95,9 @@ indicators:
     reach: cn
     call: {fn: moa_hog_release}
     extract: {value: 生猪定点屠宰企业屠宰量}
+    # 新口径自 2025年7月起；此前的规模以上口径是另一个指标（ADR-0026）。
+    caliber_from: 2025-07-01
+    continues: slaughter_above_scale
     notes: >
       月频出栏的近似 —— 产能兑现为供给的那一步，也是这套数据里唯一月频的
       供给侧实测量。2025年7月起的新口径，覆盖全国生猪定点屠宰企业。
@@ -369,6 +372,7 @@ indicators:
     call: {report: slaughter, scope: 全部定点}
     extract: {value: 白条肉平均出厂价格}
     caliber_from: 2024-01-01
+    continues: carcass_price_above_scale
     notes: >
       屠宰端出厂价，农业农村部畜牧兽医局「生猪定点屠宰企业生猪收购和白条肉
       出厂价格情况」，周一至周日一周一期。
