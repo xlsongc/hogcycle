@@ -29,6 +29,7 @@ import { echarts } from "./base/echarts";
 import { SERIES, fmt, panelOption } from "./base/theme";
 import { PLOT_INSET } from "./base/marks";
 import { syncPointer } from "./base/pointerSync";
+import { readByKeyboard } from "./base/keyboard";
 import { shiftMonths, toIso, toTime } from "@/lib/dates";
 import { lagDays } from "@/lib/period";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
@@ -111,6 +112,8 @@ export function PanelChart({
   // Pointer x and the plot width, so the label can flip before the edge.
   const [cursor, setCursor] = useState<{ x: number; w: number } | null>(null);
   const [band, setBand] = useState<[number, number] | null>(null);
+  // What a screen reader hears on a keyboard step; hovering stays silent.
+  const [spoken, setSpoken] = useState("");
 
   // Handlers in refs, so a parent re-render does not tear the chart down.
   const zoomRef = useRef(onZoom);
@@ -185,6 +188,8 @@ export function PanelChart({
       setProbe(null);
       showDot(null);
     };
+    // The point the crosshair last read, by pointer or by key.
+    let current: number | null = null;
 
     const onAxis = (raw: unknown) => {
       const at = (raw as { axesInfo?: { value?: number }[] }).axesInfo?.[0]?.value;
@@ -211,9 +216,34 @@ export function PanelChart({
       const orig = hit == null ? null : source[hit];
       setProbe({ hit: orig ? { d: orig.d, v: orig.v, g: orig.g, p: orig.p } : null });
       showDot(hit);
+      current = hit;
     };
     chart.on("updateAxisPointer", onAxis);
     const unsync = syncPointer(chart, el, group, clear);
+    const unkey = readByKeyboard({
+      chart,
+      el,
+      group,
+      times: plotted.points.map((p) =>
+        p.v != null && p.d >= min && p.d <= max ? toTime(p.d) : null
+      ),
+      current: () => current,
+      onStep: (i, x) => {
+        setCursor({ x, w: el.clientWidth });
+        const r = source[i];
+        if (!r) return;
+        const t = dict(locale).chart;
+        const gran = t.granularityName[r.g as keyof typeof t.granularityName] ?? "";
+        setSpoken(
+          t.spoken(fmt(r.v, panel.unit, locale), unitOf(panel.unit, locale), r.d, gran, r.p)
+        );
+      },
+      onLeave: () => {
+        clear();
+        setCursor(null);
+        setSpoken("");
+      },
+    });
 
     const zr = chart.getZr();
     let from: number | null = null;
@@ -266,6 +296,7 @@ export function PanelChart({
     return () => {
       cancelAnimationFrame(frame);
       unsync();
+      unkey();
       ro.disconnect();
       mq.removeEventListener("change", render);
       window.removeEventListener("hogcycle:theme", render);
@@ -323,8 +354,13 @@ export function PanelChart({
           ref={host}
           className={`panel-chart ${size}`}
           role="img"
-          aria-label={t.chart.panelLabel(name, unitOf(panel.unit, locale), panel.points.length)}
+          tabIndex={0}
+          aria-keyshortcuts="ArrowLeft ArrowRight Home End Escape"
+          aria-label={`${t.chart.panelLabel(name, unitOf(panel.unit, locale), panel.points.length)}. ${t.chart.keys}`}
         />
+        <span className="sr-only" aria-live="polite">
+          {spoken}
+        </span>
         {cursor != null && probe && (
           <div
             className={cursor.x > cursor.w * 0.62 ? "probe flip" : "probe"}

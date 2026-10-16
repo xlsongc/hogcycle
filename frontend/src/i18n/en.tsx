@@ -234,7 +234,8 @@ export const en = {
         quarterly readings: a different measurement, not a smoother sample.
         Where readings are more than a month apart, the line between them is
         dashed: nothing was measured in between. A labelled dotted line marks
-        where a series changes how often it is read.
+        where a series changes how often it is read. From the keyboard, Tab to
+        a panel and step through it with the arrow keys.
       </>
     ),
     zoomed: "custom window",
@@ -435,6 +436,9 @@ export const en = {
     },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}, unit ${unit}, ${n} observations`,
+    keys: "Left and right arrows step through the readings; Home and End jump to the ends.",
+    spoken: (value: string, unit: string, date: string, kind: string, published?: string) =>
+      `${value} ${unit}, ${date}, ${kind}${published ? `, published ${published}` : ""}`,
     coarse: "coarse",
   },
 

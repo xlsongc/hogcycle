@@ -20,6 +20,14 @@ import type { echarts } from "./echarts";
 type Chart = ReturnType<typeof echarts.init>;
 type Detail = { at: number | null; from: string };
 
+/** Tell every chart in a group to point at a time, or to let go (null),
+ *  as the chart `from` would when hovered. The keyboard reader uses it. */
+export function broadcastPointer(group: string, at: number | null, from: string): void {
+  window.dispatchEvent(
+    new CustomEvent<Detail>(`hogcycle:pointer:${group}`, { detail: { at, from } })
+  );
+}
+
 export function syncPointer(
   chart: Chart,
   el: HTMLElement,
@@ -30,8 +38,7 @@ export function syncPointer(
   pointY: () => number = () => el.clientHeight / 2
 ): () => void {
   const name = `hogcycle:pointer:${group}`;
-  const send = (at: number | null) =>
-    window.dispatchEvent(new CustomEvent<Detail>(name, { detail: { at, from: chart.id } }));
+  const send = (at: number | null) => broadcastPointer(group, at, chart.id);
 
   // DOM pointer events rather than zrender's: they fire before the chart's
   // own axis-pointer handling, so the very first move is already "ours".
