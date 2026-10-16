@@ -307,6 +307,28 @@ indicators:
     notes: >
       养殖成本里最大的一项。同一份 500 县周报，同一采集日。
 
+  - id: soymeal_price_county
+    name_zh: 豆粕价格（500县集贸）
+    name_en: Soybean meal price (500-county markets)
+    tier: margin
+    freq: weekly
+    unit: CNY/kg
+    lo: 1.0
+    hi: 10.0
+    adapter: moa_weekly
+    reach: cn
+    call: {report: market}
+    extract:
+      value: 全国豆粕平均价格
+      # 5月份第4周 2023 (published 2023-05-30) printed 「全国豆粕价格4.50元/公斤」:
+      # the same figure in the same report, 平均 dropped once in 250 articles
+      # (docs/adr/0027).
+      also: [全国豆粕价格]
+    notes: >
+      饲料里的蛋白原料，和玉米一起决定配合饲料的成本。同一份 500 县周报、同一采集日，
+      所以和 corn_price_county、feed_price_county 可以逐周对齐。历史从已采集的同一份
+      周报里回放而来（ADR-0027），没有重新抓取。
+
   # ---------- price：被预测的结果 ----------
 
   - id: hog_price_index

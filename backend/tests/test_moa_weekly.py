@@ -69,6 +69,22 @@ def test_market_report_reads_each_week_at_its_collection_day(registry, reports):
     assert {o.granularity for o in obs} == {"weekly"}
 
 
+def test_soymeal_comes_from_the_same_report_and_collection_day(registry, reports):
+    """Added by replaying the market report already in bronze (ADR-0027): its
+    weeks are the corn and feed prices' weeks, read from the same articles."""
+    soy = read(registry, reports, "soymeal_price_county")
+    corn = read(registry, reports, "corn_price_county")
+    assert [o.obs_date for o in soy] == [o.obs_date for o in corn]
+    assert [(o.obs_date, o.value) for o in soy] == [
+        (D(2022, 12, 28), 5.07),
+        (D(2025, 3, 13), 3.74),
+        (D(2026, 2, 24), 3.32),
+        (D(2026, 2, 26), 3.32),
+        (D(2026, 4, 23), 3.34),
+        (D(2026, 9, 30), 3.42),
+    ]
+
+
 def test_names_one_character_apart_are_different_markets(registry, reports):
     """全国生猪平均价格 and 全国仔猪平均价格: the exact name decides."""
     hogs = {o.obs_date: o.value for o in read(registry, reports, "hog_price_county")}
