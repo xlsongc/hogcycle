@@ -42,10 +42,13 @@ trap 'rm -f "$body"' EXIT
     echo "hosts has stopped, or cannot reach them from where it runs; see"
     echo "docs/adr/0023. For \`cn/*\` that is scripts/local-collector."
     echo
-    echo "| group | last fetched | age | limit |"
-    echo "|---|---|---|---|"
+    echo "The last run column is the collector's own record (data/runs, ADR-0028):"
+    echo "refused, timed out, or no run on record at all."
+    echo
+    echo "| group | last fetched | age | limit | last run |"
+    echo "|---|---|---|---|---|"
     jq -r 'select(.failing and .kind == "heartbeat")
-      | "| `\(.indicator)` | \(.latest // "never") | \(.age_hours // "—")h | \(.limit_hours)h |"' "$JSONL"
+      | "| `\(.indicator)` | \(.latest // "never") | \(.age_hours // "—")h | \(.limit_hours)h | \(.last_run // "—") |"' "$JSONL"
     echo
   fi
   if jq -e -s 'any(.[]; .failing and .kind == "series")' "$JSONL" >/dev/null; then

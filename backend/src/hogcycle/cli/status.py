@@ -15,6 +15,7 @@ from ..registry.heartbeat import check_groups
 from ..registry.spec import Registry
 from ..registry.staleness import check_all
 from ..storage.bronze import BronzeStore
+from ..storage.runs import RunLog, summary
 from ..storage.silver import SilverStore
 
 
@@ -25,7 +26,9 @@ def run_status(
     *,
     as_json: bool,
     fail_on_stale: bool,
+    runs: RunLog | None = None,
 ) -> int:
+    runs = runs or RunLog()
     rows = {r["indicator"]: r for r in silver.coverage()}
     latest = {k: v["latest"] for k, v in rows.items() if v["latest"]}
     ages = {s.indicator: s for s in check_all(registry, latest)}
@@ -33,6 +36,13 @@ def run_status(
     beats = check_groups(registry, bronze)
     silent = [b for b in beats if b.failing]
     failed = bool(failing or silent)
+
+    def last_run(group: str) -> str:
+        """What the newest run of this group's reach did with its indicators:
+        the reason beside a silence, when there is one (ADR-0028)."""
+        reach, adapter = group.split("/", 1)
+        ids = {s.id for s in registry if s.reach == reach and s.adapter == adapter}
+        return summary(runs.latest(reach), ids)
 
     if as_json:
         for spec in registry:
@@ -59,6 +69,7 @@ def run_status(
                 "age_hours": b.age_hours,
                 "limit_hours": b.limit_hours,
                 "failing": b.failing,
+                "last_run": last_run(b.group),
             }))
         return 1 if fail_on_stale and failed else 0
 
@@ -77,10 +88,10 @@ def run_status(
         else:
             print(f"{spec.id:<20} {spec.tier:<9} {'—':>6}  (no data)")
 
-    print(f"\n{'source group':<20} {'last fetched (UTC)':<20} {'age':<20} via")
+    print(f"\n{'source group':<20} {'last fetched (UTC)':<20} {'age':<20} last run")
     for b in beats:
         when = "—" if b.latest is None else f"{b.latest:%Y-%m-%d %H:%M}"
-        print(f"{b.group:<20} {when:<20} {b.note:<20} {b.indicator or ''}")
+        print(f"{b.group:<20} {when:<20} {b.note:<20} {last_run(b.group)}")
 
     acked = [s for s in ages.values() if s.acknowledged]
     if acked:

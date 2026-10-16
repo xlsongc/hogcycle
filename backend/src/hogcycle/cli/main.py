@@ -21,6 +21,7 @@ from ..pipeline import collect_all, replay_one
 from ..registry.loader import DEFAULT_CONFIG, load_registry
 from ..registry.spec import Registry
 from ..storage.bronze import BronzeStore
+from ..storage.runs import RunLog
 from ..storage.silver import SilverStore
 from .published import run_published
 from .status import run_status
@@ -132,7 +133,16 @@ def main(argv: list[str] | None = None) -> int:
             registry = Registry({i: registry[i] for i in ids})
         if args.reach != "all":
             registry = Registry({s.id: s for s in registry if s.reach == args.reach})
+        started = dt.datetime.now(dt.UTC)
         results = collect_all(registry, adapters, bronze, silver)
+        # The record of what this run did, failures and all, committed with
+        # the data so a silent source group has a reason beside it (ADR-0028).
+        by_reach: dict[str, list] = {}
+        for r in results:
+            by_reach.setdefault(registry[r.indicator].reach, []).append(r)
+        finished = dt.datetime.now(dt.UTC)
+        for reach, part in sorted(by_reach.items()):
+            RunLog().append(reach, started=started, finished=finished, results=part)
         for r in results:
             mark = "ok  " if r.ok else "FAIL"
             why = f"[{r.kind}] {r.error}" if r.kind else (r.error or "")

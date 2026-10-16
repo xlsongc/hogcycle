@@ -186,7 +186,8 @@ hogcycle replay                      # re-parse every bronze snapshot, zero HTTP
                                      # upstream call read each other's (a new series gets its history)
 hogcycle collect --reach anywhere    # what the GitHub run collects
 scripts/local-collector/collect.sh   # the `reach: cn` sources, from an ordinary network
-hogcycle status                      # coverage, latest obs_date, and age per series
+hogcycle status                      # coverage, latest obs_date, and age per series; source
+                                     # groups with their last run (data/runs, ADR-0028)
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
 hogcycle status --json               # one object per series; the stale-series issue reads it
 hogcycle revisions --indicator sow_inventory
