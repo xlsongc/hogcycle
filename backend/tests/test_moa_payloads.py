@@ -268,3 +268,34 @@ def test_imports_read_the_single_month_rows_only(registry, payload):
     ]
     assert not any(o.obs_date.month == 1 for o in obs)
     assert validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi) == obs
+
+
+def test_a_loss_is_a_negative_number_not_a_missing_month(registry):
+    """202508 prints 规模养殖每头净利润 as 「-57」. The number pattern had no
+    sign, so every loss month parsed as nothing and was skipped: 14 of 44
+    months, all of them losses, gone without an error."""
+    import dataclasses
+
+    from hogcycle.registry.spec import Extract
+
+    edition = json.loads((FIXTURES / "moa_hog_release_202508.json").read_text("utf-8"))
+    spec = dataclasses.replace(
+        registry["sow_inventory"],
+        id="profit",
+        extract=Extract(value="规模养殖生猪每头净利润"),
+        lo=-2000.0,
+    )
+    obs = MoaAdapter().normalise(spec, edition, snapshot_id="f", fetched_at=NOW)
+    assert [(o.obs_date, o.value) for o in obs] == [(dt.date(2025, 8, 31), -57.0)]
+
+
+def test_a_value_that_will_not_parse_fails_the_batch(registry, payload):
+    edition = json.loads(json.dumps(payload["editions"][0]))
+    for row in edition["rows"]:
+        if isinstance(row[2], str) and row[2].endswith("能繁母猪存栏（万头）"):
+            row[3] = "约4067"
+    with pytest.raises(ValueError, match="is not a number"):
+        MoaAdapter().normalise(
+            registry["sow_inventory"], {"editions": [edition], "skipped": []},
+            snapshot_id="f", fetched_at=NOW,
+        )

@@ -110,8 +110,9 @@ _PERIOD_HEAD = re.compile(
 
 # 「3780（相当于调控目标的100.8%）」 — the reading is the leading number; the
 # parenthetical is the 产能调控 zone commentary, which belongs to policy, not
-# to the measurement.
-_LEADING_NUMBER = re.compile(r"^\s*([0-9]+(?:\.[0-9]+)?)")
+# to the measurement. A loss is printed with a hyphen (「-57」, 规模养殖每头净利润
+# in 202508); without the sign here, every loss month was dropped unseen.
+_LEADING_NUMBER = re.compile(r"^\s*(-?[0-9]+(?:\.[0-9]+)?)")
 
 
 class MoaFetchError(RuntimeError):
@@ -262,7 +263,12 @@ class MoaAdapter:
                     raw = next((c for c in row[i + 1 :] if c not in (None, "")), None)
                     value = None if raw is None else _number(raw)
                     if value is None:
-                        continue
+                        # The label is ours and its value will not parse: a
+                        # skipped row here is a month gone without a trace.
+                        raise ValueError(
+                            f"{spec.id}: edition {edition['ym']} prints {cell!r} with "
+                            f"value {raw!r}, which is not a number"
+                        )
                     period = parse_period(period_token, default=spec.freq)
                     lag = (published_on - period.date).days
                     if lag > MAX_RELEASE_LAG_DAYS:
