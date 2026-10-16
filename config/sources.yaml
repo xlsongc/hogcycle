@@ -329,6 +329,43 @@ indicators:
       所以和 corn_price_county、feed_price_county 可以逐周对齐。历史从已采集的同一份
       周报里回放而来（ADR-0027），没有重新抓取。
 
+  - id: scale_profit_per_head
+    name_zh: 每头净利润（规模养殖）
+    name_en: Net profit per hog (scale farms)
+    tier: margin
+    freq: monthly
+    unit: CNY/head
+    lo: -2000.0
+    hi: 5000.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 规模养殖生猪每头净利润}
+    # 202508 那期之后的联合发布不再有这一行（ADR-0027）。背后的调查是否在别处继续，
+    # 这里无从得知；发布它的那张表关闭了它，所以从一开始就是 retired。
+    retired: true
+    notes: >
+      五部委月度联合发布里的规模养殖每头净利润，2021-12 至 2025-08。负值是亏损。
+      历史从已采集的各期月报回放而来。
+
+  - id: scale_cost_per_head
+    name_zh: 每头成本（规模养殖）
+    name_en: Cost per hog (scale farms)
+    tier: margin
+    freq: monthly
+    unit: CNY/head
+    lo: 500.0
+    hi: 5000.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 规模养殖生猪每头成本}
+    # Same as scale_profit_per_head: last printed in the 202508 edition.
+    retired: true
+    notes: >
+      五部委月度联合发布里的规模养殖每头总成本，2021-12 至 2025-08。与每头净利润
+      出自同一张表、同一个月。
+
   # ---------- price：被预测的结果 ----------
 
   - id: hog_price_index

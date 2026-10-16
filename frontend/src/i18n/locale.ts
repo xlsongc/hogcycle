@@ -83,10 +83,11 @@ export function labelOf(
  *  unit is part of the caliber. Only the display form is localised, and only
  *  where the source's own form is not already language-neutral. */
 const UNIT_DISPLAY: Record<Locale, Record<string, string>> = {
-  en: { "万头": "10k head", "万吨": "10k t", ratio: ": 1", "1000 head": "1,000 head", "1000 t CWE": "1,000 t CWE" },
+  en: { "万头": "10k head", "万吨": "10k t", "CNY/head": "CNY/head", ratio: ": 1", "1000 head": "1,000 head", "1000 t CWE": "1,000 t CWE" },
   zh: {
     "CNY/kg": "元/公斤",
     "CNY/tonne": "元/吨",
+    "CNY/head": "元/头",
     kg: "公斤",
     ratio: ": 1",
     "1000 head": "千头",

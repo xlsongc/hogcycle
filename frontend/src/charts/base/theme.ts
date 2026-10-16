@@ -22,7 +22,7 @@ import { splitByGap } from "./segments";
  *  Only the grouping follows the locale. */
 /** Units counted in whole things, where decimals would claim a precision
  *  the source never had. */
-const WHOLE = new Set(["万头", "CNY/tonne", "1000 head", "1000 t CWE"]);
+const WHOLE = new Set(["万头", "CNY/tonne", "CNY/head", "1000 head", "1000 t CWE"]);
 
 export function fmt(
   value: number | null | undefined,

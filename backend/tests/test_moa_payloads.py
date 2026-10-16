@@ -299,3 +299,17 @@ def test_a_value_that_will_not_parse_fails_the_batch(registry, payload):
             registry["sow_inventory"], {"editions": [edition], "skipped": []},
             snapshot_id="f", fetched_at=NOW,
         )
+
+
+def test_per_head_cost_and_profit_are_retired_at_202508(registry, payload):
+    """Printed up to the 202508 edition and in none since (ADR-0027): the
+    later editions in the fixture carry neither, which a retired series
+    takes as done rather than failing on."""
+    edition = json.loads((FIXTURES / "moa_hog_release_202508.json").read_text("utf-8"))
+    for indicator in ("scale_profit_per_head", "scale_cost_per_head"):
+        spec = registry[indicator]
+        assert spec.retired
+        recent = {"editions": payload["editions"][1:], "skipped": []}
+        assert MoaAdapter().normalise(spec, recent, snapshot_id="f", fetched_at=NOW) == []
+    _, obs = normalise(registry, edition, "scale_profit_per_head")
+    assert [(o.obs_date, o.value) for o in obs] == [(dt.date(2025, 8, 31), -57.0)]

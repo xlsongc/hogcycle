@@ -110,6 +110,24 @@ series:
       zh: 育肥猪配合饲料的平均价格，元/公斤。养一头猪最大的一笔成本。
       en: Average price of finishing-hog compound feed per kilogram, the largest single cost of raising a hog.
 
+  scale_profit_per_head:
+    publisher:
+      zh: 农业农村部等五部委月度联合发布（表中未注明由哪个部门编制）
+      en: The five-ministry monthly release (the table does not say which agency compiles it)
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 规模养殖场每出栏一头猪的净利润，元/头，负值是亏损。联合发布在 2025 年 8 月那期之后不再刊出，所以这是一段已结束的历史。
+      en: Net profit per hog sold by scale farms, in yuan per head; negative is a loss. The joint release stopped printing it after the August 2025 edition, so this is a finished history.
+
+  scale_cost_per_head:
+    publisher:
+      zh: 农业农村部等五部委月度联合发布（表中未注明由哪个部门编制）
+      en: The five-ministry monthly release (the table does not say which agency compiles it)
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 规模养殖场每出栏一头猪的总成本，元/头。与每头净利润出自同一张表。联合发布在 2025 年 8 月那期之后不再刊出。
+      en: Total cost per hog sold by scale farms, in yuan per head, from the same table as the net profit. The joint release stopped printing it after the August 2025 edition.
+
   soymeal_price_county:
     publisher:
       zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
