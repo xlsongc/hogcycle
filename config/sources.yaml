@@ -447,6 +447,27 @@ indicators:
       玄田镜像 2025年10月停更，无替代口径的指数源；若上游恢复，去掉 retired
       即可继续采。
 
+  - id: pork_price_county
+    name_zh: 猪肉价格（500县集贸）
+    name_en: Pork price (500-county markets)
+    tier: price
+    freq: weekly
+    unit: CNY/kg
+    lo: 8.0
+    hi: 80.0
+    adapter: moa_weekly
+    reach: cn
+    call: {report: market}
+    extract:
+      value: 全国猪肉平均价格
+      # 2月份第3周 2023 (published 2023-02-21) printed 「全国猪肉平均26.70元/公斤」:
+      # the same figure, 价格 dropped once in 250 articles (docs/adr/0027).
+      also: [全国猪肉平均]
+    notes: >
+      500 县集贸市场的猪肉均价，和生猪价格出自同一份周报、同一采集日，所以两者的差是
+      同一批市场里从毛猪到白肉的价差。与 36 城精瘦肉零售价（pork_retail_price，
+      月度、城市、零售）是两个口径，各自一格。历史从已采集的周报回放而来（ADR-0027）。
+
   - id: pork_retail_price
     name_zh: 猪肉零售价（36城精瘦肉）
     name_en: Pork retail price (lean cuts, 36 cities)

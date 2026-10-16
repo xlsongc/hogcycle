@@ -182,6 +182,15 @@ series:
       zh: 跨肉类的相对价格指数，用来判断猪肉是独立行情还是普涨。镜像 2025 年 10 月停更，已封存。
       en: A cross-meat relative price index, for telling a pork-only move from a general one. The mirror stopped in October 2025, and the series is retired.
 
+  pork_price_county:
+    publisher:
+      zh: 农业农村部畜牧兽医局，500 个县集贸市场周度监测
+      en: MARA Animal Husbandry and Veterinary Bureau, weekly 500-county market survey
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 500 县集贸市场的猪肉平均价格，元/公斤。与同一份周报、同一采集日的生猪价格放在一起，读的是同一批市场里从生猪到猪肉的价差。
+      en: The average price of pork across the 500-county markets, per kilogram. Read beside the hog price from the same weekly report and collection day, it gives the step from live hog to pork in the same markets.
+
   pork_retail_price:
     publisher:
       zh: 国家发展改革委 36 个大中城市监测，五部委月度联合发布

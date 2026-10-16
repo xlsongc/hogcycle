@@ -85,6 +85,13 @@ def test_soymeal_comes_from_the_same_report_and_collection_day(registry, reports
     ]
 
 
+def test_pork_is_read_from_the_same_articles_as_the_hog_price(registry, reports):
+    pork = read(registry, reports, "pork_price_county")
+    hogs = read(registry, reports, "hog_price_county")
+    assert [o.obs_date for o in pork] == [o.obs_date for o in hogs]
+    assert pork[-1].value == 21.07 and hogs[-1].value == 11.13  # 2026-09-30
+
+
 def test_names_one_character_apart_are_different_markets(registry, reports):
     """全国生猪平均价格 and 全国仔猪平均价格: the exact name decides."""
     hogs = {o.obs_date: o.value for o in read(registry, reports, "hog_price_county")}
