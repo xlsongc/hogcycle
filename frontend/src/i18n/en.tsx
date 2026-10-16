@@ -395,6 +395,7 @@ export const en = {
     note: (rows: number) =>
       `Resampled monthly · last observation in each month · ${rows} rows`,
     month: "Month",
+    caption: "Every series on the wall by month: the last observation in each month.",
   },
 
   chart: {

@@ -292,8 +292,23 @@ td:first-child {
   text-align: left;
 }
 
-tbody tr + tr td {
+tbody tr + tr td,
+tbody tr + tr th[scope="row"] {
   border-top: 1px solid var(--grid);
+}
+
+/* A row header (the month) stays in view as a wide table scrolls sideways,
+   instead of inheriting the column headers' stick to the top. */
+tbody th[scope="row"] {
+  top: auto;
+  left: 0;
+  z-index: 1;
+  border-bottom: 0;
+}
+
+.table-wrap thead th:first-child {
+  left: 0;
+  z-index: 2;
 }
 
 td {
@@ -382,4 +397,13 @@ a:hover {
 .stale-tag.long {
   display: inline-block;
   max-width: 100%;
+}
+
+/* Keyboard focus, on every control: a ring in ink, offset so it never merges
+   with a control's own border. A mouse click does not draw it
+   (:focus-visible), so it costs pointer readers nothing. */
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 2px;
 }

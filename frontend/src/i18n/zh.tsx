@@ -303,6 +303,7 @@ export const zh: Dict = {
     hide: "隐藏表格",
     note: (rows: number) => `按月重采样 · 每月取最后一个观测值 · 共 ${rows} 行`,
     month: "月份",
+    caption: "图表墙上每个序列的月度表：每月取最后一个观测值。",
   },
 
   chart: {

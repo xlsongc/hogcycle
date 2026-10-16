@@ -44,6 +44,7 @@ export function TableView({ panels, locale }: { panels: Panel[]; locale: Locale 
       {open && (
         <div className="table-wrap">
           <table>
+            <caption className="sr-only">{t.table.caption}</caption>
             <thead>
               <tr>
                 <th scope="col">{t.table.month}</th>
@@ -61,7 +62,9 @@ export function TableView({ panels, locale }: { panels: Panel[]; locale: Locale 
             <tbody>
               {rows.map(([month, values]) => (
                 <tr key={month}>
-                  <td className="num">{month}</td>
+                  <th scope="row" className="num">
+                    {month}
+                  </th>
                   {panels.map((p) => (
                     <td key={p.id} className="num">
                       {fmt(values[p.id] ?? null, p.unit, locale)}
