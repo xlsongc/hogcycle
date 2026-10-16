@@ -11,6 +11,7 @@
  */
 
 import { useState } from "react";
+import { useAlign } from "@/lib/useAlign";
 import type { Panel } from "@/types/generated/wall";
 import { PanelChart } from "@/charts/PanelChart";
 import { PRESETS, bounds, type Range } from "@/lib/range";
@@ -31,7 +32,7 @@ type Props = {
 export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
   const t = dict(locale);
   const [range, setRange] = useState<Range>({ kind: "preset", preset: "all" });
-  const [align, setAlign] = useState<"period" | "release">("period");
+  const [align, setAlign] = useAlign();
   const first = panel.points.find((p) => p.v != null)?.d ?? start;
   // A forecast runs past today; its last point is the reason to look.
   const last = panel.points[panel.points.length - 1]?.d ?? end;
@@ -81,7 +82,9 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
           max={max}
           align={align}
           marker={marker}
-          startNote={asOf ? t.asOf.startsAt : undefined}
+          startNote={
+            align === "release" ? t.chart.datedFrom : asOf ? t.asOf.startsAt : undefined
+          }
           size="hero"
           showAxisLabels
           locale={locale}

@@ -279,6 +279,8 @@ export const zh: Dict = {
       </>
     ),
     share: "这个视图记在地址栏里 —— 复制网址即可分享。",
+    undated: (names: string[]) =>
+      `未画出：${names.join("、")}。它们的源头不写发布日期，本页从不猜测日期。`,
   },
 
   picker: {
@@ -298,8 +300,11 @@ export const zh: Dict = {
   chart: {
     noData: "此期间无数据",
     noneNear: "该日期附近无数据",
-    published: (date: string) => `${date} 发布`,
+    published: (date: string, lag: number) =>
+      lag >= 0 ? `${date} 发布 · 晚 ${lag} 天` : `${date} 发布 · 提前 ${-lag} 天`,
     startsAt: (month: string) => `数据始于 ${month}`,
+    datedFrom: (month: string) => `发布日期始于 ${month}`,
+    undated: "源头不写发布日期，这个视图里没有它的位置",
     caliberFrom: (month: string) => `新口径始于 ${month}`,
     cadence: {
       D: "日度",

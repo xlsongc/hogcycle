@@ -6,6 +6,7 @@
  */
 
 import { PRESETS, type Range } from "@/lib/range";
+import type { Align } from "@/lib/useAlign";
 import { TimeRuler } from "@/charts/TimeRuler";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
@@ -17,10 +18,22 @@ type Props = {
   group: string;
   onRange: (r: Range) => void;
   onReset: () => void;
+  align: Align;
+  onAlign: (a: Align) => void;
   locale: Locale;
 };
 
-export function WallToolbar({ range, min, max, group, onRange, onReset, locale }: Props) {
+export function WallToolbar({
+  range,
+  min,
+  max,
+  group,
+  onRange,
+  onReset,
+  align,
+  onAlign,
+  locale,
+}: Props) {
   const t = dict(locale);
   const custom = range.kind === "custom";
 
@@ -46,6 +59,15 @@ export function WallToolbar({ range, min, max, group, onRange, onReset, locale }
           {min} → {max}
           {custom ? ` · ${t.wall.zoomed}` : ""}
         </span>
+      </div>
+      <div className="bar">
+        <span className="filter-label">{t.overview.align}</span>
+        <button aria-pressed={align === "period"} onClick={() => onAlign("period")}>
+          {t.overview.alignPeriod}
+        </button>
+        <button aria-pressed={align === "release"} onClick={() => onAlign("release")}>
+          {t.overview.alignRelease}
+        </button>
       </div>
       <TimeRuler group={group} min={min} max={max} />
     </div>

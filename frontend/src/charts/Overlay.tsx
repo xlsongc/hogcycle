@@ -25,9 +25,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-import { shiftMonths } from "@/lib/dates";
+import { shiftMonths, toIso } from "@/lib/dates";
+import { lagDays, periodLabel } from "@/lib/period";
+import { hasReleases, type Align } from "@/lib/useAlign";
 
-import type { Panel } from "@/types/generated/wall";
+import type { Panel, Point } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
 import { fmt, slotColor } from "./base/theme";
 import { NUM_PX, cssVar, labelPx, monoFont } from "./base/ink";
@@ -42,17 +44,38 @@ type Props = {
   min: string;
   max: string;
   lag: LagSpec | null;
+  /** Where readings go: at their period, or at the day they were published,
+   *  where an undated source has no place and is named as left out. */
+  align?: Align;
   locale: Locale;
 };
 
-export function Overlay({ panels, selected, slots, min, max, lag, locale }: Props) {
+type TipItem = {
+  seriesIndex?: number;
+  seriesName?: string;
+  marker?: string;
+  value?: unknown;
+  axisValue?: unknown;
+};
+
+/** Contract text goes into the tooltip's HTML, so it is escaped. */
+function esc(s: string): string {
+  return s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+}
+
+export function Overlay({ panels, selected, slots, min, max, lag, align = "period", locale }: Props) {
   const t = dict(locale);
   const host = useRef<HTMLDivElement>(null);
 
-  const chosen = useMemo(
+  const picked = useMemo(
     () => selected.map((id) => panels.find((p) => p.id === id)).filter((p): p is Panel => !!p),
     [panels, selected]
   );
+  const chosen = useMemo(
+    () => (align === "release" ? picked.filter((p) => hasReleases(p.points)) : picked),
+    [picked, align]
+  );
+  const dropped = picked.filter((p) => !chosen.includes(p));
 
   // One shared unit means raw values are honest and more informative; mixed
   // units leave indexing as the only non-misleading option.
@@ -96,20 +119,22 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
       const ink = cssVar("--ink", "#0b0b0b");
       const surface = cssVar("--surface-1", "#fcfcfb");
 
+      // The reading behind each drawn point, per series, for the tooltip:
+      // which period a value describes, and how late it became public.
+      const behind: Map<string, Point>[] = [];
       const series = chosen.map((panel) => {
         const shift = lag && lag.id === panel.id ? lag.months : 0;
-        const inWindow = panel.points.filter((p) => {
-          const d = shiftMonths(p.d, shift);
-          return d >= min && d <= max && p.v != null;
-        });
-        const base = inWindow[0]?.v ?? null;
+        const inWindow = panel.points
+          .filter((p) => p.v != null && (align === "period" || p.p != null))
+          .map((p) => ({ x: shiftMonths(align === "release" ? (p.p as string) : p.d, shift), p }))
+          .filter(({ x }) => x >= min && x <= max)
+          .sort((a, b) => a.x.localeCompare(b.x));
+        const base = inWindow[0]?.p.v ?? null;
+        behind.push(new Map(inWindow.map(({ x, p }) => [x, p])));
 
-        const data = inWindow.map((p) => {
+        const data = inWindow.map(({ x, p }) => {
           const v = p.v as number;
-          return [
-            shiftMonths(p.d, shift),
-            indexed ? (base ? (v / base) * 100 : null) : v,
-          ] as [string, number | null];
+          return [x, indexed ? (base ? (v / base) * 100 : null) : v] as [string, number | null];
         });
 
         const color = slotColor(slots.get(panel.id) ?? 0);
@@ -159,8 +184,32 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
             textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
-            valueFormatter: (v: unknown) =>
-              typeof v === "number" ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale) : "—",
+            formatter: (raw: unknown) => {
+              const items = (Array.isArray(raw) ? raw : [raw]) as TipItem[];
+              const at = items[0]?.axisValue;
+              const head = typeof at === "number" ? toIso(at) : String(at ?? "");
+              const rows = items
+                .filter((i) => i.seriesName)
+                .map((i) => {
+                  const [x, v] = (i.value ?? []) as [string, number | null];
+                  const value =
+                    typeof v === "number"
+                      ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale)
+                      : "—";
+                  const p = behind[i.seriesIndex ?? -1]?.get(x);
+                  const notes = p
+                    ? [
+                        align === "release" ? periodLabel(p.d, p.g, locale) : null,
+                        p.p ? t.chart.published(p.p, lagDays(p.d, p.p)) : null,
+                      ].filter(Boolean)
+                    : [];
+                  const note = notes.length
+                    ? `<br/><span style="color:${muted}">${esc(notes.join(" · "))}</span>`
+                    : "";
+                  return `${i.marker ?? ""}${esc(i.seriesName ?? "")}&nbsp;&nbsp;${value}${note}`;
+                });
+              return [esc(head), ...rows].join("<br/>");
+            },
           },
           xAxis: {
             type: "time",
@@ -222,7 +271,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
       window.removeEventListener("hogcycle:theme", render);
       chart.dispose();
     };
-  }, [chosen, slots, min, max, lag, indexed, log, locale, t]);
+  }, [chosen, slots, min, max, lag, align, indexed, log, locale, t]);
 
   return (
     <div className="overlay-card">
@@ -230,6 +279,9 @@ export function Overlay({ panels, selected, slots, min, max, lag, locale }: Prop
         <span className="panel-unit">{unitLabel}</span>
         {indexed && (
           <span className="hint">{t.overlay.indexedNote(log)}</span>
+        )}
+        {dropped.length > 0 && (
+          <span className="hint">{t.compare.undated(dropped.map((p) => nameOf(p, locale)))}</span>
         )}
       </div>
       <div

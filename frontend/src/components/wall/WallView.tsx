@@ -19,6 +19,7 @@ import { WALL_RANGE, bounds, parseRange, rangeParams, type Range } from "@/lib/r
 import { readParams, writeParams } from "@/lib/urlState";
 import { firstKnowable, panelOn } from "@/lib/asOf";
 import { useAsOf } from "@/lib/useAsOf";
+import { useAlign } from "@/lib/useAlign";
 import type { Locale } from "@/i18n/locale";
 
 type Props = {
@@ -34,6 +35,7 @@ export function WallView({ panels, start, end, today, locale }: Props) {
   // Standing on a past day cuts every panel to what was knowable then, and
   // the window ends on that day (docs/adr/0025).
   const [day, setDay] = useAsOf();
+  const [align, setAlign] = useAlign();
   const shown = useMemo(() => panels.map((p) => panelOn(p, day)), [panels, day]);
   const earliest = useMemo(
     () =>
@@ -73,11 +75,14 @@ export function WallView({ panels, start, end, today, locale }: Props) {
         group={WALL_GROUP}
         onRange={setRange}
         onReset={reset}
+        align={align}
+        onAlign={setAlign}
         locale={locale}
       />
       <ChartWall
         panels={shown}
         asOf={day}
+        align={align}
         first={firstBy(panels)}
         min={min}
         max={max}

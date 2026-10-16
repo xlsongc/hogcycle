@@ -17,6 +17,7 @@ import { nameOf, seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { PanelChart } from "./PanelChart";
 import { tierVars } from "@/lib/tier";
+import { hasReleases, type Align } from "@/lib/useAlign";
 
 export const WALL_GROUP = "hogcycle-wall";
 
@@ -26,6 +27,9 @@ type Props = {
   max: string;
   /** The day the wall stands on; its panels are already cut to it. */
   asOf?: string | null;
+  /** Where readings go on the time axis; by release, an undated source has
+   *  no place, and its panel says so. */
+  align?: Align;
   /** When each panel first became knowable, to say why one is empty. */
   first?: Record<string, { date: string; basis: "published" | "learned" } | null>;
   locale: Locale;
@@ -38,6 +42,7 @@ export function ChartWall({
   min,
   max,
   asOf = null,
+  align = "period",
   first = {},
   locale,
   onZoom,
@@ -58,16 +63,20 @@ export function ChartWall({
                 {t.chart.tierNote[panel.tier]}
               </h2>
             )}
-            {asOf && !panel.points.length ? (
-              // Not yet knowable: say so in the panel's place rather than
-              // draw an empty chart that reads as "no data" (docs/adr/0025).
+            {(asOf && !panel.points.length) ||
+            (align === "release" && !hasReleases(panel.points)) ? (
+              // Not yet knowable, or never dated: say so in the panel's place
+              // rather than draw an empty chart that reads as "no data"
+              // (docs/adr/0017, 0025).
               <div className="panel panel-unknown" id={panel.id} style={tierVars(panel.tier)}>
                 <div className="panel-head">
                   <Link className="panel-title" href={seriesPath(locale, panel.id)}>
                     {nameOf(panel, locale)}
                   </Link>
                   <span className="panel-readout">
-                    {t.asOf.panelNone(first[panel.id] ?? null)}
+                    {asOf && !panel.points.length
+                      ? t.asOf.panelNone(first[panel.id] ?? null)
+                      : t.chart.undated}
                   </span>
                 </div>
               </div>
@@ -84,7 +93,10 @@ export function ChartWall({
               href={seriesPath(locale, panel.id)}
               onZoom={onZoom}
               onReset={onReset}
-              startNote={asOf ? t.asOf.startsAt : undefined}
+              align={align}
+              startNote={
+                align === "release" ? t.chart.datedFrom : asOf ? t.asOf.startsAt : undefined
+              }
             />
             )}
           </Fragment>

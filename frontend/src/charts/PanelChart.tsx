@@ -30,6 +30,7 @@ import { SERIES, fmt, panelOption } from "./base/theme";
 import { PLOT_INSET } from "./base/marks";
 import { syncPointer } from "./base/pointerSync";
 import { shiftMonths, toIso, toTime } from "@/lib/dates";
+import { lagDays } from "@/lib/period";
 import { nameOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { tierVars } from "@/lib/tier";
@@ -338,7 +339,7 @@ export function PanelChart({
                 {probe.hit.p && (
                   <>
                     <br />
-                    {t.chart.published(probe.hit.p)}
+                    {t.chart.published(probe.hit.p, lagDays(probe.hit.d, probe.hit.p))}
                   </>
                 )}
               </>

@@ -368,6 +368,8 @@ export const en = {
       </>
     ),
     share: "This view lives in the address bar — copy the URL to share it.",
+    undated: (names: string[]) =>
+      `Not drawn: ${names.join(", ")}. Their sources do not date releases, and a date is never guessed.`,
   },
 
   picker: {
@@ -388,8 +390,11 @@ export const en = {
   chart: {
     noData: "No data in this window",
     noneNear: "nothing near this date",
-    published: (date: string) => `published ${date}`,
+    published: (date: string, lag: number) =>
+      lag >= 0 ? `published ${date} · +${lag}d` : `published ${date} · ${-lag}d ahead`,
     startsAt: (month: string) => `data from ${month}`,
+    datedFrom: (month: string) => `dated releases from ${month}`,
+    undated: "the source does not date its releases, so it has no place in this view",
     caliberFrom: (month: string) => `new caliber from ${month}`,
     cadence: {
       D: "daily",

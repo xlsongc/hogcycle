@@ -16,6 +16,7 @@ import { MAX_OVERLAY_SERIES } from "@/charts/base/theme";
 import { SeriesPicker } from "@/components/SeriesPicker";
 import { PRESETS, DEFAULT_RANGE, bounds, parseRange, rangeParams, type Range } from "@/lib/range";
 import { readParams, writeParams } from "@/lib/urlState";
+import { useAlign } from "@/lib/useAlign";
 import { nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
@@ -37,6 +38,7 @@ export function CompareView({ panels, start, end, locale }: Props) {
   const [slots, setSlots] = useState(() => slotsFor(DEFAULT_SELECTION));
   const [lag, setLag] = useState<LagSpec | null>(DEFAULT_LAG);
   const [range, setRange] = useState<Range>(DEFAULT_RANGE);
+  const [align, setAlign] = useAlign();
   const [ready, setReady] = useState(false);
 
   // Read the view from the URL once mounted. Unknown ids are dropped rather
@@ -165,6 +167,15 @@ export function CompareView({ panels, start, end, locale }: Props) {
           {min} → {max}
         </span>
       </div>
+      <div className="bar">
+        <span className="filter-label">{t.overview.align}</span>
+        <button aria-pressed={align === "period"} onClick={() => setAlign("period")}>
+          {t.overview.alignPeriod}
+        </button>
+        <button aria-pressed={align === "release"} onClick={() => setAlign("release")}>
+          {t.overview.alignRelease}
+        </button>
+      </div>
 
       <Overlay
         panels={panels}
@@ -173,6 +184,7 @@ export function CompareView({ panels, start, end, locale }: Props) {
         min={min}
         max={max}
         lag={lag && selected.includes(lag.id) ? lag : null}
+        align={align}
         locale={locale}
       />
       <p className="hint">{t.compare.share}</p>
