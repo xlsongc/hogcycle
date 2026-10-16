@@ -257,7 +257,7 @@ class MoaAdapter:
                         continue
                     period_token, name = parsed
                     names_seen.add(name)
-                    if name != label:
+                    if name not in spec.extract.names:
                         continue
                     raw = next((c for c in row[i + 1 :] if c not in (None, "")), None)
                     value = None if raw is None else _number(raw)

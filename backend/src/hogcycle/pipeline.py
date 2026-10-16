@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -140,6 +141,7 @@ def replay_one(
     silver: SilverStore,
     *,
     now: dt.datetime | None = None,
+    siblings: Sequence[IndicatorSpec] = (),
 ) -> Result:
     """Run every bronze snapshot of one indicator through today's parser.
 
@@ -153,15 +155,31 @@ def replay_one(
     snapshot holds what upstream said *then*, and replaying it today would
     make a superseded value current again. So for those only the newest
     snapshot counts, which is what a fresh fetch would have returned.
+
+    `siblings` are the indicators that share this one's upstream call. Their
+    snapshots are the same response, so a series added over a release already
+    collected is read from what bronze holds rather than fetched again
+    (docs/adr/0027).
     """
     now = now or dt.datetime.now(dt.UTC)
-    seen: list[str] = []
-    for entry in bronze.history(spec.id):
-        # A series that changed source keeps the old source's snapshots under
-        # the same id; those are another publisher's payload shape, and
-        # another caliber, so they are not this parser's to read.
-        if entry["source"] == spec.source and entry["snapshot_id"] not in seen:
-            seen.append(entry["snapshot_id"])
+    # snapshot id -> (first fetched, whose bronze holds it). Content-addressed,
+    # so one response under several ids is read once, in the order it first
+    # arrived, as an indicator's own snapshots always were.
+    first: dict[str, tuple[str, str]] = {}
+    for owner in (spec, *(s for s in siblings if s.id != spec.id)):
+        if owner.call_key != spec.call_key:
+            raise ValueError(f"{spec.id}: {owner.id} does not share its upstream call")
+        for entry in bronze.history(owner.id):
+            # A series that changed source keeps the old source's snapshots
+            # under the same id; those are another publisher's payload shape,
+            # and another caliber, so they are not this parser's to read.
+            if entry["source"] != owner.source:
+                continue
+            at = str(entry["fetched_at"])
+            known = first.get(entry["snapshot_id"])
+            if known is None or at < known[0]:
+                first[entry["snapshot_id"]] = (at, owner.id)
+    seen = sorted(first, key=lambda sid: first[sid][0])
     if not seen:
         return Result(
             spec.id, False, 0, False, f"no bronze snapshot from {spec.source} to replay"
@@ -171,7 +189,7 @@ def replay_one(
         dated: list[Observation] = []
         undated: list[Observation] = []
         for snapshot_id in seen:
-            payload = bronze.read(spec.id, snapshot_id)
+            payload = bronze.read(first[snapshot_id][1], snapshot_id)
             obs = adapter.normalise(spec, payload, snapshot_id=snapshot_id, fetched_at=now)
             dated += [o for o in obs if o.published_on is not None]
             fresh = [o for o in obs if o.published_on is None]

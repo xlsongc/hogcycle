@@ -164,7 +164,18 @@ def main(argv: list[str] | None = None) -> int:
         }
         ids = args.indicator.split(",") if args.indicator else None
         specs = [registry[i] for i in ids] if ids else list(registry)
-        results = [replay_one(s, adapters[s.adapter], bronze, silver) for s in specs]
+        # Indicators on one upstream call read each other's snapshots too: it
+        # is one response, so a series added later has its history (ADR-0027).
+        results = [
+            replay_one(
+                s,
+                adapters[s.adapter],
+                bronze,
+                silver,
+                siblings=[x for x in registry if x.call_key == s.call_key],
+            )
+            for s in specs
+        ]
         for r in results:
             mark = "ok  " if r.ok else "FAIL"
             print(f"{mark} {r.indicator:<22} {r.rows_written:>5} row(s)  {r.error or ''}")

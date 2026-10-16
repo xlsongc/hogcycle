@@ -179,7 +179,8 @@ value to suit a unit label.
 hogcycle collect                     # all indicators; one failure does not abort the rest
 hogcycle collect --months-back 60    # backfill 农业农村部 editions (default 6)
 hogcycle collect --indicator a,b --weekly-pages 25   # backfill the weekly reports
-hogcycle replay                      # re-parse every bronze snapshot, zero HTTP
+hogcycle replay                      # re-parse every bronze snapshot, zero HTTP; indicators on one
+                                     # upstream call read each other's (a new series gets its history)
 hogcycle collect --reach anywhere    # what the GitHub run collects
 scripts/local-collector/collect.sh   # the `reach: cn` sources, from an ordinary network
 hogcycle status                      # coverage, latest obs_date, and age per series
@@ -230,3 +231,4 @@ so you do not have to re-derive them.
 | 0024 | The contract carries a version, and every export is validated against the schema |
 | 0025 | The page can stand on any past day, and shows only what was knowable then |
 | 0026 | Breaks in a series are drawn where they happen: cadence changes from gold, caliber lineage from config |
+| 0027 | A new series from a release already collected is read from the bronze it left |

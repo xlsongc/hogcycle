@@ -25,6 +25,10 @@ _KNOWN_KEYS = {
 
 _DARK_KEYS = {"acknowledged", "review_by", "reason"}
 
+# Adapters that find a value by its printed name, and so can honour
+# extract.also (docs/adr/0027).
+_NAMED_ADAPTERS = {"moa", "moa_weekly"}
+
 
 def _date(owner: str, key: str, raw: Any) -> dt.date:
     # YAML turns an unquoted 2026-12-31 into a date and a quoted one into a
@@ -58,7 +62,17 @@ def _build(entry: dict[str, Any]) -> IndicatorSpec:
             "A typo here would otherwise be silently ignored."
         )
     data = dict(entry)
-    data["extract"] = Extract(**(data.get("extract") or {}))
+    extract = dict(data.get("extract") or {})
+    if extract.get("also"):
+        # Only the ministry adapters read a name off a label; anywhere else
+        # `also` would be a claim the parser silently ignored.
+        if data.get("adapter") not in _NAMED_ADAPTERS:
+            raise ValueError(
+                f"{owner}: extract.also is read only by {sorted(_NAMED_ADAPTERS)}, "
+                f"not {data.get('adapter')!r}"
+            )
+        extract["also"] = tuple(extract["also"])
+    data["extract"] = Extract(**extract)
     if (accept := data.get("accept")) is not None:
         data["accept"] = tuple(accept)
     if (dark := data.get("upstream_dark")) is not None:

@@ -48,6 +48,14 @@ class Extract:
 
     period: str = "date"
     value: str = "value"
+    # Other exact spellings the publisher used for the same figure in the
+    # same report, each seen in a real issue (docs/adr/0027). Listed, never a
+    # pattern: a pattern would also claim spellings nobody has seen.
+    also: tuple[str, ...] = ()
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        return (self.value, *self.also)
 
 
 # The longest a person may quiet the guard in one go. Renewing is allowed, but

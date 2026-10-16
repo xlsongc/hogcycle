@@ -219,7 +219,13 @@ class MoaWeeklyAdapter:
         name = spec.extract.value
         # 为 repeated is the publisher's typo (「价格为为17.46」, 2025-11-21), not
         # another phrasing: the name and the number around it are unchanged.
-        value_re = re.compile(re.escape(name) + r"为*(\d+(?:\.\d+)?)元/公斤")
+        # A spelling the publisher used for the same figure is listed in
+        # extract.also and matched as exactly as the name (docs/adr/0027);
+        # longest first, so one spelling is never read as part of another.
+        spellings = sorted(spec.extract.names, key=len, reverse=True)
+        value_re = re.compile(
+            "(?:" + "|".join(map(re.escape, spellings)) + r")为*(\d+(?:\.\d+)?)元/公斤"
+        )
         scope = spec.call.get("scope")
         if scope is not None and scope not in SCOPES:
             raise KeyError(f"{spec.id}: unknown scope {scope!r}; known: {sorted(SCOPES)}")
