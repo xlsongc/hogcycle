@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 
+from ..quality import ERROR, WARN, run_checks
 from ..registry.heartbeat import check_groups
 from ..registry.spec import Registry
 from ..registry.staleness import check_all
@@ -35,7 +36,11 @@ def run_status(
     failing = [s for s in ages.values() if s.failing]
     beats = check_groups(registry, bronze)
     silent = [b for b in beats if b.failing]
-    failed = bool(failing or silent)
+    # A duplicate key fails like a stale series; a disagreement only warns
+    # (docs/adr/0029).
+    checks = run_checks(registry, silver)
+    broken = [c for c in checks if c.level == ERROR]
+    failed = bool(failing or silent or broken)
 
     def last_run(group: str) -> str:
         """What the newest run of this group's reach did with its indicators:
@@ -71,6 +76,8 @@ def run_status(
                 "failing": b.failing,
                 "last_run": last_run(b.group),
             }))
+        for c in checks:
+            print(json.dumps(c.as_json(), ensure_ascii=False))
         return 1 if fail_on_stale and failed else 0
 
     print(
@@ -92,6 +99,16 @@ def run_status(
     for b in beats:
         when = "—" if b.latest is None else f"{b.latest:%Y-%m-%d %H:%M}"
         print(f"{b.group:<20} {when:<20} {b.note:<20} {last_run(b.group)}")
+
+    print(f"\n{'quality check':<36} {'level':<6} detail")
+    for c in checks:
+        print(f"{c.name:<36} {c.level:<6} {c.detail}")
+    for c in checks:
+        if c.level == WARN:
+            print(f"  WARN {c.name}: two sources that measure one thing have parted.")
+    if broken:
+        print("  ERROR: the store holds a duplicate key; as-of views built on it are "
+              "ambiguous until it is found (docs/adr/0029).")
 
     acked = [s for s in ages.values() if s.acknowledged]
     if acked:

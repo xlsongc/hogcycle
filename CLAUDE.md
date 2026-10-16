@@ -237,3 +237,4 @@ so you do not have to re-derive them.
 | 0026 | Breaks in a series are drawn where they happen: cadence changes from gold, caliber lineage from config |
 | 0027 | A new series from a release already collected is read from the bronze it left |
 | 0028 | A failure says which kind it is (transient, blocked, structure), and every run leaves a record |
+| 0029 | What fails a run (a duplicate key), what warns (sources that part), and which sources must agree |
