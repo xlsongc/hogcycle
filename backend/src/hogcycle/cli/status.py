@@ -47,6 +47,7 @@ def run_status(
                 "failing": st.failing,
                 "acknowledged": st.acknowledged,
                 "review_by": None if st.review_by is None else st.review_by.isoformat(),
+                "lapses_in_days": st.lapses_in,
                 "retired": st.retired,
             }))
         for b in beats:
@@ -87,7 +88,13 @@ def run_status(
         # number on the site is still old, and someone owes a fix.
         print(f"\n{len(acked)} series are dark upstream and acknowledged:")
         for s in acked:
-            print(f"  {s.indicator:<20} latest {s.latest}  review by {s.review_by}")
+            soon = f"  LAPSES IN {s.lapses_in} DAYS" if s.lapsing else ""
+            print(f"  {s.indicator:<20} latest {s.latest}  review by {s.review_by}{soon}")
+        if any(s.lapsing for s in acked):
+            # The run turns red by itself on the day after review_by. Decide
+            # before then: the fix is built (remove the mark), the caliber is
+            # gone (retire it), or renew with a reason.
+            print("  An acknowledgement that lapses fails the run again (docs/adr/0015).")
     resumed = [s for s in ages.values() if s.resumed]
     if resumed:
         print("\nAdvancing again but still marked upstream_dark — remove the mark:")

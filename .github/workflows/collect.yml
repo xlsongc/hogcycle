@@ -71,6 +71,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: .github/scripts/stale-issue.sh status.txt status.jsonl
 
+      # An acknowledgement lapses into a red run by design (ADR-0015); this
+      # says so two weeks ahead, so the decision is made before the day.
+      - name: File, update or close the ack-lapsing issue
+        if: always() && steps.stale.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: .github/scripts/lapse-issue.sh status.jsonl
+
       - name: Fail if any series has stopped advancing
         if: always() && steps.stale.outcome == 'success'
         run: hogcycle status --fail-on-stale > /dev/null

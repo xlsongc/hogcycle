@@ -219,3 +219,17 @@ def test_status_json_tells_the_workflow_which_series_fail(tmp_path, monkeypatch,
     assert row["stale"] is True and row["failing"] is True
     assert row["acknowledged"] is False and row["review_by"] is None
     assert code == 1
+
+
+def test_an_acknowledgement_says_when_it_is_about_to_lapse():
+    """Two weeks out it starts saying so, every run; nothing renews itself."""
+    early = check(spec(upstream_dark=dark()), FROZE, today=REVIEW - dt.timedelta(days=15))
+    assert early.lapses_in == 15 and not early.lapsing
+    assert "lapses" not in early.note
+    soon = check(spec(upstream_dark=dark()), FROZE, today=REVIEW - dt.timedelta(days=14))
+    assert soon.lapsing and not soon.failing
+    assert soon.note.endswith("lapses in 14d")
+    last = check(spec(upstream_dark=dark()), FROZE, today=REVIEW)
+    assert last.lapses_in == 0 and last.lapsing
+    after = check(spec(upstream_dark=dark()), FROZE, today=REVIEW + dt.timedelta(days=1))
+    assert after.lapses_in is None and after.failing

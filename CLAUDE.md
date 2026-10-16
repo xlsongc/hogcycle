@@ -77,8 +77,10 @@ with zero HTTP requests.
   caliber is alive but the source we reach went dark, and the primary-source
   fix is not built yet, mark it `upstream_dark` with a `review_by` at most 92
   days out (ADR-0015). It stops failing the run until that date, then fails
-  again by itself. The page still shows it as stale: an acknowledgement quiets
-  the collector, never the reader. A red run nobody reads hides the next
+  again by itself. Two weeks before that date `status` says it is about to
+  lapse and an `ack-lapsing` issue opens, so the decision (fix, retire, or
+  renew with a reason) is made before the run goes red. The page still shows
+  it as stale: an acknowledgement quiets the collector, never the reader. A red run nobody reads hides the next
   freeze, which is why this exists. It is not a way to get CI green.
 - **Prefer the primary source to a mirror.** A convenient wrapper around
   someone else's copy of a government release inherits their outages and

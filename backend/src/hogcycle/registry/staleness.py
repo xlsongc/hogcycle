@@ -50,6 +50,15 @@ DEFAULT_MAX_AGE_DAYS: dict[str, int] = {
 }
 
 
+# How far ahead of `review_by` an acknowledgement starts saying it will lapse,
+# and the nearer warning after that. An acknowledgement that lapses unseen
+# turns the run red on a day nobody planned for; two weeks is enough to
+# build the fix, renew with a reason, or retire the series. Nothing renews or
+# retires itself.
+LAPSE_WARN_DAYS = 14
+LAPSE_LAST_DAYS = 3
+
+
 @dataclass(frozen=True, slots=True)
 class Staleness:
     indicator: str
@@ -63,6 +72,13 @@ class Staleness:
     # A person owns this freeze until `review_by`. Only ever True when stale.
     acknowledged: bool = False
     review_by: dt.date | None = None
+    # Days left before an acknowledgement lapses; None when there is none.
+    lapses_in: int | None = None
+
+    @property
+    def lapsing(self) -> bool:
+        """Acknowledged, and within LAPSE_WARN_DAYS of no longer being."""
+        return self.lapses_in is not None and self.lapses_in <= LAPSE_WARN_DAYS
 
     @property
     def failing(self) -> bool:
@@ -88,7 +104,8 @@ class Staleness:
         if self.latest is None:
             return "no data"
         if self.acknowledged:
-            return f"dark {self.age_days}d, ack until {self.review_by}"
+            soon = f", lapses in {self.lapses_in}d" if self.lapsing else ""
+            return f"dark {self.age_days}d, ack until {self.review_by}{soon}"
         if self.lapsed:
             return f"STALE {self.age_days}d > {self.limit}d, ack lapsed {self.review_by}"
         if self.stale:
@@ -124,14 +141,16 @@ def check(
     age = (today - latest).days
     stale = age > limit
     dark = spec.upstream_dark
+    acknowledged = stale and dark is not None and today <= dark.review_by
     return Staleness(
         spec.id,
         latest,
         age,
         limit,
         stale=stale,
-        acknowledged=stale and dark is not None and today <= dark.review_by,
+        acknowledged=acknowledged,
         review_by=None if dark is None else dark.review_by,
+        lapses_in=(dark.review_by - today).days if acknowledged and dark else None,
     )
 
 
