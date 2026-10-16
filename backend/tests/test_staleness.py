@@ -119,6 +119,22 @@ def test_a_short_series_gets_no_percentile():
     assert percentile(long, 1e9) == 100
 
 
+def test_a_percentile_says_how_deep_its_history_is():
+    """玉米 at the 4th percentile of 1.1 years and 能繁母猪 at the 4th of 10.5
+    are different claims; the reading carries the span (contract 1.4.0)."""
+    import datetime as dt
+
+    from hogcycle.gold.wall import history_years
+
+    rows = [
+        {"obs_date": dt.date(2015, 12, 31), "value": None},
+        {"obs_date": dt.date(2016, 1, 31), "value": 4100.0},
+        {"obs_date": dt.date(2026, 6, 30), "value": 3780.0},
+    ]
+    assert history_years(rows, rows[-1]) == 10.4  # from the first value, not row
+    assert history_years([], {"obs_date": dt.date(2026, 6, 30)}) is None
+
+
 # --------------------------------------------------------------------------
 # A whole source going dark is not "partial success"
 # --------------------------------------------------------------------------

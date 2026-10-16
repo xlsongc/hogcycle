@@ -80,11 +80,17 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                             —
                           </span>
                         ) : (
-                          <span className="position" title={copy.positionTitle(r.percentile)}>
+                          <span
+                            className="position"
+                            title={copy.positionTitle(r.percentile, r.history_years ?? null)}
+                          >
                             <span className="strip" aria-hidden="true">
                               <i style={{ left: `${r.percentile}%` }} />
                             </span>
                             {copy.ordinal(r.percentile)}
+                            {r.history_years != null && (
+                              <span className="muted"> · {copy.span(r.history_years)}</span>
+                            )}
                           </span>
                         )}
                       </td>

@@ -117,7 +117,10 @@ export const en = {
     change: (pct: number, since: string) =>
       `${pct > 0 ? "+" : ""}${pct}% vs ${since}`,
     yoy: (pct: number) => `${pct > 0 ? "+" : ""}${pct}% YoY`,
-    position: (pct: number) => `${ordinal(pct)} percentile of its own history`,
+    position: (pct: number, years: number | null) =>
+      years == null
+        ? `${ordinal(pct)} percentile of its own history`
+        : `${ordinal(pct)} percentile of its own ${years}-year history`,
     released: (date: string, lag: number) => `published ${date}, ${lag} days after`,
     outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
       `${who} forecast for the end of ${year}: ${value} ${unit}${date ? ` (published ${date})` : ""}`,
@@ -206,8 +209,9 @@ export const en = {
     asOf: "As of",
     status: "Status",
     ordinal: (pct: number) => ordinal(pct),
-    positionTitle: (pct: number) =>
-      `${ordinal(pct)} percentile of its own history since 2015: 0 is its lowest reading, 100 its highest`,
+    span: (years: number) => `${years}y`,
+    positionTitle: (pct: number, years: number | null) =>
+      `${ordinal(pct)} percentile of its own history${years == null ? "" : ` over ${years} years`}: 0 is its lowest reading, 100 its highest`,
     noPositionTitle: "Too little history for a percentile",
     live: "live",
     movingBaseline: "the target baseline moves, so no gap is computed",

@@ -89,7 +89,8 @@ export const zh: Dict = {
       `连续 ${n} ${UNIT_ZH[g] ?? "期"}${dir === "down" ? "下降" : "上升"}`,
     change: (pct: number, since: string) => `较 ${since} ${pct > 0 ? "+" : ""}${pct}%`,
     yoy: (pct: number) => `同比 ${pct > 0 ? "+" : ""}${pct}%`,
-    position: (pct: number) => `处于自身历史第 ${pct} 分位`,
+    position: (pct: number, years: number | null) =>
+      years == null ? `处于自身历史第 ${pct} 分位` : `处于自身 ${years} 年历史的第 ${pct} 分位`,
     released: (date: string, lag: number) => `${date} 发布，滞后 ${lag} 天`,
     outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
       `${who} 预测 ${year} 年末：${value} ${unit}${date ? `（${date} 发布）` : ""}`,
@@ -167,8 +168,9 @@ export const zh: Dict = {
     asOf: "日期",
     status: "状态",
     ordinal: (pct: number) => `第 ${pct} 分位`,
-    positionTitle: (pct: number) =>
-      `在该序列 2015 年以来自身历史中的第 ${pct} 分位：0 为最低读数，100 为最高`,
+    span: (years: number) => `${years}年`,
+    positionTitle: (pct: number, years: number | null) =>
+      `在该序列自身${years == null ? "" : ` ${years} 年`}历史中的第 ${pct} 分位：0 为最低读数，100 为最高`,
     noPositionTitle: "历史太短，不计分位",
     live: "更新中",
     movingBaseline: "调控基准为移动值，故不计缺口",

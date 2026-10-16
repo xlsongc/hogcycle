@@ -3,11 +3,11 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.3.0";
+export const CONTRACT_VERSION = "1.4.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.3.0";
+  contract_version: "1.4.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
@@ -150,6 +150,8 @@ export interface Reading {
   published_on: string | null;
   granularity?: string;
   percentile?: number | null;
+  /** Years of history the percentile is taken over, from the series' first observation in the window to its latest. A 4th percentile over 11.7 years and a 24th over 1.1 are different claims, so the page shows the span beside the position. Null when there is no percentile. Added in 1.4.0. */
+  history_years?: number | null;
   /** Percent change against the observation nearest one year earlier, or null when none sits near the anniversary. Null is a real answer: a series that began this year has no year-on-year. */
   yoy?: number | null;
   n?: number;

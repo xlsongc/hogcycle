@@ -27,7 +27,7 @@ export function trendOf(r: Reading, locale: Locale): Trend | null {
 export function contextOf(r: Reading, locale: Locale): string | null {
   const o = dict(locale).overview;
   if (r.extreme) return o.extreme(r.extreme.kind, r.extreme.since, r.extreme.all);
-  return r.percentile != null ? o.position(r.percentile) : null;
+  return r.percentile != null ? o.position(r.percentile, r.history_years ?? null) : null;
 }
 
 export function arrow(dir: Trend["dir"]): string {

@@ -116,6 +116,15 @@ def percentile(values: list[float], target: float) -> int | None:
     return min(100, round(100 * below / (len(xs) - 1)))
 
 
+def history_years(rows: list[dict[str, Any]], latest: dict[str, Any]) -> float | None:
+    """How deep the history a percentile is taken over goes, in years: the
+    first observation with a value to the latest."""
+    first = next((r["obs_date"] for r in rows if r["value"] is not None), None)
+    if first is None:
+        return None
+    return round((latest["obs_date"] - first).days / 365.25, 1)
+
+
 def _iso(d: dt.date | None) -> str | None:
     return None if d is None else d.isoformat()
 
@@ -262,9 +271,12 @@ def build_wall(
                     "obs_date": latest["obs_date"].isoformat(),
                     "published_on": _iso(latest["published_on"]),
                     "granularity": latest["granularity"],
-                    "percentile": percentile(values, latest["value"])
-                    if latest["value"] is not None
-                    else None,
+                    "percentile": (
+                        pct := percentile(values, latest["value"])
+                        if latest["value"] is not None
+                        else None
+                    ),
+                    "history_years": None if pct is None else history_years(rows, latest),
                     "yoy": year_on_year(rows, latest),
                     "n": len(rows),
                     "stale": age.stale,
