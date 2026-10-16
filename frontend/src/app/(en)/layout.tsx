@@ -16,6 +16,7 @@ import "../series.css";
 import "../controls.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
+import { THEME_BOOT } from "@/components/shell/themeBoot";
 import { HTML_LANG } from "@/i18n/locale";
 import { en } from "@/i18n/en";
 
@@ -26,7 +27,11 @@ export const metadata: Metadata = {
 
 export default function EnLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang={HTML_LANG.en} className={fontVars}>
+    // The boot script may set data-theme before React hydrates; the DOM wins.
+    <html lang={HTML_LANG.en} className={fontVars} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>
         <SiteNav locale="en" />
         {children}

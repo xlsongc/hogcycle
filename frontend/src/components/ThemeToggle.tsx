@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { THEME_KEY as KEY } from "@/components/shell/themeBoot";
 
 type Mode = "system" | "light" | "dark";
-
-const KEY = "hogcycle:theme";
 
 /** A per-viewer convenience, so browser storage is the right home for it.
  *  Every access is guarded: a private window or blocked site data makes it
