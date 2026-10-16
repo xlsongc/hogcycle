@@ -26,6 +26,26 @@ if ! "$PY" -c 'import sys; sys.exit(sys.version_info < (3, 11))' 2>/dev/null; th
   exit 2
 fi
 
+# launchd runs a missed job at the next wake, and that is often a dark wake
+# with no network yet: the first scheduled run died on "Could not resolve
+# host: github.com" with the lid closed. Wait for the network rather than lose
+# the day; a machine that never comes online is what the heartbeat is for
+# (ADR-0023).
+TRIES=40
+for attempt in $(seq 1 "$TRIES"); do
+  if git ls-remote --quiet "$REPO" HEAD >/dev/null 2>&1; then
+    break
+  fi
+  if [[ $attempt -eq $TRIES ]]; then
+    log "cannot reach $REPO after $TRIES tries; giving up until the next run"
+    exit 1
+  fi
+  if [[ $attempt -eq 1 ]]; then
+    log "cannot reach $REPO yet; waiting for the network"
+  fi
+  sleep 30
+done
+
 if [[ ! -d "$HOME_DIR/.git" ]]; then
   log "cloning $REPO into $HOME_DIR"
   git clone --quiet "$REPO" "$HOME_DIR"
