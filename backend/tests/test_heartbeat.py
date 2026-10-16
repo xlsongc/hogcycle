@@ -96,3 +96,23 @@ def test_never_fetched_fails_rather_than_passing_quietly(tmp_path):
 
 def test_limits_differ_by_where_the_collector_runs():
     assert MAX_HOURS == {"anywhere": 36, "cn": 72}
+
+
+def test_the_contract_carries_each_group_for_the_reader(tmp_path):
+    """The page says when sources were last reached (contract 1.3.0)."""
+    from hogcycle.registry.heartbeat import health
+
+    bronze = BronzeStore(tmp_path)
+    fetched(bronze, "sow_inventory", 80)
+    fetched(bronze, "hog_price_index", 5)
+    groups = {g["group"]: g for g in health(registry(), bronze, now=NOW)["groups"]}
+    assert groups["cn/moa"] == {
+        "group": "cn/moa",
+        "reach": "cn",
+        "latest": (NOW - dt.timedelta(hours=80)).isoformat(),
+        "age_hours": 80,
+        "limit_hours": 72,
+        "silent": True,
+    }
+    assert groups["anywhere/akshare"]["silent"] is False
+    assert groups["cn/akshare"]["latest"] is None and groups["cn/akshare"]["silent"]

@@ -7,6 +7,7 @@ import type { WallContract } from "@/types/generated/wall";
 import { WallView } from "@/components/wall/WallView";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { HealthStamp } from "@/components/shell/HealthStamp";
 
 export function WallPage({ data, locale }: { data: WallContract; locale: Locale }) {
   const t = dict(locale);
@@ -38,7 +39,11 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
             <li key={i}>{item}</li>
           ))}
         </ul>
-        <p className="hint">{t.window.stamp(data.generated_at.slice(0, 10), start, end)}</p>
+        <p className="hint">
+          {t.window.stamp(data.generated_at.slice(0, 10), start, end)}
+          {data.health && " · "}
+          <HealthStamp health={data.health} locale={locale} />
+        </p>
       </footer>
     </main>
   );

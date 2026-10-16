@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import datetime as dt
 from dataclasses import dataclass
+from typing import Any
 
 from ..storage.bronze import BronzeStore
 from .spec import Registry
@@ -53,6 +54,26 @@ def latest_fetch(bronze: BronzeStore, indicator: str) -> dt.datetime | None:
     """The newest successful fetch on record for one indicator."""
     times = [dt.datetime.fromisoformat(e["fetched_at"]) for e in bronze.history(indicator)]
     return max(times, default=None)
+
+
+def health(
+    registry: Registry, bronze: BronzeStore, *, now: dt.datetime | None = None
+) -> dict[str, Any]:
+    """The heartbeat as the contract carries it: what a reader needs to tell
+    fresh data from a collector that has stopped (ADR-0023)."""
+    return {
+        "groups": [
+            {
+                "group": b.group,
+                "reach": b.group.split("/")[0],
+                "latest": None if b.latest is None else b.latest.isoformat(),
+                "age_hours": b.age_hours,
+                "limit_hours": b.limit_hours,
+                "silent": b.failing,
+            }
+            for b in check_groups(registry, bronze, now=now)
+        ]
+    }
 
 
 def check_groups(

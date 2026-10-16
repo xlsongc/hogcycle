@@ -232,6 +232,12 @@ export const zh: Dict = {
       `知识时点 ${known} · 数据窗口 ${start} → ${end}`,
   },
 
+  health: {
+    reached: (when: string) => `数据源最近一次抓取 ${when} UTC`,
+    overdue: "有采集器逾期未运行：可能缺少更新的发布",
+    never: "从未",
+  },
+
   asOf: {
     label: "站在",
     clear: "回到今天",

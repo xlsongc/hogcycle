@@ -18,6 +18,7 @@ from ..gold.about import DEFAULT_ABOUT, load_about
 from ..gold.series import all_specs
 from ..gold.wall import build_wall
 from ..pipeline import collect_all, replay_one
+from ..registry.heartbeat import health
 from ..registry.loader import DEFAULT_CONFIG, load_registry
 from ..registry.spec import Registry
 from ..storage.bronze import BronzeStore
@@ -246,6 +247,9 @@ def main(argv: list[str] | None = None) -> int:
         payload = build_wall(
             registry, silver, start=WALL_START, moment=moment, about=about
         )
+        # Today's export says when each source was last reached; an as-of
+        # export answers a different day's question, so it carries none.
+        payload["health"] = None if moment is not None else health(registry, bronze)
         if not payload["panels"]:
             if moment is not None:
                 # The audit view: nothing had been *learned* by then. Usually

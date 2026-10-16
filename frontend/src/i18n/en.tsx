@@ -311,6 +311,12 @@ export const en = {
       `Knowledge as of ${known} · data window ${start} → ${end}`,
   },
 
+  health: {
+    reached: (when: string) => `sources last reached ${when} UTC`,
+    overdue: "a collector is overdue: newer releases may be missing",
+    never: "never",
+  },
+
   asOf: {
     label: "As of",
     clear: "Back to today",

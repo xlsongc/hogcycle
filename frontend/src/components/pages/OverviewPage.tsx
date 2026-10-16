@@ -21,6 +21,7 @@ import { ReadingsTable } from "@/components/overview/ReadingsTable";
 import Link from "next/link";
 import { pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { HealthStamp } from "@/components/shell/HealthStamp";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
@@ -70,6 +71,8 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
         <p className="ov-stamp">
           {o.stamp(asOf)}
           {lastRelease && <> · {o.lastRelease(lastRelease)}</>}
+          {data.health && " · "}
+          <HealthStamp health={data.health} locale={locale} />
           {" · "}
           {/* The overview stays on today; standing on a past day is the
               wall's job (docs/adr/0025). */}

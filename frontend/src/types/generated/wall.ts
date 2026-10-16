@@ -3,18 +3,36 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.2.0";
+export const CONTRACT_VERSION = "1.3.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.2.0";
+  contract_version: "1.3.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
+  /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
+  health?: Health | null;
   window: Window;
   /** Ordered by the causal chain: capacity leads price by 10-12 months, margin decides whether a capacity move persists. */
   panels: Panel[];
   /** Latest value per series with its position in its own history. Context for a human judgement, never a verdict. */
   readings: Reading[];
+}
+
+export interface Health {
+  groups: Group[];
+}
+
+export interface Group {
+  /** <reach>/<adapter> */
+  group: string;
+  reach: "anywhere" | "cn";
+  /** UTC time of the newest successful fetch, or null if none is on record. */
+  latest: string | null;
+  age_hours: number | null;
+  limit_hours: number;
+  /** Not reached within its limit: the collector for it has stopped, or cannot reach it. */
+  silent: boolean;
 }
 
 export interface Window {
