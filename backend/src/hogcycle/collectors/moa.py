@@ -68,6 +68,7 @@ from urllib.parse import urljoin
 from ..contracts.schema import Observation
 from ..registry.periods import parse_period
 from ..registry.spec import IndicatorSpec
+from .failures import STRUCTURE, CollectFailure, classify, of_status, worst
 
 BASE = "https://www.moa.gov.cn/ztzl/szcpxx/jdsj"
 
@@ -115,7 +116,7 @@ _PERIOD_HEAD = re.compile(
 _LEADING_NUMBER = re.compile(r"^\s*(-?[0-9]+(?:\.[0-9]+)?)")
 
 
-class MoaFetchError(RuntimeError):
+class MoaFetchError(CollectFailure):
     """Every edition in the window failed. Distinct from "this month is not
     published yet", which is normal and merely skipped."""
 
@@ -189,6 +190,9 @@ class MoaAdapter:
         today = self.today or dt.datetime.now(dt.UTC).date()
         editions: list[dict[str, Any]] = []
         skipped: list[dict[str, str]] = []
+        # How each skipped month failed, so a window of nothing says whether
+        # the host refused us or the pages are not where we think (ADR-0028).
+        kinds: list[str] = []
 
         for ym in months_ending(today, self.months_back):
             page = f"{BASE}/{ym[:4]}/{ym}/"
@@ -198,6 +202,7 @@ class MoaAdapter:
                     # A month that was never published (202511) or is not out
                     # yet. Normal; recorded so bronze shows we looked.
                     skipped.append({"ym": ym, "why": f"page HTTP {r.status_code}"})
+                    kinds.append(of_status(r.status_code))
                     continue
                 r.encoding = "utf-8"
                 href = _XLSX_HREF.search(r.text)
@@ -205,6 +210,7 @@ class MoaAdapter:
                     # 202506 shipped without a workbook. Recorded rather than
                     # silently dropped: a missing month must stay visible.
                     skipped.append({"ym": ym, "why": "no xlsx link on page"})
+                    kinds.append(STRUCTURE)
                     continue
                 xlsx_url = urljoin(page, href.group(1))
                 blob = _get(session, xlsx_url)
@@ -222,9 +228,11 @@ class MoaAdapter:
                 )
             except Exception as exc:
                 skipped.append({"ym": ym, "why": f"{type(exc).__name__}: {exc}"[:160]})
+                kinds.append(classify(exc))
 
         if not editions:
             raise MoaFetchError(
+                worst(kinds),
                 f"{spec.id}: no usable edition in the last {self.months_back} "
                 f"month(s) at {BASE}. Skipped: {skipped}"
             )

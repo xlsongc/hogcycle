@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .collectors.base import Adapter, with_retry
+from .collectors.failures import STRUCTURE, classify
 from .contracts.schema import Observation
 from .contracts.validation import ValidationError, validate
 from .registry.periods import PeriodParseError
@@ -38,6 +39,8 @@ class Result:
     rows_written: int
     content_changed: bool
     error: str | None = None
+    # transient / blocked / structure (collectors/failures.py, ADR-0028).
+    kind: str | None = None
 
 
 def collect_one(
@@ -89,7 +92,7 @@ def collect_one(
         # runs), so a parser failure is replayable offline — no re-fetch, and
         # nothing is lost while the parser is being fixed.
         log.error("%s: %s", spec.id, _message(exc))
-        return Result(spec.id, False, 0, False, _message(exc))
+        return Result(spec.id, False, 0, False, _message(exc), classify(exc))
 
 
 def collect_all(
@@ -116,7 +119,7 @@ def collect_all(
         if adapter is None:
             msg = f"no adapter named {spec.adapter!r}; known: {sorted(adapters)}"
             log.error("%s: %s", spec.id, msg)
-            results.append(Result(spec.id, False, 0, False, msg))
+            results.append(Result(spec.id, False, 0, False, msg, STRUCTURE))
             continue
 
         payload = cache.get(spec.call_key)
@@ -126,7 +129,7 @@ def collect_all(
                 cache[spec.call_key] = payload
             except RuntimeError as exc:
                 log.error("%s: %s", spec.id, exc)
-                results.append(Result(spec.id, False, 0, False, str(exc)))
+                results.append(Result(spec.id, False, 0, False, str(exc), classify(exc)))
                 continue
         results.append(
             collect_one(spec, adapter, bronze, silver, now=now, payload=payload)
@@ -182,7 +185,8 @@ def replay_one(
     seen = sorted(first, key=lambda sid: first[sid][0])
     if not seen:
         return Result(
-            spec.id, False, 0, False, f"no bronze snapshot from {spec.source} to replay"
+            spec.id, False, 0, False, f"no bronze snapshot from {spec.source} to replay",
+            STRUCTURE,
         )
 
     try:
@@ -212,7 +216,7 @@ def replay_one(
         return Result(spec.id, True, len(written), False)
     except COLLECT_ERRORS as exc:
         log.error("%s: %s", spec.id, _message(exc))
-        return Result(spec.id, False, 0, False, _message(exc))
+        return Result(spec.id, False, 0, False, _message(exc), classify(exc))
 
 
 def _message(exc: Exception) -> str:

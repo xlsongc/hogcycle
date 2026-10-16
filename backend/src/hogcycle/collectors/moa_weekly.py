@@ -44,6 +44,7 @@ from typing import Any
 
 from ..contracts.schema import Observation
 from ..registry.spec import IndicatorSpec
+from .failures import STRUCTURE, TRANSIENT, CollectFailure, classify, worst
 
 BASE = "https://xmsyj.moa.gov.cn/jcyj/"
 
@@ -103,7 +104,7 @@ _COLLECTION_DAY = re.compile(r"采集日为(\d{1,2})月(\d{1,2})日")
 MAX_RELEASE_LAG_DAYS = 45
 
 
-class MoaWeeklyFetchError(RuntimeError):
+class MoaWeeklyFetchError(CollectFailure):
     """No article of the requested report could be read at all."""
 
 
@@ -116,8 +117,10 @@ def _throttle() -> None:
 
 
 def _get(session: Any, url: str, *, attempts: int = 3) -> str:
-    """One page, retried on transport errors; an HTTP error is raised, not
-    retried, because a 404 on a listed article is a fact worth recording."""
+    """One page, retried only when the failure is transient (ADR-0028). A 404
+    on a listed article is a fact worth recording, and a 403 is the host
+    refusing this network: asking twice more changes nothing. This used to
+    retry both, under a pipeline that retried the whole fetch three times."""
     last: Exception | None = None
     for i in range(attempts):
         _throttle()
@@ -127,6 +130,8 @@ def _get(session: Any, url: str, *, attempts: int = 3) -> str:
             r.encoding = "utf-8"
             return r.text
         except Exception as exc:
+            if classify(exc) != TRANSIENT:
+                raise
             last = exc
             if i < attempts - 1:
                 time.sleep(1.5 * (2**i))
@@ -173,6 +178,7 @@ class MoaWeeklyAdapter:
             page = list_items(_get(session, url))
             if not page:
                 raise MoaWeeklyFetchError(
+                    STRUCTURE,
                     f"{spec.id}: list page {url} holds no article links; the list "
                     "markup changed"
                 )
@@ -182,12 +188,14 @@ class MoaWeeklyAdapter:
 
         articles: list[dict[str, Any]] = []
         skipped: list[dict[str, str]] = []
+        kinds: list[str] = []
         for href, title, listed in items:
             url = BASE + href[2:]
             try:
                 page = _get(session, url)
             except Exception as exc:
                 skipped.append({"url": url, "why": f"{type(exc).__name__}: {exc}"[:160]})
+                kinds.append(classify(exc))
                 continue
             pub = _PUBDATE.search(page)
             body = _BODY.search(page)
@@ -203,6 +211,7 @@ class MoaWeeklyAdapter:
 
         if not articles:
             raise MoaWeeklyFetchError(
+                worst(kinds),
                 f"{spec.id}: no {wanted!r} article in the newest {self.pages} "
                 f"list page(s). Skipped: {skipped}"
             )

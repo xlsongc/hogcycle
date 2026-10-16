@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from ..collectors.akshare import AkshareAdapter
+from ..collectors.failures import ADVICE, BLOCKED
 from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..collectors.usda_psd import UsdaPsdAdapter
@@ -134,9 +135,15 @@ def main(argv: list[str] | None = None) -> int:
         results = collect_all(registry, adapters, bronze, silver)
         for r in results:
             mark = "ok  " if r.ok else "FAIL"
-            print(f"{mark} {r.indicator:<20} {r.rows_written:>5} row(s)  {r.error or ''}")
+            why = f"[{r.kind}] {r.error}" if r.kind else (r.error or "")
+            print(f"{mark} {r.indicator:<20} {r.rows_written:>5} row(s)  {why}")
         failed = [r for r in results if not r.ok]
         print(f"\n{len(results) - len(failed)}/{len(results)} ok")
+        # One line per class that occurred, saying what it calls for
+        # (docs/adr/0028): retry, a different network, or a person.
+        for kind in sorted({r.kind for r in failed if r.kind}):
+            ids = ", ".join(r.indicator for r in failed if r.kind == kind)
+            print(f"  {kind}: {ADVICE[kind]} ({ids})")
 
         # Partial success is still success — one flaky endpoint must not cost
         # a day of everything else. But a *whole source* failing is a
@@ -145,7 +152,16 @@ def main(argv: list[str] | None = None) -> int:
         # made once; it is not going to make it silently twice.
         outages = _source_outages(registry, results)
         if outages:
+            kinds = {r.indicator: r.kind for r in results}
             for adapter, ids in sorted(outages.items()):
+                if all(kinds.get(i) == BLOCKED for i in ids):
+                    print(
+                        f"\nSOURCE BLOCKED: every indicator on adapter {adapter!r} "
+                        f"was refused ({', '.join(ids)}). This network cannot "
+                        "collect it; it is collected from where it answers "
+                        "(`reach`, docs/adr/0022)."
+                    )
+                    continue
                 print(
                     f"\nSOURCE OUTAGE: every indicator on adapter {adapter!r} "
                     f"failed ({', '.join(ids)}). This is not a flaky series — "

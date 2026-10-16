@@ -104,7 +104,8 @@ with zero HTTP requests.
   addresses is `reach: cn` and is collected by `scripts/local-collector`.
   Never route around a 403 through a scraping proxy or by defeating the
   site's checks: the publisher's refusal is a fact about the source, not a
-  bug in ours.
+  bug in ours. A refusal is classed `blocked` and never retried; only a
+  `transient` failure is (ADR-0028).
 - **The daily run is not optional.** akshare's *daily* series are a rolling
   ~1-year window: data older than that disappears from upstream entirely. The
   collector runs to preserve data before it is deleted, not only to catch
@@ -234,3 +235,4 @@ so you do not have to re-derive them.
 | 0025 | The page can stand on any past day, and shows only what was knowable then |
 | 0026 | Breaks in a series are drawn where they happen: cadence changes from gold, caliber lineage from config |
 | 0027 | A new series from a release already collected is read from the bronze it left |
+| 0028 | A failure says which kind it is (transient, blocked, structure), and every run leaves a record |

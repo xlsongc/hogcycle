@@ -46,6 +46,7 @@ from typing import Any
 
 from ..contracts.schema import Observation
 from ..registry.spec import IndicatorSpec
+from .failures import CollectFailure, of_status
 
 URL = "https://apps.fas.usda.gov/psdonline/downloads/psd_livestock_csv.zip"
 _DOH = "https://cloudflare-dns.com/dns-query"
@@ -197,7 +198,9 @@ def _download_by_address(url: str) -> tuple[bytes, str | None]:
     )
     r = pool.request("GET", parts.path, headers={"Host": host})
     if r.status != 200:
-        raise ConnectionError(f"{url} via {addresses[0]}: HTTP {r.status}")
+        raise CollectFailure(
+            of_status(r.status), f"{url} via {addresses[0]}: HTTP {r.status}"
+        )
     return r.data, r.headers.get("Last-Modified")
 
 
