@@ -374,6 +374,13 @@ def _is_news(
         # The same release read again. Only a different reading of it — a
         # parser fix replayed from bronze — is news.
         return not _same(printed[release], o.value)
+    if published_on is not None and o.published_on < published_on:
+        # Older than the release held as current: judge it against the release
+        # in force on its own day, not against a later revision. A payload
+        # listing a reprint and a revision of one period otherwise wrote the
+        # reprint the second time it was read (found by tests/test_properties).
+        before = [p for (d, p) in printed if d == o.obs_date and p <= o.published_on]
+        return not before or not _same(printed[(o.obs_date, max(before))], o.value)
     # A later release repeating the value adds nothing: the earliest one is
     # when it became knowable. An earlier one, or a first date for a value
     # held undated, does.

@@ -171,3 +171,26 @@ def test_parser_break_is_loud_not_silent(tmp_path):
     assert not result.error.startswith("'"), "KeyError quoting must not leak"
     # ...and the payload is preserved so the fix is replayable offline.
     assert len(bronze.history("sow_inventory")) == 1
+
+
+def test_a_reprint_beside_a_revision_is_not_written_on_the_second_read(tmp_path):
+    """Found by tests/test_properties.py. A period released 01-28 at 3990; a
+    later payload lists a reprint on 01-29 (3990) and a revision on 01-30
+    (4035). The first read writes the revision only. The second read used to
+    write the reprint too, judged against the revision rather than against
+    the release in force on its own day."""
+    silver = SilverStore(tmp_path / "silver")
+    d = dt.date(2026, 1, 28)
+
+    def at(hour: int, *rows: tuple[dt.date | None, float]) -> list[Observation]:
+        t = dt.datetime(2026, 7, 1, hour, tzinfo=dt.UTC)
+        return [
+            Observation("sow", d, v, "万头", "monthly", "t", "s", t, published_on=p)
+            for p, v in rows
+        ]
+
+    assert len(silver.append_changes(at(1, (d, 3990.0)))) == 1
+    payload = ((dt.date(2026, 1, 30), 4035.0), (dt.date(2026, 1, 29), 3990.0))
+    first = silver.append_changes(at(2, *payload))
+    assert [(o.published_on, o.value) for o in first] == [(dt.date(2026, 1, 30), 4035.0)]
+    assert silver.append_changes(at(3, *payload)) == []
