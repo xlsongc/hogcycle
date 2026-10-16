@@ -487,6 +487,26 @@ indicators:
 
   # ---------- noise：短期扰动 ----------
 
+  - id: pork_imports
+    name_zh: 猪肉进口量（海关）
+    name_en: Pork imports (customs)
+    tier: noise
+    freq: monthly
+    unit: 万吨
+    lo: 0.5
+    hi: 100.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 进口猪肉}
+    notes: >
+      海关总署的月度进口量，经五部委联合发布。只取单月行；「1-n月累计」行不读。
+      海关把 1、2 月合并公布：2 月那期同时印出 2 月单月数和 1-2 月合计，1 月单月数
+      哪里都没有。不用合计减 2 月去算 1 月 —— 没人印过的数不画进印出来的数里
+      （ADR-0027），图上每年 12 月到 2 月之间是虚线。按月度默认的 100 天判断是否
+      停更：12 月的数要到 3 月下旬那期之后才有下一个，约 90 天，仍在阈值内。
+      历史从已采集的各期月报回放而来，没有重新抓取。
+
   - id: hog_weight
     name_zh: 出栏均重
     name_en: Average market weight

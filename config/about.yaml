@@ -200,6 +200,15 @@ series:
       zh: 36 个大中城市精瘦肉的零售价。它是零售端的猪肉，不是生猪，所以结构性地高于出厂价。
       en: The retail price of lean pork in 36 large and mid-sized cities. It prices pork at retail, not live hogs, so it sits structurally above the ex-plant price.
 
+  pork_imports:
+    publisher:
+      zh: 海关总署，经农业农村部等五部委月度联合发布
+      en: General Administration of Customs, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 每月进口的猪肉，万吨。国内猪价高时进口增加，是供给的缓冲，不改变周期本身。海关把 1、2 月合并公布，所以每年没有单独的 1 月数。
+      en: Pork imported each month, in 10,000 tonnes. Imports rise when domestic prices are high, a buffer on supply rather than a driver of the cycle. Customs reports January and February together, so there is no January figure of its own.
+
   hog_weight:
     publisher:
       zh: 行情宝平台成交数据（经 akshare）

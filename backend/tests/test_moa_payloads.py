@@ -249,3 +249,22 @@ def test_a_live_series_returning_nothing_still_aborts(registry, payload, tmp_pat
     )
     assert not result.ok
     assert "empty batch" in (result.error or "")
+
+
+# --------------------------------------------------------------------------
+# 进口猪肉 — customs, in the same release (docs/adr/0027)
+# --------------------------------------------------------------------------
+
+def test_imports_read_the_single_month_rows_only(registry, payload):
+    """202502 prints February's own 8.35 beside the 1-2月 total of 18.41.
+    February is February; the total is a span, not a month, and January
+    is in it but printed nowhere on its own, so no January row exists."""
+    spec, obs = normalise(registry, payload, "pork_imports")
+    assert [(o.obs_date, o.value, o.granularity) for o in obs] == [
+        (dt.date(2025, 2, 28), 8.3536307, "monthly"),
+        (dt.date(2025, 12, 31), 5.64, "monthly"),
+        (dt.date(2026, 6, 30), 6.7761757, "monthly"),
+        (dt.date(2026, 7, 31), 6.04, "monthly"),
+    ]
+    assert not any(o.obs_date.month == 1 for o in obs)
+    assert validate(obs, unit=spec.unit, lo=spec.lo, hi=spec.hi) == obs
