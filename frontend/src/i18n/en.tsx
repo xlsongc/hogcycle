@@ -370,6 +370,10 @@ export const en = {
     share: "This view lives in the address bar — copy the URL to share it.",
     undated: (names: string[]) =>
       `Not drawn: ${names.join(", ")}. Their sources do not date releases, and a date is never guessed.`,
+    signed: (names: string[]) =>
+      names.length > 1
+        ? `Not drawn: ${names.join(", ")}. They go below zero, so an index to their first value would mean nothing. Select them with series in their own unit to see them.`
+        : `Not drawn: ${names[0]}. It goes below zero, so an index to its first value would mean nothing. Select it with series in its own unit to see it.`,
   },
 
   picker: {

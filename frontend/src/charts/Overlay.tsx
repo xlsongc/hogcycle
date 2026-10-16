@@ -71,16 +71,24 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
     () => selected.map((id) => panels.find((p) => p.id === id)).filter((p): p is Panel => !!p),
     [panels, selected]
   );
-  const chosen = useMemo(
+  const placed = useMemo(
     () => (align === "release" ? picked.filter((p) => hasReleases(p.points)) : picked),
     [picked, align]
   );
-  const dropped = picked.filter((p) => !chosen.includes(p));
+  const undated = picked.filter((p) => !placed.includes(p));
 
   // One shared unit means raw values are honest and more informative; mixed
-  // units leave indexing as the only non-misleading option.
-  const units = new Set(chosen.map((p) => p.unit));
-  const indexed = units.size > 1;
+  // units leave indexing as the only non-misleading option. An index divides
+  // by the first value, which means nothing for a series that crosses zero:
+  // a profit of 32 that turns to a loss of 244 would read as -760. Such a
+  // series is named and left out of an indexed view, never drawn as one.
+  const mixed = new Set(placed.map((p) => p.unit)).size > 1;
+  const chosen = useMemo(
+    () => (mixed ? placed.filter((p) => p.points.every((q) => q.v == null || q.v > 0)) : placed),
+    [placed, mixed]
+  );
+  const signed = placed.filter((p) => !chosen.includes(p));
+  const indexed = new Set(chosen.map((p) => p.unit)).size > 1;
 
   // Indexing alone is not enough once the spans differ by an order of
   // magnitude. 牧原 is up ~20x since 2015 (index 2000) while 能繁母猪 moved
@@ -280,8 +288,11 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
         {indexed && (
           <span className="hint">{t.overlay.indexedNote(log)}</span>
         )}
-        {dropped.length > 0 && (
-          <span className="hint">{t.compare.undated(dropped.map((p) => nameOf(p, locale)))}</span>
+        {undated.length > 0 && (
+          <span className="hint">{t.compare.undated(undated.map((p) => nameOf(p, locale)))}</span>
+        )}
+        {signed.length > 0 && (
+          <span className="hint">{t.compare.signed(signed.map((p) => nameOf(p, locale)))}</span>
         )}
       </div>
       <div

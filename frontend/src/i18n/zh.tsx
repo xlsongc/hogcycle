@@ -281,6 +281,8 @@ export const zh: Dict = {
     share: "这个视图记在地址栏里 —— 复制网址即可分享。",
     undated: (names: string[]) =>
       `未画出：${names.join("、")}。它们的源头不写发布日期，本页从不猜测日期。`,
+    signed: (names: string[]) =>
+      `未画出：${names.join("、")}。${names.length > 1 ? "它们" : "它"}会跌到零以下，以首值为 100 的指数没有意义；和同单位的序列一起选，就能看到。`,
   },
 
   picker: {
