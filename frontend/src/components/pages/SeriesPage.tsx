@@ -16,6 +16,16 @@ import { SeriesBody } from "@/components/series/SeriesBody";
 import { nameOf, pathOf, seriesPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { tierVars } from "@/lib/tier";
+import { Glossary } from "@/components/Glossary";
+import type { TermId } from "@/i18n/en/terms";
+
+/** The terms a series' own page should explain, beyond the release dates
+ *  every dated series has. */
+const TERMS_OF: Record<string, TermId[]> = {
+  sow_inventory: ["sowHerd", "normalHolding", "hollowMarkers"],
+  hog_corn_ratio: ["hogCornRatio"],
+  hog_corn_ratio_county: ["hogCornRatio"],
+};
 
 type Named = { id: string; name_zh: string; name_en: string };
 
@@ -39,6 +49,11 @@ export function SeriesPage({ panel, earlier, later, reading: r, start, end, toda
   const zh = locale === "zh";
   const name = nameOf(panel, locale);
   const about = panel.about;
+  const termIds: TermId[] = [
+    ...(TERMS_OF[panel.id] ?? []),
+    ...(panel.caliber ? (["caliber"] as const) : []),
+    ...(panel.release_lag ? (["releaseVsPeriod"] as const) : []),
+  ];
 
   return (
     <main className="wrap series" style={tierVars(panel.tier)}>
@@ -86,6 +101,7 @@ export function SeriesPage({ panel, earlier, later, reading: r, start, end, toda
             )}
           </p>
         )}
+        {termIds.length > 0 && <Glossary ids={termIds} locale={locale} />}
       </header>
 
       <SeriesBody

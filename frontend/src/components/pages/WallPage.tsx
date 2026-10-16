@@ -7,6 +7,8 @@ import type { WallContract } from "@/types/generated/wall";
 import { WallView } from "@/components/wall/WallView";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
+import { Glossary } from "@/components/Glossary";
 import { HealthStamp } from "@/components/shell/HealthStamp";
 
 export function WallPage({ data, locale }: { data: WallContract; locale: Locale }) {
@@ -22,6 +24,10 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
         <h1>{w.heading}</h1>
         <p className="sub">{w.sub(panels.length)}</p>
         <p className="section-note how-to">{w.howTo}</p>
+        <Glossary
+          ids={["sowHerd", "normalHolding", "caliber", "hogCornRatio", "releaseVsPeriod", "hollowMarkers"]}
+          locale={locale}
+        />
       </header>
 
       <WallView
@@ -34,6 +40,7 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
 
       <footer>
         <b>{w.footerHeading}</b>
+        <Term id="caliber" locale={locale} />
         <ul>
           {w.footer.map((item, i) => (
             <li key={i}>{item}</li>

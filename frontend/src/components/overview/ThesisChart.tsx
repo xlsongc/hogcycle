@@ -22,6 +22,7 @@ import { PanelChart } from "@/charts/PanelChart";
 import { shiftMonths } from "@/lib/dates";
 import { nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
 
 const GROUP = "hogcycle-thesis";
 const LEADS = [0, 10, 12];
@@ -59,7 +60,11 @@ export function ThesisChart({ capacity, price, end, locale }: Props) {
         ))}
         {lag && (
           <>
-            <span className="filter-label bar-gap">{t.align}</span>
+            <span className="filter-label bar-gap">
+              <Term id="releaseVsPeriod" locale={locale}>
+                {t.align}
+              </Term>
+            </span>
             <button aria-pressed={align === "period"} onClick={() => setAlign("period")}>
               {t.alignPeriod}
             </button>

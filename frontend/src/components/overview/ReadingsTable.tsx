@@ -13,6 +13,7 @@ import type { Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
 import { tierVars } from "@/lib/tier";
 
 const TIERS: Reading["tier"][] = ["capacity", "margin", "price", "noise"];
@@ -64,7 +65,11 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                       <td>
                         <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link>
                         {r.id === "sow_inventory" && (
-                          <span className="row-note">{copy.movingBaseline}</span>
+                          <span className="row-note">
+                            <Term id="normalHolding" locale={locale}>
+                              {copy.movingBaseline}
+                            </Term>
+                          </span>
                         )}
                       </td>
                       <td>

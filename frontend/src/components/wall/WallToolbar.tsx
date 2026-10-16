@@ -10,6 +10,7 @@ import type { Align } from "@/lib/useAlign";
 import { TimeRuler } from "@/charts/TimeRuler";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
 
 type Props = {
   range: Range;
@@ -61,7 +62,11 @@ export function WallToolbar({
         </span>
       </div>
       <div className="bar">
-        <span className="filter-label">{t.overview.align}</span>
+        <span className="filter-label">
+          <Term id="releaseVsPeriod" locale={locale}>
+            {t.overview.align}
+          </Term>
+        </span>
         <button aria-pressed={align === "period"} onClick={() => onAlign("period")}>
           {t.overview.alignPeriod}
         </button>

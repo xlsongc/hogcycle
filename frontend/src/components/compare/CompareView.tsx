@@ -19,6 +19,7 @@ import { readParams, writeParams } from "@/lib/urlState";
 import { useAlign } from "@/lib/useAlign";
 import { nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
 
 // Opens on the project's own thesis: capacity, shifted by the biological lag,
 // against the price it is supposed to lead.
@@ -168,7 +169,11 @@ export function CompareView({ panels, start, end, locale }: Props) {
         </span>
       </div>
       <div className="bar">
-        <span className="filter-label">{t.overview.align}</span>
+        <span className="filter-label">
+          <Term id="releaseVsPeriod" locale={locale}>
+            {t.overview.align}
+          </Term>
+        </span>
         <button aria-pressed={align === "period"} onClick={() => setAlign("period")}>
           {t.overview.alignPeriod}
         </button>

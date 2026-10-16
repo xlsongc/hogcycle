@@ -17,6 +17,7 @@ import { PanelChart } from "@/charts/PanelChart";
 import { PRESETS, bounds, type Range } from "@/lib/range";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { Term } from "@/components/Term";
 
 const GROUP = "hogcycle-series";
 
@@ -64,7 +65,11 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
         )}
         {panel.release_lag && (
           <>
-            <span className="filter-label bar-gap">{t.overview.align}</span>
+            <span className="filter-label bar-gap">
+              <Term id="releaseVsPeriod" locale={locale}>
+                {t.overview.align}
+              </Term>
+            </span>
             <button aria-pressed={align === "period"} onClick={() => setAlign("period")}>
               {t.overview.alignPeriod}
             </button>

@@ -141,3 +141,73 @@ input[type="date"]:focus-visible {
   flex: 1 1 32ch;
   max-width: 76ch;
 }
+
+/* A term's explanation, one press away (components/Term.tsx). The toggle is
+   a small square beside the term; the note opens under the line. */
+.term-toggle {
+  margin-left: 4px;
+  padding: 0 4px;
+  font: var(--type) var(--mono);
+  line-height: 1.2;
+  color: var(--muted);
+  vertical-align: baseline;
+}
+
+.term-toggle[aria-expanded="true"] {
+  color: var(--ink);
+  background: var(--chip);
+}
+
+.term-note {
+  display: block;
+  max-width: 72ch;
+  margin: 6px 0;
+  padding: 6px 10px;
+  border-left: 2px solid var(--border);
+  color: var(--ink-2);
+  font: var(--type) / 1.6 var(--sans);
+  white-space: normal;
+  text-align: left;
+}
+
+.term-note[hidden] {
+  display: none;
+}
+
+/* The page's terms, as disclosures that need no script. */
+.glossary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin: 10px 0 14px;
+}
+
+.glossary details {
+  font: var(--type) var(--sans);
+  color: var(--ink-2);
+}
+
+.glossary summary {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+
+.glossary details[open] {
+  flex-basis: 100%;
+}
+
+.glossary details p {
+  max-width: 72ch;
+  margin: 6px 0 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--border);
+  line-height: 1.6;
+}
+
+/* In a toolbar row, a label whose note is open takes the whole row, so the
+   note reads at full width and the buttons wrap below it. */
+.bar .filter-label:has(.term-note:not([hidden])) {
+  flex-basis: 100%;
+}

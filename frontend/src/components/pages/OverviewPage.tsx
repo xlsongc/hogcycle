@@ -22,6 +22,7 @@ import Link from "next/link";
 import { pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { HealthStamp } from "@/components/shell/HealthStamp";
+import { Glossary } from "@/components/Glossary";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
@@ -79,6 +80,7 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
           <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
         </p>
         <p className="ov-lede">{o.lede}</p>
+        <Glossary ids={["sowHerd", "normalHolding", "releaseVsPeriod", "caliber"]} locale={locale} />
       </header>
 
       <Signals signals={signals} end={end} locale={locale} />

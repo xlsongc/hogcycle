@@ -19,6 +19,7 @@ import { series } from "./en/series";
 import { wall } from "./en/wall";
 import { compare } from "./en/compare";
 import { chart } from "./en/chart";
+import { terms } from "./en/terms";
 
 // One object per page (src/i18n/en/), so no file grows past the ceiling;
 // spread back together, the type is still the whole shape.
@@ -29,6 +30,7 @@ export const en = {
   ...wall,
   ...compare,
   ...chart,
+  ...terms,
 };
 
 export type Dict = typeof en;

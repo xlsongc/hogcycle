@@ -13,6 +13,7 @@ import { series } from "./zh/series";
 import { wall } from "./zh/wall";
 import { compare } from "./zh/compare";
 import { chart } from "./zh/chart";
+import { terms } from "./zh/terms";
 
 // 每页一个对象（src/i18n/zh/），各自按 en 的同名部分定型。
 export const zh: Dict = {
@@ -22,4 +23,5 @@ export const zh: Dict = {
   ...wall,
   ...compare,
   ...chart,
+  ...terms,
 };
