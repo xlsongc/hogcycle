@@ -125,3 +125,58 @@ def test_the_weekly_list_page_is_not_asked_again_after_a_refusal(monkeypatch, qu
     with pytest.raises(requests.HTTPError):
         moa_weekly._get(session, moa_weekly.BASE)
     assert session.calls == 1
+
+
+def test_a_shared_call_that_failed_is_not_asked_again(monkeypatch, tmp_path):
+    """Both USDA series read one bulk file. When the host timed out on
+    2026-10-19 the second series sat through the same three 120s attempts as
+    the first: thirteen minutes to learn one fact twice."""
+    from hogcycle.collectors import base
+    from hogcycle.collectors.usda_psd import UsdaPsdAdapter
+
+    monkeypatch.setattr(base.time, "sleep", lambda s: None)
+    asks: list[str] = []
+
+    class TimesOut(UsdaPsdAdapter):
+        def fetch(self, spec):
+            asks.append(spec.id)
+            raise requests.ConnectTimeout("connect timeout=120")
+
+    results = collect_usda(TimesOut(), tmp_path)
+    assert asks == ["usda_sow_stocks"] * 3
+    assert [r.kind for r in results] == [TRANSIENT, TRANSIENT]
+    assert all("after 3 attempts" in (r.error or "") for r in results)
+
+
+def test_series_reading_one_bulk_file_download_it_once(tmp_path):
+    import json
+
+    from hogcycle.collectors.usda_psd import UsdaPsdAdapter
+
+    payload = json.loads((Path(__file__).parent / "fixtures" / "usda_psd.json").read_text())
+    asks: list[str] = []
+
+    class Once(UsdaPsdAdapter):
+        def fetch(self, spec):
+            asks.append(spec.id)
+            return payload
+
+    results = collect_usda(Once(), tmp_path)
+    assert asks == ["usda_sow_stocks"]
+    assert all(r.ok and r.rows_written for r in results)
+
+
+def collect_usda(adapter, tmp_path):
+    from hogcycle.pipeline import collect_all
+    from hogcycle.registry.spec import Registry
+    from hogcycle.storage.bronze import BronzeStore
+    from hogcycle.storage.silver import SilverStore
+
+    full = load_registry(CONFIG)
+    ids = ["usda_sow_stocks", "usda_pork_production"]
+    return collect_all(
+        Registry({i: full[i] for i in ids}),
+        {"usda_psd": adapter},
+        BronzeStore(tmp_path / "bronze"),
+        SilverStore(tmp_path / "silver"),
+    )

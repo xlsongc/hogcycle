@@ -85,13 +85,17 @@ def rows_from_zip(blob: bytes) -> list[dict[str, str]]:
 class UsdaPsdAdapter:
     name = "usda_psd"
 
+    def request_key(self, spec: IndicatorSpec) -> str:
+        # `call` names the commodity and attribute to read, but every series
+        # here reads them out of the same bulk file: one download per run.
+        return f"{self.name}:{URL}"
+
     def fetch(self, spec: IndicatorSpec) -> Any:
         body, last_modified = download(URL)
         rows = rows_from_zip(body)
         if not rows:
             raise ValueError(f"{spec.id}: no {COUNTRY} swine rows in {URL}")
         return {"url": URL, "last_modified": last_modified, "rows": rows}
-
 
     def normalise(
         self,
@@ -160,7 +164,10 @@ def download(url: str) -> tuple[bytes, str | None]:
     import requests
 
     try:
-        r = requests.get(url, timeout=120)
+        # Connect within 30s or not at all: a host that has not answered a
+        # handshake by then will not in two minutes, and three such attempts
+        # cost the run six. The 15 MB body still gets its two minutes.
+        r = requests.get(url, timeout=(30, 120))
         r.raise_for_status()
         return r.content, r.headers.get("Last-Modified")
     except requests.exceptions.ConnectionError as exc:

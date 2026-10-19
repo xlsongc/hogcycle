@@ -8,7 +8,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from .collectors.base import Adapter, with_retry
+from .collectors.base import Adapter, request_key, with_retry
 from .collectors.failures import STRUCTURE, classify
 from .contracts.schema import Observation
 from .contracts.validation import ValidationError, validate
@@ -112,6 +112,11 @@ def collect_all(
     """
     now = now or dt.datetime.now(dt.UTC)
     cache: dict[str, Any] = {}
+    # A shared call that failed is not asked again for the next indicator on
+    # it. Both USDA series read one ZIP; on 2026-10-19 the host timed out and
+    # the second series sat through the same three 120s attempts as the first,
+    # thirteen minutes to learn one fact twice.
+    failed: dict[str, RuntimeError] = {}
     results: list[Result] = []
 
     for spec in registry:
@@ -122,12 +127,18 @@ def collect_all(
             results.append(Result(spec.id, False, 0, False, msg, STRUCTURE))
             continue
 
-        payload = cache.get(spec.call_key)
+        key = request_key(adapter, spec)
+        if (exc := failed.get(key)) is not None:
+            log.error("%s: %s (shared call, not asked again)", spec.id, exc)
+            results.append(Result(spec.id, False, 0, False, str(exc), classify(exc)))
+            continue
+        payload = cache.get(key)
         if payload is None:
             try:
                 payload = with_retry(lambda a=adapter, s=spec: a.fetch(s))
-                cache[spec.call_key] = payload
+                cache[key] = payload
             except RuntimeError as exc:
+                failed[key] = exc
                 log.error("%s: %s", spec.id, exc)
                 results.append(Result(spec.id, False, 0, False, str(exc), classify(exc)))
                 continue

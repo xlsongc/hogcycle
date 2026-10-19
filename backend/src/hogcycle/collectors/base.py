@@ -32,6 +32,15 @@ class Adapter(Protocol):
         """Pure: payload -> observations. No IO, no clock, no globals."""
 
 
+def request_key(adapter: Adapter, spec: IndicatorSpec) -> str:
+    """Which upstream request a fetch makes, so the pipeline asks it once per
+    run. Usually the spec's `call`; an adapter whose `call` also carries what
+    to read out of one shared response says so with its own `request_key`.
+    """
+    own = getattr(adapter, "request_key", None)
+    return own(spec) if own is not None else spec.call_key
+
+
 def with_retry(
     fn: Callable[[], Any], *, attempts: int = 3, base_delay: float = 2.0
 ) -> Any:
