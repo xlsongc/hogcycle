@@ -57,19 +57,30 @@ class SilverStore:
     def __init__(self, root: Path | str = "data/silver") -> None:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
+        # One connection for the store's life. Opening one per query, and
+        # describing every file each time, was most of `export`'s seconds;
+        # the view re-reads its glob on every query, so a file appended
+        # after the connection opened is still seen.
+        self._con: duckdb.DuckDBPyConnection | None = None
+        # The view's column list is bound when it is created. Built over
+        # files that all predate a column, it fills that column with NULL,
+        # and must be built again once a file carrying it is written.
+        self._filled = False
 
     @property
     def _glob(self) -> str:
         return str(self.root / "**" / "*.parquet")
 
     def _has_data(self) -> bool:
-        return any(self.root.rglob("*.parquet"))
+        # Files are never deleted, so once there is data there always is.
+        return self._con is not None or any(self.root.rglob("*.parquet"))
 
     def _connect(self) -> duckdb.DuckDBPyConnection:
         con = duckdb.connect()
         source = _SOURCE.format(glob=_sql_literal(self._glob))
         described = con.execute(f"DESCRIBE SELECT * FROM {source}").fetchall()
         present = {r[0] for r in described}
+        self._filled = any(f.name not in present for f in SILVER_SCHEMA)
         columns = ", ".join(
             f.name if f.name in present
             else f"CAST(NULL AS {_ADDED_LATER[f.name]}) AS {f.name}"
@@ -83,8 +94,9 @@ class SilverStore:
         yet, so callers never special-case a cold start."""
         if not self._has_data():
             return []
-        with self._connect() as con:
-            return con.execute(sql, params or {}).fetchall()
+        if self._con is None:
+            self._con = self._connect()
+        return self._con.execute(sql, params or {}).fetchall()
 
     # ---------- writes ----------
 
@@ -134,6 +146,8 @@ class SilverStore:
         seq = max(existing, default=-1) + 1
         table = pa.Table.from_pylist([o.as_row() for o in changed], schema=SILVER_SCHEMA)
         pq.write_table(table, part / f"part-{seq:03d}.parquet", compression="zstd")
+        if self._filled:
+            self._con = None
         return changed
 
     def _current(
