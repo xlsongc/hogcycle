@@ -10,6 +10,7 @@ from typing import Any
 
 from .collectors.base import Adapter, request_key, with_retry
 from .collectors.failures import STRUCTURE, classify
+from .collectors.shape import drift_since_last
 from .contracts.schema import Observation
 from .contracts.validation import ValidationError, validate
 from .registry.periods import PeriodParseError
@@ -41,6 +42,9 @@ class Result:
     error: str | None = None
     # transient / blocked / structure (collectors/failures.py, ADR-0028).
     kind: str | None = None
+    # What the payload gained and lost against the snapshot before it
+    # (collectors/shape.py, ADR-0032).
+    drift: str | None = None
 
 
 def collect_one(
@@ -55,10 +59,20 @@ def collect_one(
     """Collect one indicator. `payload` lets the caller supply an already
     fetched response so several indicators can share one upstream call."""
     now = now or dt.datetime.now(dt.UTC)
+    drift: str | None = None
     try:
         if payload is None:
             payload = with_retry(lambda: adapter.fetch(spec))
         snap = bronze.write(spec.id, payload, fetched_at=now, source=spec.source)
+        if snap.is_new:
+            # Before parsing, so a parse that fails on a renamed field says
+            # what the field became. An unchanged payload cannot have drifted.
+            found = drift_since_last(
+                adapter, bronze, spec.id, spec.source, snap.snapshot_id, payload
+            )
+            if found is not None:
+                drift = found.describe()
+                log.warning("%s: %s", spec.id, drift)
 
         obs = adapter.normalise(
             spec, payload, snapshot_id=snap.snapshot_id, fetched_at=now
@@ -72,7 +86,7 @@ def collect_one(
             # carries it. Letting that abort would paint the run red every
             # single day, which is precisely how a real red gets ignored.
             log.info("%s: retired — upstream no longer publishes this caliber", spec.id)
-            return Result(spec.id, True, 0, snap.is_new)
+            return Result(spec.id, True, 0, snap.is_new, drift=drift)
         obs = validate(
             obs,
             unit=spec.unit,
@@ -85,14 +99,15 @@ def collect_one(
 
         if written:
             log.info("%s: %d row(s) new or revised", spec.id, len(written))
-        return Result(spec.id, True, len(written), snap.is_new)
+        return Result(spec.id, True, len(written), snap.is_new, drift=drift)
 
     except COLLECT_ERRORS as exc:
         # Bronze already holds the payload (it is written before normalise
         # runs), so a parser failure is replayable offline — no re-fetch, and
         # nothing is lost while the parser is being fixed.
-        log.error("%s: %s", spec.id, _message(exc))
-        return Result(spec.id, False, 0, False, _message(exc), classify(exc))
+        message = _message(exc) if drift is None else f"{_message(exc)} — {drift}"
+        log.error("%s: %s", spec.id, message)
+        return Result(spec.id, False, 0, False, message, classify(exc), drift)
 
 
 def collect_all(

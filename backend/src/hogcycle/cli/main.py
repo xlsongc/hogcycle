@@ -148,6 +148,8 @@ def main(argv: list[str] | None = None) -> int:
             mark = "ok  " if r.ok else "FAIL"
             why = f"[{r.kind}] {r.error}" if r.kind else (r.error or "")
             print(f"{mark} {r.indicator:<20} {r.rows_written:>5} row(s)  {why}")
+            if r.ok and r.drift:
+                print(f"     {'':<20}       {r.drift}")
         failed = [r for r in results if not r.ok]
         print(f"\n{len(results) - len(failed)}/{len(results)} ok")
         # One line per class that occurred, saying what it calls for

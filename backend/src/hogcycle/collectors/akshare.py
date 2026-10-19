@@ -90,6 +90,10 @@ class AkshareAdapter:
             "records": df.astype(object).where(df.notna(), None).to_dict("records"),
         }
 
+    def shape(self, payload: Any) -> frozenset[str]:
+        """The columns: akshare renames them between releases (ADR-0032)."""
+        return frozenset(payload["columns"])
+
     def normalise(
         self,
         spec: IndicatorSpec,

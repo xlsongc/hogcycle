@@ -97,6 +97,13 @@ class UsdaPsdAdapter:
             raise ValueError(f"{spec.id}: no {COUNTRY} swine rows in {URL}")
         return {"url": URL, "last_modified": last_modified, "rows": rows}
 
+    def shape(self, payload: Any) -> frozenset[str]:
+        """Which commodity, attribute and unit rows the bulk file carries for
+        China (ADR-0032)."""
+        return frozenset(
+            f"{r['commodity']} / {r['attribute']} / {r['unit']}" for r in payload["rows"]
+        )
+
     def normalise(
         self,
         spec: IndicatorSpec,

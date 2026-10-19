@@ -93,6 +93,8 @@ _RANGE = re.compile(
 # it wants in `call.scope`; the other's articles are not its observations.
 SCOPES = {"规模以上": "全国规模以上生猪定点屠宰企业", "全部定点": "生猪定点屠宰企业"}
 _SUBJECT = re.compile(r"(全国规模以上)?生猪定点屠宰企业")
+_FIGURE = re.compile(r"([\u4e00-\u9fff]{2,16}(?:价格|平均))为*\d+(?:\.\d+)?元/公斤")
+
 _COLLECTION_DAY = re.compile(r"采集日为(\d{1,2})月(\d{1,2})日")
 
 # A weekly report describes the week just ended. Over 400 articles the lag
@@ -216,6 +218,16 @@ class MoaWeeklyAdapter:
                 f"list page(s). Skipped: {skipped}"
             )
         return {"report": report, "articles": articles, "skipped": skipped}
+
+    def shape(self, payload: Any) -> frozenset[str]:
+        """The names of the prices the articles print, 「<name>为<n>元/公斤」
+        (ADR-0032). Names end in 价格 or 平均, which keeps 「较上周上涨0.12
+        元/公斤」 out: a change is not a figure."""
+        return frozenset(
+            m
+            for art in payload["articles"]
+            for m in _FIGURE.findall(plain(art["text"] or ""))
+        )
 
     def normalise(
         self,

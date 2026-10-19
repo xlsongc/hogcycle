@@ -240,3 +240,4 @@ so you do not have to re-derive them.
 | 0029 | What fails a run (a duplicate key), what warns (sources that part), and which sources must agree |
 | 0030 | Year-to-date totals are stored as printed; a quarter is a difference gold takes |
 | 0031 | The release calendar: an expectation read off past releases, never a date |
+| 0032 | A payload that changed shape says how (names gone, names new) before it is parsed |

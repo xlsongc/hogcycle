@@ -246,6 +246,17 @@ class MoaAdapter:
             )
         return {"editions": editions, "skipped": skipped}
 
+    def shape(self, payload: Any) -> frozenset[str]:
+        """Every 指标 name the window's workbooks print. A caliber change shows
+        up here first, as a name that went and another that came (ADR-0032)."""
+        return frozenset(
+            parsed[1]
+            for edition in payload["editions"]
+            for row in edition["rows"]
+            for cell in row
+            if (parsed := _label(cell)) is not None
+        )
+
     def normalise(
         self,
         spec: IndicatorSpec,

@@ -62,6 +62,12 @@ class RunLog:
                     "rows": r.rows_written,
                     "kind": r.kind,
                     "error": None if r.error is None else r.error[:_ERROR_CHARS],
+                    # Only when the payload changed shape (ADR-0032).
+                    **(
+                        {"drift": r.drift[:_ERROR_CHARS]}
+                        if getattr(r, "drift", None)
+                        else {}
+                    ),
                 }
                 for r in results
             ],
