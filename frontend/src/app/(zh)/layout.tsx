@@ -7,8 +7,11 @@ import "../wall.css";
 import "../overview.css";
 import "../series.css";
 import "../controls.css";
+import "../search.css";
+import "../phone.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
+import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
 import { HTML_LANG } from "@/i18n/locale";
 import { zh } from "@/i18n/zh";
@@ -26,7 +29,7 @@ export default function ZhLayout({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body>
-        <SiteNav locale="zh" />
+        <SiteNav locale="zh" series={searchItems} />
         {children}
       </body>
     </html>

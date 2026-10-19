@@ -77,10 +77,10 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                         <b className="num">{fmt(r.value, r.unit, locale)}</b>{" "}
                         <span className="muted">{unitOf(r.unit, locale)}</span>
                       </td>
-                      <td className="num">
+                      <td className="num" data-label={copy.yoy}>
                         {r.yoy == null ? "—" : `${r.yoy > 0 ? "+" : ""}${r.yoy}%`}
                       </td>
-                      <td>
+                      <td data-label={copy.position}>
                         {r.percentile == null ? (
                           <span className="muted" title={copy.noPositionTitle}>
                             —
@@ -100,7 +100,10 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                           </span>
                         )}
                       </td>
-                      <td title={g ? t.chart.granularityName[g] : undefined}>
+                      <td
+                        title={g ? t.chart.granularityName[g] : undefined}
+                        data-label={copy.asOf}
+                      >
                         <span className="num">{r.obs_date}</span>
                         {g ? ` · ${t.granularity[g]}` : ""}
                       </td>

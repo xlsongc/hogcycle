@@ -211,3 +211,33 @@ input[type="date"]:focus-visible {
 .bar .filter-label:has(.term-note:not([hidden])) {
   flex-basis: 100%;
 }
+
+/* The compare picker's filter: chosen series above, the full list below on
+   demand, so the chart is not pushed off a phone's first screens. */
+.picker-find {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.picker-find input {
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+  font: var(--type) var(--sans);
+  color: var(--ink);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 10px;
+}
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.picker-list[hidden] {
+  display: none;
+}

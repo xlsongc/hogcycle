@@ -2,7 +2,10 @@
 
 import type { Dict } from "../en";
 
-export const shell: Pick<Dict, "meta" | "nav" | "gauge" | "theme" | "health" | "asOf" | "window"> = {
+export const shell: Pick<
+  Dict,
+  "meta" | "nav" | "gauge" | "search" | "theme" | "health" | "asOf" | "window"
+> = {
   meta: {
     title: "猪周期图表墙",
     description: "把猪周期的因果链放在一条共享时间轴上，供人判断，不代人判断。",
@@ -24,6 +27,16 @@ export const shell: Pick<Dict, "meta" | "nav" | "gauge" | "theme" | "health" | "
   gauge: {
     stale: "停更",
     staleSince: (date: string, days: number) => `${date} 之后无新数据（${days} 天）`,
+  },
+
+  search: {
+    open: "搜索",
+    title: "查找序列（按 / 或 ⌘K）",
+    label: "查找序列",
+    placeholder: "中文或英文名称，或 id",
+    none: "没有匹配的序列。",
+    compare: "对比",
+    hint: "↑↓ 移动 · 回车打开它的页面 · Esc 关闭",
   },
 
   theme: {

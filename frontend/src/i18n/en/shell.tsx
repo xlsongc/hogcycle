@@ -26,6 +26,16 @@ export const shell = {
       `No new data since ${date} (${days} days)`,
   },
 
+  search: {
+    open: "Search",
+    title: "Find a series (press / or ⌘K)",
+    label: "Find a series",
+    placeholder: "A name in either language, or an id",
+    none: "No series matches.",
+    compare: "compare",
+    hint: "↑↓ to move · Enter opens its page · Esc closes",
+  },
+
   theme: {
     switch: "Switch theme",
     system: "System",

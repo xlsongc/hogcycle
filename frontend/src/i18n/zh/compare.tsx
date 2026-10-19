@@ -33,6 +33,11 @@ export const compare: Pick<Dict, "compare" | "picker" | "overlay"> = {
       `最多同时叠放 ${max} 条 —— 再多就得生成新色相，而生成的色相在色觉缺陷下与已有色无法区分`,
     selected: (n: number, max: number) => `已选 ${n}/${max}`,
     atCap: " · 已达上限",
+    chosen: "已选",
+    find: "查找要加入的序列",
+    showAll: (n: number) => `全部 ${n} 条序列`,
+    hideAll: "收起列表",
+    none: "没有匹配的序列。",
   },
 
   overlay: {

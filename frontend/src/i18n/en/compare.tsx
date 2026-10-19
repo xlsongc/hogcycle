@@ -40,6 +40,11 @@ export const compare = {
       `At most ${max} series at once — a ninth would need a generated hue, and a generated hue is indistinguishable from an existing one under colour-vision deficiency`,
     selected: (n: number, max: number) => `${n}/${max} selected`,
     atCap: " · at limit",
+    chosen: "Shown",
+    find: "Find a series to add",
+    showAll: (n: number) => `All ${n} series`,
+    hideAll: "Hide the list",
+    none: "No series matches.",
   },
 
   overlay: {

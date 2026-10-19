@@ -14,8 +14,11 @@ import "../wall.css";
 import "../overview.css";
 import "../series.css";
 import "../controls.css";
+import "../search.css";
+import "../phone.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
+import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
 import { HTML_LANG } from "@/i18n/locale";
 import { en } from "@/i18n/en";
@@ -33,7 +36,7 @@ export default function EnLayout({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body>
-        <SiteNav locale="en" />
+        <SiteNav locale="en" series={searchItems} />
         {children}
       </body>
     </html>

@@ -1,0 +1,94 @@
+/* The series search: a button in the nav and the dialog it opens. */
+
+.search-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-open kbd {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0 4px;
+  line-height: 1.4;
+}
+
+dialog.search {
+  width: min(560px, calc(100vw - 24px));
+  margin: 12vh auto auto;
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface-1);
+  border: 1px solid var(--axis);
+  border-radius: 4px;
+}
+
+dialog.search::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+dialog.search input {
+  width: 100%;
+  font: var(--type) var(--sans);
+  color: var(--ink);
+  background: var(--page);
+  border: 0;
+  border-bottom: 1px solid var(--grid);
+  padding: 12px 14px;
+  outline: none;
+}
+
+/* The dialog lives in the nav, whose list and link rules would otherwise
+   reach it: these are written to outrank them. */
+dialog.search ul {
+  display: block;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 52vh;
+  overflow-y: auto;
+}
+
+dialog.search li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+/* The option the arrows are on: a rule and ink, not colour alone. */
+dialog.search li[aria-selected="true"] {
+  background: var(--chip);
+  box-shadow: inset 2px 0 0 var(--ink);
+}
+
+.search-name {
+  flex: 1;
+}
+
+dialog.search .search-compare {
+  color: var(--muted);
+  font-size: var(--type);
+  padding: 0;
+  border: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--axis);
+}
+
+.search-hint {
+  margin: 0;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--grid);
+}
+
+@media (max-width: 560px) {
+  .search-open kbd {
+    display: none;
+  }
+
+  dialog.search {
+    margin-top: 8px;
+  }
+}

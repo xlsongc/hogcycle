@@ -1,0 +1,116 @@
+/* Phone widths. Imported last, so these rules win over the desktop ones they
+   adjust. The audit (docs/specs/2026-10-14-phase-2-upgrade.md, B3) found the
+   nav taking two rows and the readings table 814px wide inside 349, its
+   status column, the one a reader most needs, off-screen with no hint. */
+
+@media (max-width: 560px) {
+  .wrap {
+    padding: 20px 14px 48px;
+  }
+
+  /* ---------- one-row nav ---------- */
+
+  .site-nav-inner {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  /* The overview link is the way home; the wordmark is not needed for it. */
+  .brand {
+    display: none;
+  }
+
+  .site-nav ul a {
+    padding: 4px 6px;
+  }
+
+  .site-nav-end {
+    gap: 6px;
+  }
+
+  /* The page is already in its language; only the other one is offered. */
+  .lang b[aria-current] {
+    display: none;
+  }
+
+  .site-nav-end button {
+    padding: 5px 7px;
+  }
+
+  /* ---------- the readings table as stacked rows ---------- */
+
+  table.readings,
+  table.readings tbody,
+  table.readings tr,
+  table.readings td {
+    display: block;
+  }
+
+  table.readings thead {
+    display: none;
+  }
+
+  table.readings tbody tr:not(.tier-row) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 12px;
+    padding: 9px 12px;
+    border-top: 1px solid var(--grid);
+  }
+
+  table.readings tr.tier-row th {
+    display: block;
+    padding: 7px 12px;
+  }
+
+  table.readings td {
+    padding: 0;
+    border: 0 !important;
+    text-align: left;
+    white-space: normal;
+  }
+
+  /* Name across the row; value beside the status; the rest labelled. */
+  table.readings td:nth-child(1) {
+    grid-column: 1 / -1;
+  }
+
+  table.readings td:nth-child(6) {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
+  }
+
+  /* Year-on-year and position share a line, the period below them. */
+  table.readings td:nth-child(3) {
+    grid-column: 1;
+  }
+
+  table.readings td:nth-child(4) {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  table.readings td:nth-child(5) {
+    grid-column: 1 / -1;
+    color: var(--muted);
+  }
+
+  table.readings td[data-label]::before {
+    content: attr(data-label) " ";
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: var(--type);
+  }
+
+  .readings-wrap {
+    overflow-x: visible;
+  }
+
+  /* ---------- tables elsewhere scroll inside their box ---------- */
+
+  .series-table {
+    font-size: var(--type);
+  }
+}

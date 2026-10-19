@@ -24,8 +24,9 @@ import {
 } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SeriesSearch, type SearchItem } from "@/components/search/SeriesSearch";
 
-export function SiteNav({ locale }: { locale: Locale }) {
+export function SiteNav({ locale, series }: { locale: Locale; series: SearchItem[] }) {
   const t = dict(locale).nav;
   const pathname = usePathname() ?? "/";
   const page = pageOf(pathname);
@@ -46,6 +47,7 @@ export function SiteNav({ locale }: { locale: Locale }) {
           ))}
         </ul>
         <div className="site-nav-end">
+          <SeriesSearch items={series} locale={locale} />
           <span className="lang" aria-label={t.language}>
             {LOCALES.map((l) =>
               l === locale ? (
