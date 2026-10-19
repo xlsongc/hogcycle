@@ -158,6 +158,11 @@ class IndicatorSpec:
     # machine on an ordinary network, and the GitHub run collects the rest
     # and watches everything for staleness (ADR-0022).
     reach: str = "anywhere"
+    # Each value is a running total from 1 January to its obs_date, as the
+    # publisher prints it (统计局's 1季度 / 上半年 / 前3季度 / 全年). A sawtooth
+    # that resets every January reads as a cycle on a chart, so it stays off
+    # the wall; gold differences it into quarters (docs/adr/0030).
+    ytd: bool = False
     notes: str = ""
 
     def __post_init__(self) -> None:

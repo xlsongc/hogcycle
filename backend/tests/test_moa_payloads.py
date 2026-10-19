@@ -313,3 +313,25 @@ def test_per_head_cost_and_profit_are_retired_at_202508(registry, payload):
         assert MoaAdapter().normalise(spec, recent, snapshot_id="f", fetched_at=NOW) == []
     _, obs = normalise(registry, edition, "scale_profit_per_head")
     assert [(o.obs_date, o.value) for o in obs] == [(dt.date(2025, 8, 31), -57.0)]
+
+
+def test_three_more_rows_of_the_joint_release_read_from_the_same_editions(
+    registry, payload
+):
+    """发改委's 出场价, customs' offal imports and the backyard farms' profit
+    line, each read by name from the editions already in the fixture."""
+    by_id = {
+        i: [(o.obs_date, o.value) for o in normalise(registry, payload, i)[1]]
+        for i in ("hog_price_ndrc", "offal_imports")
+    }
+    assert by_id["hog_price_ndrc"] == [
+        (dt.date(2025, 2, 28), 15.77),
+        (dt.date(2025, 12, 31), 11.99),
+        (dt.date(2026, 6, 30), 9.71),
+        (dt.date(2026, 7, 31), 10.77),
+    ]
+    # February's own month, not the 1-2月 total beside it.
+    assert by_id["offal_imports"][0] == (dt.date(2025, 2, 28), 8.4727021)
+    edition = json.loads((FIXTURES / "moa_hog_release_202508.json").read_text("utf-8"))
+    _, obs = normalise(registry, edition, "backyard_profit_per_head")
+    assert [(o.obs_date, o.value) for o in obs] == [(dt.date(2025, 8, 31), -109.0)]

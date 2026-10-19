@@ -125,6 +125,46 @@ indicators:
       保留它是因为它提供 2021-12 至 2025-06 的月频供给史；不可与 slaughter
       接成一条曲线。
 
+  - id: hog_output_ytd
+    name_zh: 生猪出栏（年内累计）
+    name_en: Hogs marketed (year to date)
+    tier: capacity
+    freq: quarterly
+    unit: 万头
+    lo: 5000.0
+    hi: 150000.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 生猪出栏}
+    # 统计局只按年内累计印：1季度、上半年、前3季度、全年（ADR-0030）。
+    ytd: true
+    notes: >
+      国家统计局的生猪出栏，经五部委联合发布，只在季末那期出现。每个数都是从 1 月 1 日
+      累计到所注期末的总数，所以按时间画出来是每年 1 月归零的锯齿，不上图表墙；
+      单季出栏由 gold 用相邻两个累计数相减得到（hog_output_quarter）。
+      202506 那期没有附表，所以 2025 年上半年的累计数不在手上，2025 年二、三季度的
+      单季数也就算不出来 —— 不用别的数去补。「1-n月累计」屠宰量是另一个口径，不读。
+      历史从已采集的各期月报回放而来（ADR-0027），没有重新抓取。
+
+  - id: pork_output_ytd
+    name_zh: 猪肉产量（年内累计）
+    name_en: Pork output (year to date)
+    tier: capacity
+    freq: quarterly
+    unit: 万吨
+    lo: 300.0
+    hi: 10000.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 猪肉产量}
+    ytd: true
+    notes: >
+      国家统计局的猪肉产量，与生猪出栏同表、同一期、同样只按年内累计印。单季产量在
+      gold 里由相邻两个累计数相减（pork_output_quarter）。产量 ÷ 出栏随出栏体重变化，
+      所以两条不是同一条线换个单位。
+
   - id: piglet_price
     name_zh: 仔猪价格
     name_en: Piglet price
@@ -366,6 +406,24 @@ indicators:
       五部委月度联合发布里的规模养殖每头总成本，2021-12 至 2025-08。与每头净利润
       出自同一张表、同一个月。
 
+  - id: backyard_profit_per_head
+    name_zh: 每头净利润（散养）
+    name_en: Net profit per hog (backyard farms)
+    tier: margin
+    freq: monthly
+    unit: CNY/head
+    lo: -2000.0
+    hi: 5000.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 散养生猪每头净利润}
+    # Printed beside the scale-farm rows and closed with them after 202508.
+    retired: true
+    notes: >
+      同一张表里散养户的每头净利润，2021-12 至 2025-08，与规模养殖的那一行并列。
+      散养户成本高、进退快，两条的差就是规模化的成本优势。负值是亏损。
+
   # ---------- price：被预测的结果 ----------
 
   - id: hog_price_index
@@ -417,6 +475,24 @@ indicators:
       ADR-0005 的第二口径：农业农村部 500 个县集贸市场和采集点。与行情宝平台
       成交价（hog_price_index）、玄田外三元出栏价（hog_price_wai3）是三套
       不同的测量，各自一格，永远不画进同一条线。2021-12 起有周度历史。
+
+  - id: hog_price_ndrc
+    name_zh: 生猪出场价格（发改委）
+    name_en: Hog ex-farm price (NDRC)
+    tier: price
+    freq: monthly
+    unit: CNY/kg
+    lo: 3.0
+    hi: 60.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 全国生猪出场价格}
+    notes: >
+      发改委价格监测中心在全国生猪主产区定点采报的出场价，月度，随五部委联合发布。
+      这是第五套猪价口径：发改委自己的猪粮比价就是它除以全国玉米批发价，所以 5:1
+      那条线定义在这个价格上。它不是 hog_price_index、hog_price_wai3 或 500 县的
+      任何一条，各自一格。历史从已采集的各期月报回放而来（ADR-0027）。
 
   - id: carcass_price
     name_zh: 白条肉出厂价（定点屠宰企业）
@@ -543,6 +619,23 @@ indicators:
       （ADR-0027），图上每年 12 月到 2 月之间是虚线。按月度默认的 100 天判断是否
       停更：12 月的数要到 3 月下旬那期之后才有下一个，约 90 天，仍在阈值内。
       历史从已采集的各期月报回放而来，没有重新抓取。
+
+  - id: offal_imports
+    name_zh: 猪杂碎进口量（海关）
+    name_en: Pork offal imports (customs)
+    tier: noise
+    freq: monthly
+    unit: 万吨
+    lo: 0.5
+    hi: 100.0
+    adapter: moa
+    reach: cn
+    call: {fn: moa_hog_release}
+    extract: {value: 进口猪杂碎}
+    notes: >
+      海关总署的月度猪杂碎（内脏、蹄、头等副产品）进口量，与进口猪肉同表。量级和
+      猪肉进口相当，但主要进餐饮和加工，对生猪价格的缓冲比猪肉进口弱。与 pork_imports
+      一样只读单月行，1 月并在 1-2 月合计里、没有单独的数。
 
   - id: hog_weight
     name_zh: 出栏均重

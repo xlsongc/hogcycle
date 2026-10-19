@@ -222,7 +222,14 @@ def build_wall(
         # available in the overlay — comparing 规模以上 against 全口径 屠宰量
         # is a legitimate thing to want — but it is kept off the wall, whose
         # tiles are read as "where we are now".
-        in_wall = spec.tier in WALL_TIERS and not spec.retired and not spec.forecast
+        # A year-to-date total resets every January; its quarters are on the
+        # wall in its place (docs/adr/0030).
+        in_wall = (
+            spec.tier in WALL_TIERS
+            and not spec.retired
+            and not spec.forecast
+            and not spec.ytd
+        )
         panels.append(
             {
                 "id": spec.id,

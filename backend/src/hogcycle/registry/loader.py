@@ -20,7 +20,7 @@ _KNOWN_KEYS = {
     "id", "name_zh", "name_en", "tier", "freq", "unit", "lo", "hi", "adapter",
     "call", "extract", "accept", "revises", "zero_is_null", "max_age_days",
     "retired", "upstream_dark", "caliber_from", "caliber_until", "forecast",
-    "reach", "continues", "notes",
+    "reach", "continues", "ytd", "notes",
 }
 
 _DARK_KEYS = {"acknowledged", "review_by", "reason"}
@@ -73,6 +73,9 @@ def _build(entry: dict[str, Any]) -> IndicatorSpec:
             )
         extract["also"] = tuple(extract["also"])
     data["extract"] = Extract(**extract)
+    if data.get("ytd") and data.get("adapter") != "moa":
+        # Only the joint-release parser knows the year-to-date labels.
+        raise ValueError(f"{owner}: ytd is read only by the moa adapter")
     if (accept := data.get("accept")) is not None:
         data["accept"] = tuple(accept)
     if (dark := data.get("upstream_dark")) is not None:

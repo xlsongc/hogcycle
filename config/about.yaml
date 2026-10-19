@@ -119,6 +119,15 @@ series:
       zh: 规模养殖场每出栏一头猪的净利润，元/头，负值是亏损。联合发布在 2025 年 8 月那期之后不再刊出，所以这是一段已结束的历史。
       en: Net profit per hog sold by scale farms, in yuan per head; negative is a loss. The joint release stopped printing it after the August 2025 edition, so this is a finished history.
 
+  backyard_profit_per_head:
+    publisher:
+      zh: 农业农村部等五部委月度联合发布（表中未注明由哪个部门编制）
+      en: The five-ministry monthly release (the table does not say which agency compiles it)
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 散养户每出栏一头猪的净利润，元/头，负值是亏损，与规模养殖那一行并列印出。两条的差就是规模化的成本优势。2025 年 8 月那期之后不再刊出。
+      en: Net profit per hog sold by backyard farms, in yuan per head; negative is a loss. It is printed beside the scale-farm row, and the gap between the two is what scale saves. Not printed after the August 2025 edition.
+
   scale_cost_per_head:
     publisher:
       zh: 农业农村部等五部委月度联合发布（表中未注明由哪个部门编制）
@@ -145,6 +154,51 @@ series:
     about:
       zh: 同一份周报、同一采集日的生猪价 ÷ 玉米价。与发改委口径相关 0.996，平均低 0.26，所以不画发改委的 5:1 线。
       en: Hog price over corn price, from the same weekly report and the same collection day. It correlates 0.996 with the NDRC ratio but runs 0.26 lower on average, so the NDRC's 5:1 line is not drawn on it.
+
+  hog_price_ndrc:
+    publisher:
+      zh: 国家发展改革委价格监测中心，五部委月度联合发布
+      en: NDRC Price Monitoring Center, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 主产区定点养殖场的生猪出场价，月度。发改委的猪粮比价就是这个价格除以玉米批发价，5:1 那条线定义在它上面。与其他四套猪价是不同的测量。
+      en: The price hogs leave designated farms at in the main producing regions, monthly. The NDRC's hog-to-corn ratio is this price over the corn wholesale price, so the 5:1 line is defined on it. A different measurement from the other four hog prices.
+
+  hog_output_ytd:
+    publisher:
+      zh: 国家统计局，五部委月度联合发布
+      en: National Bureau of Statistics, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 从 1 月 1 日累计到所注季末的生猪出栏头数，统计局只按这种累计数公布。每年 1 月归零，所以不上图表墙，单季数见「生猪出栏（单季）」。
+      en: Hogs marketed from 1 January to the quarter end shown, which is the only form the statistics bureau publishes. It resets every January, so it stays off the wall; see the per-quarter series.
+
+  pork_output_ytd:
+    publisher:
+      zh: 国家统计局，五部委月度联合发布
+      en: National Bureau of Statistics, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 从 1 月 1 日累计到所注季末的猪肉产量，万吨。与生猪出栏同表，同样每年 1 月归零。
+      en: Pork produced from 1 January to the quarter end shown, in 10,000 tonnes. From the same table as hogs marketed, and it resets every January too.
+
+  hog_output_quarter:
+    publisher:
+      zh: 由本项目计算，相邻两个统计局年内累计数相减
+      en: Computed here, as the difference of two of the statistics bureau's year-to-date totals
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 一个季度出栏的生猪头数。一季度就是印出的数；之后每季是到本季末的累计减到上季末的累计。两个累计数都印过才算，缺一个就留空。这是 10–12 个月前能繁母猪落到供给上的那一端。
+      en: Hogs marketed in one quarter. The first quarter is the printed figure; each later quarter is the total to its end less the total to the end of the one before, computed only when both were printed. It is where the sow herd of 10–12 months earlier arrives as supply.
+
+  pork_output_quarter:
+    publisher:
+      zh: 由本项目计算，相邻两个统计局年内累计数相减
+      en: Computed here, as the difference of two of the statistics bureau's year-to-date totals
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 一个季度的猪肉产量，万吨，算法同单季出栏。它与出栏之比随出栏体重变化。
+      en: Pork produced in one quarter, in 10,000 tonnes, computed as for hogs marketed. Its ratio to hogs marketed moves with slaughter weight.
 
   hog_price_index:
     publisher:
@@ -217,6 +271,15 @@ series:
     about:
       zh: 36 个大中城市精瘦肉的零售价。它是零售端的猪肉，不是生猪，所以结构性地高于出厂价。
       en: The retail price of lean pork in 36 large and mid-sized cities. It prices pork at retail, not live hogs, so it sits structurally above the ex-plant price.
+
+  offal_imports:
+    publisher:
+      zh: 海关总署，经农业农村部等五部委月度联合发布
+      en: General Administration of Customs, in the five-ministry monthly release
+    url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
+    about:
+      zh: 每月进口的猪杂碎（内脏、蹄、头等），万吨。量与猪肉进口相当，但多进餐饮和加工，对猪价的缓冲更弱。同样没有单独的 1 月数。
+      en: Pork offal (organs, feet, heads) imported each month, in 10,000 tonnes. The volume is close to pork's, but it mostly goes to restaurants and processing, so it cushions hog prices less. There is no January figure of its own here either.
 
   pork_imports:
     publisher:

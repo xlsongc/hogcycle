@@ -66,7 +66,7 @@ from typing import Any
 from urllib.parse import urljoin
 
 from ..contracts.schema import Observation
-from ..registry.periods import parse_period
+from ..registry.periods import Period, month_end, parse_period
 from ..registry.spec import IndicatorSpec
 from .failures import STRUCTURE, CollectFailure, classify, of_status, worst
 
@@ -108,6 +108,14 @@ _UNIT_SUFFIX = re.compile(r"[（(][^（()）]*[)）]\s*$")
 _PERIOD_HEAD = re.compile(
     r"^\s*(\d{4}\s*年\s*(?:第?\s*[一二三四1-4]\s*季度\s*末?|\d{1,2}\s*月\s*[末份]?))"
 )
+
+# 统计局's year-to-date totals: 「2026年1季度生猪出栏」, 「2026年上半年…」,
+# 「2026年前3季度…」 (「前三季度」 in 2023) and the bare year for the whole of
+# it. Each runs from 1 January to the end of the period it names, so it is
+# read only for a spec that declares `ytd`: a running total must never pass
+# for a reading of one quarter (docs/adr/0030). 「1-7月累计…」 rows are not
+# matched; the name that follows them is not the configured one.
+_YTD_HEAD = re.compile(r"^\s*(\d{4})\s*年\s*(第?\s*[一1]\s*季度|上半年|前\s*[3三]\s*季度)?")
 
 # 「3780（相当于调控目标的100.8%）」 — the reading is the leading number; the
 # parenthetical is the 产能调控 zone commentary, which belongs to policy, not
@@ -261,7 +269,7 @@ class MoaAdapter:
             published_on = released(edition)
             for row in edition["rows"]:
                 for i, cell in enumerate(row):
-                    parsed = _label(cell)
+                    parsed = _ytd_label(cell) if spec.ytd else _label(cell)
                     if parsed is None:
                         continue
                     period_token, name = parsed
@@ -277,7 +285,11 @@ class MoaAdapter:
                             f"{spec.id}: edition {edition['ym']} prints {cell!r} with "
                             f"value {raw!r}, which is not a number"
                         )
-                    period = parse_period(period_token, default=spec.freq)
+                    period = (
+                        _ytd_period(period_token)
+                        if spec.ytd
+                        else parse_period(period_token, default=spec.freq)
+                    )
                     lag = (published_on - period.date).days
                     if lag > MAX_RELEASE_LAG_DAYS:
                         raise ValueError(
@@ -361,6 +373,29 @@ def _label(cell: str | None) -> tuple[str, str] | None:
     if head is None:
         return None
     return head.group(1).strip(), text[head.end() :].strip()
+
+
+def _ytd_label(cell: str | None) -> tuple[str, str] | None:
+    """Split a year-to-date label into (period token, name), or None."""
+    if not cell:
+        return None
+    text = _UNIT_SUFFIX.sub("", cell.replace("\n", "")).strip()
+    head = _YTD_HEAD.match(text)
+    if head is None:
+        return None
+    return head.group(0).strip(), text[head.end() :].strip()
+
+
+def _ytd_period(token: str) -> Period:
+    """The end of the stretch a year-to-date total covers. Every one of them
+    arrives a quarter after the last, so the cadence is quarterly, the
+    whole-year total included."""
+    head = _YTD_HEAD.match(token)
+    if head is None:  # pragma: no cover - the token came from this regex
+        raise ValueError(f"not a year-to-date period: {token!r}")
+    span = head.group(2) or ""
+    months = 6 if span == "上半年" else 9 if span.startswith("前") else 3 if span else 12
+    return Period(month_end(int(head.group(1)), months), "quarterly")
 
 
 def _number(raw: str) -> float | None:

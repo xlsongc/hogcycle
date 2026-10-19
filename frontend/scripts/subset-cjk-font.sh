@@ -23,6 +23,9 @@ fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 OUT="$ROOT/frontend/src/fonts/Zpix-Subset.woff2"
+# The glyphs the subset holds, as text, so the build can tell when copy has
+# outgrown the font (scripts/check-cjk-coverage.mjs) without parsing woff2.
+LIST="$ROOT/frontend/src/fonts/Zpix-Subset.chars.txt"
 CHARS="$(mktemp)"
 trap 'rm -f "$CHARS"' EXIT
 
@@ -57,5 +60,7 @@ pyftsubset "$SRC" \
   --no-hinting \
   --desubroutinize \
   --notdef-outline
+
+cp "$CHARS" "$LIST"
 
 printf 'wrote %s (%s KB)\n' "$OUT" "$(( $(wc -c < "$OUT") / 1024 ))"

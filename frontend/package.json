@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run types && next dev",
-    "build": "npm run types && node scripts/check-type-grid.mjs && next build && node scripts/check-zh-spacing.mjs",
+    "build": "npm run types && node scripts/check-type-grid.mjs && node scripts/check-cjk-coverage.mjs && next build && node scripts/check-zh-spacing.mjs",
     "start": "next start",
     "types": "node scripts/generate-types.mjs",
     "lint": "tsc --noEmit && node scripts/check-type-grid.mjs"
