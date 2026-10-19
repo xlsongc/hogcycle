@@ -209,15 +209,27 @@ Traps, all encoded in `sources.yaml`:
 
 ## Status
 
-Phase 1 complete: config → fetch → bronze → validate → silver → gold →
-contract → static dashboard, with 122 tests, the adapters among them over real
-captured payloads, and the site published in English and Chinese as three
-pages each. Every 农业农村部 row carries its release date, and the weekly
-prices come from the ministry's own reports, not a mirror
-([ADR-0018](docs/adr/0018-weekly-prices-from-the-ministry.md)). USDA's
-estimates and forecasts of China's herd and pork output come in as a second,
-foreign account, and the only source that revises itself on a schedule
-([ADR-0021](docs/adr/0021-a-foreign-source-and-forecasts.md)).
+Phase 2 is mostly done ([plan](docs/specs/2026-10-14-phase-2-upgrade.md),
+[what is left](docs/specs/2026-10-19-next-steps.md)). The pipeline runs
+config → fetch → bronze → validate → silver → gold → contract → static site,
+with 212 tests, the adapters among them over real captured payloads. 37
+collected series and 4 derived ones are published in English and Chinese.
+
+- **Time travel.** Every page can stand on a past day and shows only what was
+  knowable then: a dated value from its release, an undated one from the day
+  this warehouse learned it, never by an assumed lag (ADR-0025).
+- **Primary sources.** Every 农业农村部 row carries its release date; weekly
+  prices come from the ministry's own reports; the joint release adds
+  imports, cost and profit per head, 发改委's ex-farm price, and 统计局's
+  output, taken per quarter from its year-to-date totals (ADR-0030). USDA is
+  the foreign, self-revising second account (ADR-0021).
+- **A run that stops is loud.** Series staleness, a heartbeat per source
+  group, failures classed as transient, blocked or structure, a run record
+  committed with the data, shape drift named before a parse (ADR-0032), and
+  a release calendar that says when each next value is due (ADR-0031).
+- **Readers.** Breaks in cadence and caliber are drawn where they happen,
+  terms are explained where they appear, panels read from the keyboard, any
+  series is one keystroke away (`/`), and the phone layout is its own.
 
 Next: a machine-readable source for 发改委's 猪粮比价 before its
 acknowledgement lapses on 2026-12-31; then the verification layer the storage

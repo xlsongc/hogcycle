@@ -1,6 +1,13 @@
 # 10. dbt confined to gold
 
-Date: 2026-09-06 · Status: Proposed / Deferred
+Date: 2026-09-06 · Status: **Rejected** (2026-10-15)
+
+> Closed by decision Q6 of the phase-2 plan
+> ([docs/specs/2026-10-14-phase-2-upgrade.md](../specs/2026-10-14-phase-2-upgrade.md)):
+> gold has one SQL model and its other derivations are Python (facts,
+> calendar, derived series), so a second toolchain would carry one file.
+> Revisit only if gold grows a body of SQL models. The text below is the
+> proposal as it stood.
 
 ## Context
 
