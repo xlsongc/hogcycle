@@ -29,6 +29,20 @@ export type Signal = { role: Role; reading: Reading; panel: Panel; outlook?: Rea
 
 type Props = { signals: Signal[]; end: string; locale: Locale };
 
+/** When the next value is due, or that it is later than any before it
+ *  (docs/adr/0031). An expectation the pipeline read off past releases. */
+export function NextRelease({ reading: r, locale }: { reading: Reading; locale: Locale }) {
+  const o = dict(locale).overview;
+  const n = r.next_release;
+  if (!n) return null;
+  const period = periodLabel(n.period, granularityLetter(r.granularity ?? ""), locale);
+  return n.overdue ? (
+    <li className="next-overdue">{o.nextOverdue(period, n.by)}</li>
+  ) : (
+    <li className="muted">{o.nextRelease(period, shortDate(n.usual))}</li>
+  );
+}
+
 export function Signals({ signals, end, locale }: Props) {
   return (
     <div className="signals">
@@ -80,6 +94,7 @@ function SignalCard({
           </li>
         )}
         {context && <li className="muted">{context}</li>}
+        {r.next_release && <NextRelease reading={r} locale={locale} />}
         {outlook && (
           <li className="signal-outlook">
             <Link href={seriesPath(locale, outlook.id)}>

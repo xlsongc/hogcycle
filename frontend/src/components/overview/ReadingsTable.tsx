@@ -15,6 +15,7 @@ import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
 import { tierVars } from "@/lib/tier";
+import { periodLabel } from "@/lib/period";
 
 const TIERS: Reading["tier"][] = ["capacity", "margin", "price", "noise"];
 
@@ -110,6 +111,16 @@ export function ReadingsTable({ readings, locale }: { readings: Reading[]; local
                             title={t.gauge.staleSince(r.obs_date, r.age_days ?? 0)}
                           >
                             {t.gauge.stale}
+                          </em>
+                        ) : r.next_release?.overdue ? (
+                          <em
+                            className="overdue-tag"
+                            title={copy.overdueTitle(
+                              periodLabel(r.next_release.period, g ?? "", locale),
+                              r.next_release.by
+                            )}
+                          >
+                            {copy.overdue}
                           </em>
                         ) : (
                           <span className="muted">{copy.live}</span>

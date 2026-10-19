@@ -3,11 +3,11 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.4.0";
+export const CONTRACT_VERSION = "1.5.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.4.0";
+  contract_version: "1.5.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
@@ -169,6 +169,8 @@ export interface Reading {
   streak: Streak | null;
   /** For a series with a domain threshold: how many consecutive observations sit on the latest value's side of it, and since when. A value on the line counts as above. */
   threshold_run: ThresholdRun | null;
+  /** When the next period's value is due, read off the series' own dated releases (docs/adr/0031): the period's end plus the median release lag (usual) and plus the longest on record (by). An expectation, never a date: published_on is never filled from it. Overdue when generated_at is past by. Null for an undated, daily, retired or forecast series, or one with fewer than six dated releases. Added in 1.5.0. */
+  next_release?: NextRelease | null;
 }
 
 export interface Extreme {
@@ -192,4 +194,12 @@ export interface ThresholdRun {
   side: "below" | "above";
   since: string;
   n: number;
+}
+
+export interface NextRelease {
+  /** End of the next period, ISO date. */
+  period: string;
+  usual: string;
+  by: string;
+  overdue: boolean;
 }

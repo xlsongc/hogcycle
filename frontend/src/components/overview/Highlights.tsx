@@ -14,6 +14,7 @@ import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { labelOf, nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
+import { granularityLetter, periodLabel } from "@/lib/period";
 
 type Props = { readings: Reading[]; panels: Panel[]; locale: Locale };
 
@@ -23,6 +24,8 @@ export function Highlights({ readings, panels, locale }: Props) {
   const runs = readings.filter((r) => r.threshold_run);
   const extremes = readings.filter((r) => r.extreme);
   const stale = readings.filter((r) => r.stale);
+  // Overdue but not yet stale: a stale series is already listed above.
+  const overdue = readings.filter((r) => r.next_release?.overdue && !r.stale);
 
   const lead = (r: Reading) => (
     <>
@@ -72,6 +75,19 @@ export function Highlights({ readings, panels, locale }: Props) {
           {o.staleFor(r.age_days ?? 0, r.obs_date)}
         </li>
       )),
+    },
+    {
+      key: "overdue",
+      items: overdue.map((r) => {
+        const n = r.next_release!;
+        const g = granularityLetter(r.granularity ?? "");
+        return (
+          <li key={r.id}>
+            <Link href={seriesPath(locale, r.id)}>{nameOf(r, locale)}</Link> ·{" "}
+            {o.overdueFor(periodLabel(n.period, g, locale), n.by)}
+          </li>
+        );
+      }),
     },
   ];
   const shown = groups.filter((g) => g.items.length);

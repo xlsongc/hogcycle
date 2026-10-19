@@ -33,6 +33,12 @@ export const series: Pick<Dict, "series"> = {
         天，基于 <b className="num">{n}</b> 次有日期的发布。回测也必须等这么久。
       </>
     ),
+    releaseNext: (period: string, usual: string, by: string) => (
+      <>
+        下一期：{period}。通常 <b className="num">{usual}</b> 前发布；过了{" "}
+        <b className="num">{by}</b> 仍未发布，就比有记录以来的每一次都晚。这是从过去的发布推出的预期，不是发布日期。
+      </>
+    ),
     releaseNone: "源头没有注明发布日期，所以每个数值是哪天公开的并不知道。不要假设它在期末当天就公开了。",
     revisionsHeading: "修订记录",
     revisionsNote: "同一时期出现过的每个数值，按本仓库得知的先后排列。没有任何覆盖。",

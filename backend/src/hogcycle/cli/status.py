@@ -9,8 +9,12 @@ left alone, is the eleven-month freeze this project was built after.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
+from typing import Any
 
+from ..gold.calendar import next_release
+from ..gold.series import rows_of
 from ..quality import ERROR, WARN, run_checks
 from ..registry.heartbeat import check_groups
 from ..registry.spec import Registry
@@ -45,6 +49,17 @@ def run_status(
     checks = run_checks(registry, silver)
     broken = [c for c in checks if c.level == ERROR]
     failed = bool(failing or silent or broken)
+    # When each live series' next value is due (docs/adr/0031). Overdue warns
+    # and never fails: a release later than any on record is worth a look,
+    # and is not yet a series that stopped.
+    now = dt.datetime.now(dt.UTC)
+    due: dict[str, dict[str, Any] | None] = {
+        spec.id: None
+        if spec.retired or spec.forecast
+        else next_release(rows_of(spec, silver, moment=now), today=now.date())
+        for spec in registry
+    }
+    overdue = [i for i, n in due.items() if n and n["overdue"]]
 
     def last_run(group: str) -> str:
         """What the newest run of this group's reach did with its indicators:
@@ -68,6 +83,7 @@ def run_status(
                 "review_by": None if st.review_by is None else st.review_by.isoformat(),
                 "lapses_in_days": st.lapses_in,
                 "retired": st.retired,
+                "next_release": due[spec.id],
             }))
         for b in beats:
             print(json.dumps({
@@ -86,7 +102,7 @@ def run_status(
 
     print(
         f"{'indicator':<20} {'tier':<9} {'n':>6}  {'first':<12} "
-        f"{'latest':<12} {'age':<16}"
+        f"{'latest':<12} {'age':<16} next release (usually / at the latest)"
     )
     for spec in registry:
         r = rows.get(spec.id)
@@ -94,7 +110,7 @@ def run_status(
         if r:
             print(
                 f"{spec.id:<20} {spec.tier:<9} {r['n']:>6}  "
-                f"{r['first']!s:<12} {r['latest']!s:<12} {note:<16}"
+                f"{r['first']!s:<12} {r['latest']!s:<12} {note:<16} {_due(due[spec.id])}"
             )
         else:
             print(f"{spec.id:<20} {spec.tier:<9} {'—':>6}  (no data)")
@@ -133,6 +149,15 @@ def run_status(
         for s in resumed:
             print(f"  {s.indicator:<20} latest {s.latest}")
 
+    if overdue:
+        print(
+            f"\n{len(overdue)} release(s) later than any on record for the series "
+            "(a warning; the series is not stale yet):"
+        )
+        for i in overdue:
+            n = due[i] or {}
+            print(f"  {i:<20} period to {n.get('period')}, longest wait ends {n.get('by')}")
+
     if failing:
         # Loud, and worth the paragraph: this is the exact failure that hid an
         # eleven-month freeze in the leading indicator.
@@ -151,3 +176,11 @@ def run_status(
         for b in silent:
             print(f"  {b.group:<20} {b.note}")
     return 1 if fail_on_stale and failed else 0
+
+
+def _due(n: dict[str, Any] | None) -> str:
+    if n is None:
+        return ""
+    if n["overdue"]:
+        return f"OVERDUE since {n['by']}"
+    return f"{n['usual'][5:]} / {n['by'][5:]}"

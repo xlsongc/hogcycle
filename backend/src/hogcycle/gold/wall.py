@@ -22,6 +22,7 @@ from ..registry.spec import IndicatorSpec, Registry
 from ..registry.staleness import check
 from ..storage.silver import SilverStore
 from .breaks import cadence_breaks, caliber_of
+from .calendar import next_release
 from .facts import change, extreme, first_seen_date, streak, threshold_run
 from .series import all_specs, first_seen_of, is_derived, rows_of
 from .vintage import learned_on, stamp_learned
@@ -299,6 +300,11 @@ def build_wall(
                     "threshold_run": threshold_run(rows, threshold["value"])
                     if (threshold := THRESHOLDS.get(spec.id))
                     else None,
+                    # A closed caliber has no next release, and a forecast's
+                    # are not lags (docs/adr/0031).
+                    "next_release": None
+                    if spec.retired or spec.forecast
+                    else next_release(rows, today=moment.date()),
                 }
             )
 

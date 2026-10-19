@@ -37,6 +37,13 @@ export const series = {
         <b className="num">{n}</b> dated releases. A backtest has to wait that long too.
       </>
     ),
+    releaseNext: (period: string, usual: string, by: string) => (
+      <>
+        Next: {period}. Usually out by <b className="num">{usual}</b>; after{" "}
+        <b className="num">{by}</b> it would be later than any release on record. An
+        expectation read off past releases, never a release date.
+      </>
+    ),
     releaseNone:
       "The source does not date its releases, so when each value became public is not known. Do not assume it was the day the period ended.",
     revisionsHeading: "Revisions",

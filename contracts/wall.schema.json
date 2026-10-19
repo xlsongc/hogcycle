@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.4.0",
+      "const": "1.5.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -300,6 +300,18 @@
               "side": { "type": "string", "enum": ["below", "above"] },
               "since": { "type": "string" },
               "n": { "type": "integer" }
+            }
+          },
+          "next_release": {
+            "type": ["object", "null"],
+            "description": "When the next period's value is due, read off the series' own dated releases (docs/adr/0031): the period's end plus the median release lag (usual) and plus the longest on record (by). An expectation, never a date: published_on is never filled from it. Overdue when generated_at is past by. Null for an undated, daily, retired or forecast series, or one with fewer than six dated releases. Added in 1.5.0.",
+            "required": ["period", "usual", "by", "overdue"],
+            "additionalProperties": false,
+            "properties": {
+              "period": { "type": "string", "description": "End of the next period, ISO date." },
+              "usual": { "type": "string" },
+              "by": { "type": "string" },
+              "overdue": { "type": "boolean" }
             }
           }
         }

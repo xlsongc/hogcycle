@@ -31,12 +31,15 @@ export const overview = {
       runs: "Thresholds",
       extremes: "Multi-year extremes",
       stale: "Stopped updating",
+      overdue: "Releases overdue",
     },
     extreme: (kind: "low" | "high", since: string, all: boolean) =>
       `${kind === "low" ? "lowest" : "highest"} since ${all ? `the series begins (${since})` : since}`,
     run: (below: boolean, line: string, n: number, since: string) =>
       `${below ? "below" : "above"} the ${line} for ${n} straight readings, since ${since}`,
     staleFor: (days: number, date: string) => `last reading ${date}, ${days} days ago`,
+    overdueFor: (period: string, by: string) =>
+      `${period} not out, and later than any release on record since ${by}`,
     nothing: "Nothing to report under these definitions.",
 
     heading: "Where the hog cycle stands",
@@ -69,6 +72,9 @@ export const overview = {
     outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
       `${who} forecast for the end of ${year}: ${value} ${unit}${date ? ` (published ${date})` : ""}`,
     releaseUnknown: "source gives no release date",
+    nextRelease: (period: string, usual: string) => `next: ${period}, usually out by ${usual}`,
+    nextOverdue: (period: string, by: string) =>
+      `${period} is overdue: later than any release on record (${by})`,
     staleBadge: (days: number) => `no new data for ${days} days`,
     align: "Place each reading at",
     alignPeriod: "the period it describes",
@@ -102,6 +108,9 @@ export const overview = {
       `${ordinal(pct)} percentile of its own history${years == null ? "" : ` over ${years} years`}: 0 is its lowest reading, 100 its highest`,
     noPositionTitle: "Too little history for a percentile",
     live: "live",
+    overdue: "overdue",
+    overdueTitle: (period: string, by: string) =>
+      `The value for ${period} is not out, and it is later than any release on record (${by}). Not stale yet.`,
     movingBaseline: "the target baseline moves, so no gap is computed",
   },
 };

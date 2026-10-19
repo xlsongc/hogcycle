@@ -25,12 +25,15 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
       runs: "阈值",
       extremes: "多年极值",
       stale: "停止更新",
+      overdue: "发布逾期",
     },
     extreme: (kind: "low" | "high", since: string, all: boolean) =>
       `${all ? `序列开始（${since}）` : since}以来${kind === "low" ? "最低" : "最高"}`,
     run: (below: boolean, line: string, n: number, since: string) =>
       `自 ${since} 起连续 ${n} 期在${line}${below ? "下方" : "上方"}`,
     staleFor: (days: number, date: string) => `最后读数 ${date}，已 ${days} 天`,
+    overdueFor: (period: string, by: string) =>
+      `${period}尚未发布，自 ${by} 起已晚于有记录以来的每一次`,
     nothing: "按这些定义，暂无可报告的事实。",
 
     heading: "猪周期现在在哪",
@@ -56,6 +59,9 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     outlook: (who: string, year: string, value: string, unit: string, date: string | null) =>
       `${who} 预测 ${year} 年末：${value} ${unit}${date ? `（${date} 发布）` : ""}`,
     releaseUnknown: "源头未注明发布日期",
+    nextRelease: (period: string, usual: string) => `下一期 ${period}，通常 ${usual} 前发布`,
+    nextOverdue: (period: string, by: string) =>
+      `${period}已逾期：晚于有记录以来的每一次发布（${by}）`,
     staleBadge: (days: number) => `已 ${days} 天没有新数据`,
     align: "读数画在",
     alignPeriod: "它描述的时期",
@@ -86,6 +92,9 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
       `在该序列自身${years == null ? "" : ` ${years} 年`}历史中的第 ${pct} 分位：0 为最低读数，100 为最高`,
     noPositionTitle: "历史太短，不计分位",
     live: "更新中",
+    overdue: "逾期",
+    overdueTitle: (period: string, by: string) =>
+      `${period}的数尚未发布，已晚于有记录以来的每一次发布（${by}）。还不算停更。`,
     movingBaseline: "调控基准为移动值，故不计缺口",
   },
 };

@@ -160,6 +160,15 @@ function TodayLatest({ reading: r, locale }: { reading: Reading; locale: Locale 
         )}
         {context && <li className="muted">{context}</li>}
       </ul>
+      {r.next_release && (
+        <p className={r.next_release.overdue ? "next-overdue" : "muted"}>
+          {s.releaseNext(
+            periodLabel(r.next_release.period, granularityLetter(r.granularity ?? ""), locale),
+            r.next_release.usual,
+            r.next_release.by
+          )}
+        </p>
+      )}
     </section>
   );
 }
