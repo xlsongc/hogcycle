@@ -194,3 +194,25 @@ def test_a_reprint_beside_a_revision_is_not_written_on_the_second_read(tmp_path)
     first = silver.append_changes(at(2, *payload))
     assert [(o.published_on, o.value) for o in first] == [(dt.date(2026, 1, 30), 4035.0)]
     assert silver.append_changes(at(3, *payload)) == []
+
+
+def test_coverage_counts_only_what_a_caliber_covers(tmp_path):
+    """A history held across a caliber change stays in silver whole; status
+    counts what the wall draws, not everything held."""
+    _, silver = _stores(tmp_path)
+    at = dt.datetime(2026, 10, 1, tzinfo=UTC)
+    silver.append_changes(
+        [
+            Observation(
+                indicator="carcass_price", obs_date=d, value=20.0, unit="CNY/kg",
+                granularity="weekly", source="s", snapshot_id="x", fetched_at=at,
+            )
+            for d in (dt.date(2023, 12, 31), dt.date(2024, 1, 7), dt.date(2024, 1, 14))
+        ]
+    )
+    (whole,) = silver.coverage()
+    assert (whole["n"], whole["first"]) == (3, dt.date(2023, 12, 31))
+    (bounded,) = silver.coverage(lambda i, d: d >= dt.date(2024, 1, 1))
+    assert (bounded["n"], bounded["first"], bounded["latest"]) == (
+        2, dt.date(2024, 1, 7), dt.date(2024, 1, 14)
+    )

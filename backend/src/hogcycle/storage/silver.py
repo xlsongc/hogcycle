@@ -17,6 +17,7 @@ of a fresh binary blob every morning.
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -321,19 +322,34 @@ class SilverStore:
         )
         return rows[0][0] if rows else None
 
-    def coverage(self) -> list[dict[str, Any]]:
-        """One row per indicator: how much we hold and how fresh it is."""
+    def coverage(
+        self, covers: Callable[[str, dt.date], bool] | None = None
+    ) -> list[dict[str, Any]]:
+        """One row per indicator: how much we hold and how fresh it is.
+
+        `covers` says whether an obs_date belongs to an indicator's caliber.
+        A history held across a caliber change stays in silver whole, and a
+        count over all of it disagreed with the wall: 白条肉出厂价 read 451
+        points from 2018 where its caliber starts in 2024 and the wall draws
+        144."""
         rows = self.query(
             """
-            SELECT indicator, count(DISTINCT obs_date), min(obs_date),
-                   max(obs_date), max(fetched_at)
-            FROM silver GROUP BY indicator ORDER BY indicator
+            SELECT indicator, obs_date, max(fetched_at) FROM silver
+            GROUP BY indicator, obs_date ORDER BY indicator, obs_date
             """
         )
-        return [
-            {"indicator": r[0], "n": r[1], "first": r[2], "latest": r[3], "fetched": r[4]}
-            for r in rows
-        ]
+        out: dict[str, dict[str, Any]] = {}
+        for indicator, obs_date, fetched in rows:
+            if covers is not None and not covers(indicator, obs_date):
+                continue
+            c = out.setdefault(
+                indicator,
+                {"indicator": indicator, "n": 0, "first": obs_date, "fetched": fetched},
+            )
+            c["n"] += 1
+            c["latest"] = obs_date
+            c["fetched"] = max(c["fetched"], fetched)
+        return list(out.values())
 
     def revisions(
         self, indicator: str

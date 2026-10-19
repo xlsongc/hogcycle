@@ -30,7 +30,11 @@ def run_status(
     runs: RunLog | None = None,
 ) -> int:
     runs = runs or RunLog()
-    rows = {r["indicator"]: r for r in silver.coverage()}
+    known = registry.indicators
+    rows = {
+        r["indicator"]: r
+        for r in silver.coverage(lambda i, d: i not in known or known[i].covers(d))
+    }
     latest = {k: v["latest"] for k, v in rows.items() if v["latest"]}
     ages = {s.indicator: s for s in check_all(registry, latest)}
     failing = [s for s in ages.values() if s.failing]
