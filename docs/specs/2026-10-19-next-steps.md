@@ -38,12 +38,21 @@ panel by design, so slicing the contract per page saves little. Revisit if
 the panel count doubles, or with a throttled Lighthouse run showing a
 problem.
 
+Later on 10-20 the site went past the phase-2 plan, on the owner's ask
+([brainstorm](2026-10-20-platform-brainstorm.md)): a profit and breakeven
+estimate (ADR-0034), the futures market as its own tier (ADR-0035), units,
+seasons and a lag scan on the pages, and Atom feeds and a JSON index.
+
 ## Tomorrow, in order
 
 1. **Check the morning runs.** Run `gh run list --limit 6` and check
    `tail -5 ~/Library/Logs/hogcycle-collect.log`. The local run's
    `started`/`finished` in `data/runs/cn/2026-10.jsonl` should now be
-   minutes apart when the Mac is on power.
+   minutes apart when the Mac is on power. **New:** the local run collects
+   `lh_futures_main` and `lh_futures_curve` for the first time (`reach: cn`).
+   Check both are `ok` and that the curve gained a day's prints. Then probe
+   Sina from a runner. If it answers, move both to `reach: anywhere` so
+   GitHub collects them too (ADR-0035).
 2. **Watch the first real calendar event.** The 202609 joint release is
    expected around 10-26 to 10-30 (`usual` 10-26/10-28, `by` 11-03 for the
    quarterly series). When it lands, check: 2026Q3 sow and hog inventory, the
@@ -61,7 +70,15 @@ problem.
    what 能繁母猪 the public could see on that day, and how long after the
    period. That is the input any lead test must use. Gold computes; it does
    not call turns.
-5. **A small one: a cycle start from the chart.** Today a start is typed as
+5. **Watch the estimate (ADR-0034).** It is fitted on 41 frozen months.
+   If the joint release ever prints 规模养殖成本 again, re-check the model
+   against it. Next estimate candidates, each needing its own holdout test
+   first: 自繁自养 vs 外购仔猪 profit, and the sow-culling margin.
+6. **Platform, next round** (from the brainstorm). A weekly digest page per
+   week, archived. The full futures curve's history as a chart: how the
+   market's view of a month moved, from silver's daily prints. E-mail
+   alerts are the owner's call, because they are outward-facing.
+7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a
    mode. Only if readers ask.

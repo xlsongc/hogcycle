@@ -212,9 +212,9 @@ Traps, all encoded in `sources.yaml`:
 Phase 2 is mostly done ([plan](docs/specs/2026-10-14-phase-2-upgrade.md),
 [what is left](docs/specs/2026-10-19-next-steps.md)). The pipeline runs
 config → fetch → bronze → validate → silver → gold → contract → static site,
-with 212 backend tests, the adapters among them over real captured
-payloads, and 13 for what the browser computes. 37
-collected series and 4 derived ones are published in English and Chinese.
+with 229 backend tests, the adapters among them over real captured
+payloads, and 24 for what the browser computes. 39
+collected series and 5 derived ones are published in English and Chinese.
 
 - **Time travel.** Every page can stand on a past day and shows only what was
   knowable then: a dated value from its release, an undated one from the day
@@ -235,6 +235,12 @@ collected series and 4 derived ones are published in English and Chinese.
   cycles over each other from starts the reader names; the browser computes
   only over such choices, and says so (ADR-0033). Revised periods are ringed,
   and every chart has a table twin.
+- **A platform, not only a wall.** A weekly estimate of what a scale farm
+  earns per hog and its breakeven price, since the official figure stopped
+  (ADR-0034), tested out of sample before it went up. The Dalian futures
+  curve, as the market's expectation and never ours (ADR-0035). Units,
+  seasonal and lag views on every series. Atom feeds, and every series as
+  CSV and JSON with an index at `data/index.json`.
 
 Next: a machine-readable source for 发改委's 猪粮比价 before its
 acknowledgement lapses on 2026-12-31; then the verification layer the storage

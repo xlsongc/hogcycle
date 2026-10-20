@@ -48,3 +48,18 @@ checked, and what was built.
 - **"The page renders, it does not compute."** Already narrowed by ADR-0033.
   Transforms, seasonality and the lag scan are reader-chosen views of the
   data, so they fall under it.
+
+## What was built on 2026-10-20
+
+| # | built | where |
+|---|---|---|
+| 1 | `profit_per_head_est`, `breakeven_price_est` (weekly). The overview's margin card shows the profit. The latest week is −382 元/head, breakeven 13.70 元/kg | ADR-0034, `gold/estimate.py` |
+| 2 | Tier `market`: `lh_futures_main` (daily since 2021-01-08) and `lh_futures_curve` (a forecast, by delivery month). The overview shows the curve | ADR-0035, `collectors/futures.py` |
+| 3 | Units on the series page: level, change and % from a year ago, % from the reading before (`?u=`) | `lib/transform.ts` |
+| 4 | Season by season on daily, weekly and monthly series | `lib/seasons.ts` |
+| 5 | Which shift lines up best, under the compare overlay | `lib/leadLag.ts` |
+| 6 | `feed.xml`, `zh/feed.xml`, `data/index.json`, `data/series/<id>.json` | `export/feeds.py` |
+
+Found on the way: gold's week-on-week and year-on-year changes gave
+percentages across zero, so a deepening loss read "+8.5%" and "+9.5% YoY".
+Neither does now.
