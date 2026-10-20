@@ -18,6 +18,7 @@ import { fmt } from "@/charts/base/theme";
 import { SeriesChart } from "@/components/series/SeriesChart";
 import { AsOfControl } from "@/components/AsOfControl";
 import { Cycles } from "@/components/series/Cycles";
+import { Seasons } from "@/components/series/Seasons";
 import { pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { firstKnowable, knownOn, panelOn, type Known } from "@/lib/asOf";
@@ -78,6 +79,8 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
           <a href={staticPath(`/data/series/${panel.id}.csv`)} download>
             {t.series.download}
           </a>
+          {" · "}
+          <a href={staticPath(`/data/series/${panel.id}.json`)}>JSON</a>
           <span className="muted"> · {t.series.downloadNote}</span>
           <br />
           {panel.in_wall !== false ? (
@@ -89,6 +92,8 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
           )}
         </p>
       </section>
+
+      <Seasons panel={shown} locale={locale} />
 
       {spansCycles(shown) && <Cycles panel={shown} locale={locale} />}
 

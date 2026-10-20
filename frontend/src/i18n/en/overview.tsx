@@ -5,6 +5,8 @@ import { ordinal, UNIT_EN } from "./words";
 export const overview = {
   overview: {
     thesisHeading: "Capacity leads price",
+    feed: "Subscribe (Atom)",
+    api: "Every series as JSON",
     futuresHeading: "What the futures market prices ahead",
     futuresNote: (date: string) =>
       `The latest settle of every listed Dalian live-hog contract, by delivery month, as of ${date}, from Sina's copy of the exchange's prices. The market's expectation with money behind it, not this site's forecast. Per tonne of the delivery grade, a different caliber from the spot prices above.`,

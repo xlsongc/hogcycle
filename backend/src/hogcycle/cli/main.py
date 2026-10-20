@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import json
 import logging
 import sys
 from pathlib import Path
@@ -13,6 +14,7 @@ from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..collectors.usda_psd import UsdaPsdAdapter
 from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
+from ..export.feeds import write_feeds, write_index, write_series_json
 from ..export.series_csv import DEFAULT_DIR as CSV_DIR
 from ..export.series_csv import write_series_csv
 from ..gold.about import DEFAULT_ABOUT, load_about
@@ -273,6 +275,13 @@ def main(argv: list[str] | None = None) -> int:
         csvs = write_series_csv(
             registry, silver, CSV_DIR, moment=moment or dt.datetime.now(dt.UTC)
         )
+        # The feeds and the index describe today; an as-of export answers
+        # another day's question and leaves them as they are.
+        if moment is None:
+            doc = json.loads(Path(path).read_text("utf-8"))
+            write_series_json(registry, silver, moment=dt.datetime.now(dt.UTC))
+            write_index(doc)
+            write_feeds(doc)
         pts = sum(len(p["points"]) for p in payload["panels"])
         print(
             f"wrote {path} — {len(payload['panels'])} panel(s), {pts} points, "

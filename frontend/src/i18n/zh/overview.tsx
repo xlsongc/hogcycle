@@ -5,6 +5,8 @@ import type { Dict } from "../en";
 
 export const overview: Pick<Dict, "overview" | "readings"> = {
   overview: {
+    feed: "订阅（Atom）",
+    api: "全部序列的 JSON",
     futuresHeading: "期货市场给未来的定价",
     futuresNote: (date: string) =>
       `大商所生猪期货每个在挂合约的最新结算价，按交割月排开，${date} 结算，读自新浪的镜像。这是市场用钱下注的预期，不是本站的预测。单位是交割标准品的元/吨，和上面现货价格不是同一口径。`,

@@ -20,12 +20,14 @@ import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
 import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
-import { HTML_LANG } from "@/i18n/locale";
+import { HTML_LANG, staticPath } from "@/i18n/locale";
 import { en } from "@/i18n/en";
 
 export const metadata: Metadata = {
   title: en.meta.title,
   description: en.meta.description,
+  // So a feed reader pointed at the site finds the feed (export/feeds.py).
+  alternates: { types: { "application/atom+xml": staticPath("/feed.xml") } },
 };
 
 export default function EnLayout({ children }: { children: React.ReactNode }) {

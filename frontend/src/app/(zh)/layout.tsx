@@ -13,12 +13,13 @@ import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
 import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
-import { HTML_LANG } from "@/i18n/locale";
+import { HTML_LANG, staticPath } from "@/i18n/locale";
 import { zh } from "@/i18n/zh";
 
 export const metadata: Metadata = {
   title: zh.meta.title,
   description: zh.meta.description,
+  alternates: { types: { "application/atom+xml": staticPath("/zh/feed.xml") } },
 };
 
 export default function ZhLayout({ children }: { children: React.ReactNode }) {

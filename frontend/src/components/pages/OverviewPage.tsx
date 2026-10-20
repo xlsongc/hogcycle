@@ -19,7 +19,7 @@ import { ReleaseFeed } from "@/components/overview/ReleaseFeed";
 import { Highlights } from "@/components/overview/Highlights";
 import { ReadingsTable } from "@/components/overview/ReadingsTable";
 import Link from "next/link";
-import { pathOf, type Locale } from "@/i18n/locale";
+import { pathOf, staticPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { HealthStamp } from "@/components/shell/HealthStamp";
 import { Glossary } from "@/components/Glossary";
@@ -83,6 +83,10 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
           {/* The overview stays on today; standing on a past day is the
               wall's job (docs/adr/0025). */}
           <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
+          {" · "}
+          <a href={staticPath(locale === "zh" ? "/zh/feed.xml" : "/feed.xml")}>{o.feed}</a>
+          {" · "}
+          <a href={staticPath("/data/index.json")}>{o.api}</a>
         </p>
         <p className="ov-lede">{o.lede}</p>
         <Glossary ids={["sowHerd", "normalHolding", "releaseVsPeriod", "caliber"]} locale={locale} />
