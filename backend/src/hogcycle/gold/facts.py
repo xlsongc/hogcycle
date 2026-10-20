@@ -94,11 +94,17 @@ def change(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
     streak() gives; the date is carried because "previous" can be a week, a
     quarter, or — across an unpublished quarter — two."""
     same = _same_granularity(rows)
-    if len(same) < 2 or not same[-2]["value"]:
+    if len(same) < 2:
         return None
     prev, last = same[-2], same[-1]
+    # A percentage of a quantity at or below zero says nothing, or worse: a
+    # loss deepening from 352 to 382 per hog read as "+8.5%". The streak and
+    # the level carry such a series instead.
+    a, b = prev["value"], last["value"]
+    if a is None or b is None or a <= 0 or b <= 0:
+        return None
     return {
-        "pct": round((last["value"] / prev["value"] - 1) * 100, 1),
+        "pct": round((b / a - 1) * 100, 1),
         "since": prev["obs_date"].isoformat(),
     }
 

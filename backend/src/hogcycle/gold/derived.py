@@ -4,6 +4,8 @@
                             weekly report
     hog_output_quarter      生猪出栏 per quarter, the difference of two of
     pork_output_quarter     统计局's year-to-date totals (and 猪肉产量 likewise)
+    profit_per_head_est     a scale farm's profit per hog and the hog price it
+    breakeven_price_est     breaks even at, estimated weekly (gold/estimate.py)
 
 The hog-to-corn ratio is the margin reading the cycle turns on, and the
 official one — 发改委价格监测中心's weekly 猪粮比价 — has no machine-readable
@@ -29,6 +31,7 @@ from typing import Any
 
 from ..registry.spec import IndicatorSpec
 from ..storage.silver import SilverStore
+from .estimate import ESTIMATES, Estimate
 
 
 @dataclass(frozen=True, slots=True)
@@ -151,7 +154,7 @@ def _quarterly(id: str, name_zh: str, name_en: str, unit: str, source: str) -> Q
     )
 
 
-DERIVED: tuple[Ratio | Quarters, ...] = (
+DERIVED: tuple[Ratio | Quarters | Estimate, ...] = (
     Ratio(
         spec=IndicatorSpec(
             id="hog_corn_ratio_county",
@@ -176,4 +179,5 @@ DERIVED: tuple[Ratio | Quarters, ...] = (
         "pork_output_quarter", "猪肉产量（单季）", "Pork output (per quarter)", "万吨",
         "pork_output_ytd",
     ),
+    *ESTIMATES,
 )

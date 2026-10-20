@@ -26,13 +26,15 @@ import { Glossary } from "@/components/Glossary";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
-// cycle is positioned against. The margin card prefers the 500-county ratio
-// because it is still published; 发改委's own ratio is the fallback for a
-// wall rebuilt as of a date before the county series existed.
+// cycle is positioned against. The margin card shows what a farm earns per
+// hog, estimated since the official figure stopped (docs/adr/0034), because
+// losses are what make farms cull; its name says it is an estimate. The
+// 500-county ratio follows, for a wall rebuilt before the estimate could be
+// fitted, and 发改委's own ratio before the county series existed.
 const CARDS: [Role, string[]][] = [
   ["capacity", ["sow_inventory"]],
   ["price", ["hog_price_index"]],
-  ["margin", ["hog_corn_ratio_county", "hog_corn_ratio"]],
+  ["margin", ["profit_per_head_est", "hog_corn_ratio_county", "hog_corn_ratio"]],
 ];
 const OUTLOOK: Partial<Record<Role, string>> = { capacity: "usda_sow_stocks" };
 const CAPACITY = "sow_inventory";

@@ -155,6 +155,24 @@ series:
       zh: 同一份周报、同一采集日的生猪价 ÷ 玉米价。与发改委口径相关 0.996，平均低 0.26，所以不画发改委的 5:1 线。
       en: Hog price over corn price, from the same weekly report and the same collection day. It correlates 0.996 with the NDRC ratio but runs 0.26 lower on average, so the NDRC's 5:1 line is not drawn on it.
 
+  profit_per_head_est:
+    publisher:
+      zh: 本项目估算，输入为农业农村部 500 县周报的生猪、育肥猪饲料和仔猪价格，以五部委月度联合发布的规模养殖成本与净利润（2021-12 至 2025-08）校准
+      en: Estimated here, from the hog, fattening-feed and piglet prices in MARA's weekly 500-county report, calibrated on the joint release's scale-farm cost and profit (2021-12 to 2025-08)
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 估算值，不是官方数。官方的规模养殖每头净利润在 2025 年 8 月那期之后停发；这里用仍在公布的周度价格把它接下去。成本 = 常数 + 系数 × 13 周前的饲料价 + 系数 × 13 周前的仔猪价，收入 = 校准系数 × 当周生猪价，系数用两者重叠的月份拟合，每次导出重新拟合。上线前做过样本外检验：用前 24、28 或 32 个月拟合、预测其余月份，误差约 45–51 元/头（官方值的波动约 ±388），相关 0.93–0.98，盈亏方向 94–100% 一致。
+      en: An estimate, not an official figure. The official scale-farm profit per hog stopped after the 2025-08 edition; this carries it forward from weekly prices that are still published. Cost = a constant + a coefficient × the feed price 13 weeks earlier + a coefficient × the piglet price 13 weeks earlier; revenue = a calibrated factor × this week's hog price. The coefficients are fitted on the months both exist, again at every export. Tested out of sample before it went up — fitted on the first 24, 28 or 32 months and predicting the rest — it was off by about 45–51 CNY per hog on a series that swings ±388, correlated 0.93–0.98, and called profit or loss right in 94–100% of months.
+
+  breakeven_price_est:
+    publisher:
+      zh: 本项目估算，与「每头净利润（规模养殖，估算）」同一个模型
+      en: Estimated here, by the same model as the estimated net profit per hog
+    url: https://xmsyj.moa.gov.cn/jcyj/
+    about:
+      zh: 估算的成本 ÷ 校准系数：500 县生猪价要到多少，规模养殖场才不赚不亏。和 500 县生猪价同一口径，可以在对比页上与它画在同一条轴上；价格在它下面就是亏损。估算值，不是官方数，方法与误差见每头净利润估算。
+      en: Estimated cost over the calibrated factor, the 500-county hog price at which a scale farm neither earns nor loses. It is on the 500-county price's caliber, so it can share an axis with that price on the compare page; a price below it is a loss. An estimate, not an official figure; the method and its error are on the estimated profit's page.
+
   hog_price_ndrc:
     publisher:
       zh: 国家发展改革委价格监测中心，五部委月度联合发布

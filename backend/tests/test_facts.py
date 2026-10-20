@@ -150,3 +150,16 @@ def test_change_is_against_the_previous_reading_of_the_same_kind():
     ]
     assert change(rows) == {"pct": -3.2, "since": "2026-03-31"}
     assert change(rows[:1]) is None
+
+
+def test_no_percentage_change_at_or_below_zero():
+    """A loss that deepens from 352 to 382 per hog is not "+8.5%"."""
+    from hogcycle.gold.facts import change
+
+    def w(day: int, v: float) -> dict:
+        return {"obs_date": D(2026, 10, day), "value": v, "granularity": "weekly"}
+
+    assert change([w(8, -352.0), w(15, -382.0)]) is None
+    assert change([w(8, 31.0), w(15, -12.0)]) is None
+    assert change([w(8, 0.0), w(15, 5.0)]) is None
+    assert change([w(8, 10.0), w(15, 11.0)]) == {"pct": 10.0, "since": "2026-10-08"}
