@@ -212,7 +212,8 @@ Traps, all encoded in `sources.yaml`:
 Phase 2 is mostly done ([plan](docs/specs/2026-10-14-phase-2-upgrade.md),
 [what is left](docs/specs/2026-10-19-next-steps.md)). The pipeline runs
 config → fetch → bronze → validate → silver → gold → contract → static site,
-with 212 tests, the adapters among them over real captured payloads. 37
+with 212 backend tests, the adapters among them over real captured
+payloads, and 13 for what the browser computes. 37
 collected series and 4 derived ones are published in English and Chinese.
 
 - **Time travel.** Every page can stand on a past day and shows only what was
@@ -229,7 +230,11 @@ collected series and 4 derived ones are published in English and Chinese.
   a release calendar that says when each next value is due (ADR-0031).
 - **Readers.** Breaks in cadence and caliber are drawn where they happen,
   terms are explained where they appear, panels read from the keyboard, any
-  series is one keystroke away (`/`), and the phone layout is its own.
+  series is one keystroke away (`/`), and the phone layout is its own. A
+  series page gives the facts of any window the reader picks and lays its
+  cycles over each other from starts the reader names; the browser computes
+  only over such choices, and says so (ADR-0033). Revised periods are ringed,
+  and every chart has a table twin.
 
 Next: a machine-readable source for 发改委's 猪粮比价 before its
 acknowledgement lapses on 2026-12-31; then the verification layer the storage
