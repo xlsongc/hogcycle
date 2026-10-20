@@ -17,6 +17,7 @@ import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { SeriesChart } from "@/components/series/SeriesChart";
 import { AsOfControl } from "@/components/AsOfControl";
+import { Cycles } from "@/components/series/Cycles";
 import { pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { firstKnowable, knownOn, panelOn, type Known } from "@/lib/asOf";
@@ -89,6 +90,8 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
         </p>
       </section>
 
+      {spansCycles(shown) && <Cycles panel={shown} locale={locale} />}
+
       {children}
 
       <section aria-labelledby="recent-h">
@@ -128,6 +131,15 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
       </section>
     </>
   );
+}
+
+/** Three years of readings: about one cycle. Below that there is nothing
+ *  to lay over anything. */
+function spansCycles(panel: Panel): boolean {
+  const xs = panel.points.filter((p) => p.v != null);
+  const first = xs[0]?.d;
+  const last = xs[xs.length - 1]?.d;
+  return !panel.forecast && !!first && !!last && Date.parse(last) - Date.parse(first) >= 3 * 365 * 86_400_000;
 }
 
 /** The release date where the source gives one; in the as-of view, the day

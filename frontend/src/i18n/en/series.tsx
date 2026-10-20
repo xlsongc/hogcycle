@@ -69,6 +69,35 @@ export const series = {
     allNote: "Every reading at full resolution, newest first.",
   },
 
+  cycles: {
+    heading: "Cycles side by side",
+    intro:
+      "Name the month each cycle starts (a trough, a peak, any turn you want to compare) and each is redrawn from that month, indexed to 100 at its start. The page never picks a start for you: finding the turn is reading the cycle, and that is yours.",
+    signedNote:
+      "This series goes to zero or below, so an index of it would mean nothing: cycles are laid over in its own units.",
+    add: "Start a cycle at",
+    addButton: "Add",
+    horizon: "Show",
+    tick: (m: number) => (m === 0 ? "start" : `+${m} mo`),
+    monthsIn: (m: number) => (m === 0 ? "at the start" : `${m} months in`),
+    legend: (month: string) => `from ${month}`,
+    remove: (month: string) => `Remove the cycle from ${month}`,
+    none: (months: string[]) =>
+      `No reading in ${months.join(", ")}, so no cycle starts there. A start is never moved to a neighbouring month.`,
+    bad: "A start is a month, written YYYY-MM.",
+    atCap: (max: number) => `At most ${max} cycles at once.`,
+    empty: "No cycle picked yet. Add a start month above.",
+    indexAxis: "Index (each cycle's start = 100)",
+    computed: "computed in your browser from the readings shown",
+    showTable: "Table view",
+    hideTable: "Hide table",
+    monthCol: "Since start",
+    caption:
+      "Each cycle by whole months since its start: the reading nearest each month, as an index and in the series' own units.",
+    label: (n: number, months: number, indexed: boolean) =>
+      `Cycles side by side, ${n} cycles over ${months} months, ${indexed ? "indexed to each start" : "in the series' own units"}`,
+  },
+
   span: {
     heading: "In this window",
     hint: "Pick a window, or drag across the chart, to see its change, high and low.",

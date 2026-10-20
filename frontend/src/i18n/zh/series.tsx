@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { Dict } from "../en";
 
-export const series: Pick<Dict, "series" | "span"> = {
+export const series: Pick<Dict, "series" | "span" | "cycles"> = {
   series: {
     back: "全部读数",
     publisher: "发布方",
@@ -59,6 +59,33 @@ export const series: Pick<Dict, "series" | "span"> = {
     showAll: (n: number) => `显示全部 ${n} 个读数`,
     showRecent: "只显示最近 12 个",
     allNote: "每个读数都是原始分辨率，最新的在前。",
+  },
+
+  cycles: {
+    heading: "周期叠放",
+    intro:
+      "写下每轮周期开始的月份（低谷、高峰，或任何你想对照的拐点），每轮都从那个月重画，起点指数化为 100。本页从不替你挑起点：找拐点就是在解读周期，这一步留给你。",
+    signedNote: "这个序列会到零或以下，指数化没有意义，所以按它自己的单位叠放。",
+    add: "周期起点",
+    addButton: "添加",
+    horizon: "显示",
+    tick: (m: number) => (m === 0 ? "起点" : `+${m} 月`),
+    monthsIn: (m: number) => (m === 0 ? "起点" : `第 ${m} 个月`),
+    legend: (month: string) => `自 ${month}`,
+    remove: (month: string) => `移除自 ${month} 起的周期`,
+    none: (months: string[]) =>
+      `${months.join("、")} 没有读数，无法从那里开始。起点从不挪到相邻的月份。`,
+    bad: "起点是一个月份，写作 YYYY-MM。",
+    atCap: (max: number) => `最多同时叠放 ${max} 轮。`,
+    empty: "还没有选起点。在上面添加一个起始月份。",
+    indexAxis: "指数（每轮起点 = 100）",
+    computed: "由你的浏览器根据图上的读数计算",
+    showTable: "表格视图",
+    hideTable: "隐藏表格",
+    monthCol: "距起点",
+    caption: "每轮周期按距起点的整月排列：取离每个月最近的读数，给出指数和原单位数值。",
+    label: (n: number, months: number, indexed: boolean) =>
+      `周期叠放，${n} 轮，每轮 ${months} 个月，${indexed ? "以各自起点指数化" : "按序列自己的单位"}`,
   },
 
   span: {
