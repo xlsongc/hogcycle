@@ -38,6 +38,7 @@ export const chart = {
     spoken: (value: string, unit: string, date: string, kind: string, published?: string) =>
       `${value} ${unit}, ${date}, ${kind}${published ? `, published ${published}` : ""}`,
     coarse: "coarse",
+    revised: (n: number) => `revised: ${n} values on record`,
   },
 
   tier: {

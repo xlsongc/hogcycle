@@ -19,7 +19,8 @@ export const wall = {
         Where readings are more than a month apart, the line between them is
         dashed: nothing was measured in between. A labelled dotted line marks
         where a series changes how often it is read. From the keyboard, Tab to
-        a panel and step through it with the arrow keys.
+        a panel and step through it with the arrow keys. A ring marks a period
+        whose value was revised; its series page lists every value it has had.
       </>
     ),
     zoomed: "custom window",

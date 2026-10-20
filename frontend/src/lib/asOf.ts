@@ -102,8 +102,18 @@ export function firstKnowable(panel: Panel): { date: string; basis: Basis } | nu
   return first;
 }
 
+/** The prints of a revision trail knowable on `day`, each on its own
+ *  clock: a dated one from its release, an undated one from the day this
+ *  warehouse learned it. Which print was in force is `inForce`'s question;
+ *  this one is only whether a second value was out yet. */
+function knowable(prints: Print[], day: string): Print[] {
+  return prints.filter((p) => (p.p != null ? p.p : p.learned) <= day);
+}
+
 /** The panel cut down to what was knowable on `day`, for a chart: its
- *  points, and the cadence breaks with knowable readings on both sides. One
+ *  points, its revisions (a period counts as revised only once a second
+ *  value of it was out), and the cadence breaks with knowable readings on
+ *  both sides. One
  *  needs a reading before it, or there is no old cadence to change from, and
  *  its settling reading, or a new cadence cannot be told from a gap. Compared
  *  by date, because a thinned daily series need not carry the readings. */
@@ -113,5 +123,8 @@ export function panelOn(panel: Panel, day: string | null): Panel {
   const first = points[0]?.d ?? "";
   const last = points[points.length - 1]?.d ?? "";
   const breaks = (panel.breaks ?? []).filter((b) => first < b.d && b.settled <= last);
-  return { ...panel, points, breaks };
+  const revisions = panel.revisions
+    .map((r) => ({ ...r, prints: knowable(r.prints, day) }))
+    .filter((r) => r.prints.length > 1);
+  return { ...panel, points, breaks, revisions };
 }

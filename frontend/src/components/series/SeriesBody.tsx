@@ -12,7 +12,7 @@
  */
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { SeriesChart } from "@/components/series/SeriesChart";
@@ -43,7 +43,11 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
   const known = day ? knownOn(panel, day) : null;
   const first = firstKnowable(panel);
   const shown = panelOn(panel, day);
-  const recent = (known ?? panel.points).filter((p) => p.v != null).slice(-RECENT).reverse();
+  // The chart's twin (B9): the latest dozen by default, every reading on
+  // request, for a reader who cannot or would rather not hover.
+  const [all, setAll] = useState(false);
+  const readings = (known ?? panel.points).filter((p) => p.v != null);
+  const recent = (all ? readings : readings.slice(-RECENT)).slice().reverse();
   const unit = unitOf(panel.unit, locale);
 
   return (
@@ -91,7 +95,7 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
         <h2 className="section" id="recent-h">
           {t.series.recentHeading}
         </h2>
-        <div className="readings-wrap">
+        <div className={all ? "readings-wrap table-wrap" : "readings-wrap"}>
           <table className="series-table">
             <thead>
               <tr>
@@ -113,6 +117,14 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
             </tbody>
           </table>
         </div>
+        {readings.length > RECENT && (
+          <div className="bar">
+            <button aria-pressed={all} onClick={() => setAll((v) => !v)}>
+              {all ? t.series.showRecent : t.series.showAll(readings.length)}
+            </button>
+            {all && <span className="hint">{t.series.allNote}</span>}
+          </div>
+        )}
       </section>
     </>
   );

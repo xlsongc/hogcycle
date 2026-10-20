@@ -27,6 +27,10 @@ export const compare = {
       </>
     ),
     share: "This view lives in the address bar — copy the URL to share it.",
+    tableCaption:
+      "The series shown, by month, in their own units: the last observation in each month, inside the window, with any shift applied.",
+    tableNote: (rows: number) =>
+      `Raw values in their own units, by the month each describes (plus any shift) · last observation in each month · ${rows} rows`,
     undated: (names: string[]) =>
       `Not drawn: ${names.join(", ")}. Their sources do not date releases, and a date is never guessed.`,
     signed: (names: string[]) =>

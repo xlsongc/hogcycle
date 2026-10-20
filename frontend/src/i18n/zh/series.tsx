@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { Dict } from "../en";
 
-export const series: Pick<Dict, "series"> = {
+export const series: Pick<Dict, "series" | "span"> = {
   series: {
     back: "全部读数",
     publisher: "发布方",
@@ -56,5 +56,31 @@ export const series: Pick<Dict, "series"> = {
     downloadNote: "全分辨率、全历史；图上的日频数据经过抽稀。",
     onWall: "在因果链图表墙上查看",
     inCompare: "和其他序列对比",
+    showAll: (n: number) => `显示全部 ${n} 个读数`,
+    showRecent: "只显示最近 12 个",
+    allNote: "每个读数都是原始分辨率，最新的在前。",
+  },
+
+  span: {
+    heading: "所选区间",
+    hint: "选一个区间，或在图上拖选一段，可以看到这段时间的变化和高低点。",
+    note: (n: number) => `${n} 个读数 · 由你的浏览器根据图上的点计算`,
+    first: "起",
+    last: "止",
+    change: "变化",
+    high: "最高",
+    low: "最低",
+    noPct: "不给百分比：区间内有零或负值",
+    rank: (below: number, others: number) =>
+      below === 0 ? (
+        <>最后一个读数是区间内最低的。</>
+      ) : below === others ? (
+        <>最后一个读数是区间内最高的。</>
+      ) : (
+        <>
+          最后一个读数高于区间内其余 <b className="num">{others}</b> 个中的{" "}
+          <b className="num">{below}</b> 个。
+        </>
+      ),
   },
 };

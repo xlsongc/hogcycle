@@ -144,6 +144,11 @@ export function PanelChart({
         const p = byDate.get(b.d)?.p;
         return align === "release" && !p ? [] : [{ ...b, d: at(b.d, p) }];
       }),
+      // A revised period's ring sits on its reading, wherever that is drawn.
+      revisions: panel.revisions.flatMap((r) => {
+        const p = byDate.get(r.d)?.p;
+        return align === "release" && !p ? [] : [{ ...r, d: at(r.d, p) }];
+      }),
     };
   }, [panel, source, align, shift]);
   const markerDate = marker?.date;
@@ -304,6 +309,8 @@ export function PanelChart({
     };
   }, [panel, source, plotted, group, min, max, showAxisLabels, locale, markerDate, markerLabel]);
 
+  const revisedCount = (d: string) =>
+    panel.revisions.find((r) => r.d === d)?.prints.length ?? 0;
   const latest = [...panel.points].reverse().find((p) => p.v != null);
   const shown: Readout | null = probe
     ? probe.hit
@@ -376,6 +383,12 @@ export function PanelChart({
                   <>
                     <br />
                     {t.chart.published(probe.hit.p, lagDays(probe.hit.d, probe.hit.p))}
+                  </>
+                )}
+                {revisedCount(probe.hit.d) > 1 && (
+                  <>
+                    <br />
+                    {t.chart.revised(revisedCount(probe.hit.d))}
                   </>
                 )}
               </>

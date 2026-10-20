@@ -10,14 +10,17 @@
  * long view is what a single series page is for.
  */
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAlign } from "@/lib/useAlign";
 import type { Panel } from "@/types/generated/wall";
 import { PanelChart } from "@/charts/PanelChart";
-import { PRESETS, bounds, type Range } from "@/lib/range";
+import { DEFAULT_RANGE, PRESETS, bounds, parseRange, rangeParams, type Range } from "@/lib/range";
+import { readParams, writeParams } from "@/lib/urlState";
+import { windowStats } from "@/lib/windowStats";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
+import { WindowFacts } from "./WindowFacts";
 
 const GROUP = "hogcycle-series";
 
@@ -32,13 +35,29 @@ type Props = {
 
 export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
   const t = dict(locale);
-  const [range, setRange] = useState<Range>({ kind: "preset", preset: "all" });
+  const [range, setRange] = useState<Range>(DEFAULT_RANGE);
   const [align, setAlign] = useAlign();
+  // A window someone zoomed into is a view they can send. The prerendered
+  // page cannot know the query, so it is read once mounted and written back
+  // only after that, or the first render would erase it.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    setRange(parseRange(readParams()));
+    setReady(true);
+  }, []);
+  useEffect(() => {
+    if (ready) writeParams(rangeParams(range));
+  }, [range, ready]);
   const first = panel.points.find((p) => p.v != null)?.d ?? start;
   // A forecast runs past today; its last point is the reason to look.
   const last = panel.points[panel.points.length - 1]?.d ?? end;
   const until = last > end ? last : end;
   const [min, max] = bounds(range, first > start ? first : start, until);
+  const chosen = range.kind === "custom" || range.preset !== "all";
+  const stats = useMemo(
+    () => (chosen ? windowStats(panel.points, min, max, align) : null),
+    [chosen, panel.points, min, max, align]
+  );
   const marker = asOf
     ? { date: asOf, label: t.asOf.marker }
     : until > end
@@ -59,7 +78,7 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
           </button>
         ))}
         {range.kind === "custom" && (
-          <button onClick={() => setRange({ kind: "preset", preset: "all" })}>
+          <button onClick={() => setRange(DEFAULT_RANGE)}>
             {t.wall.reset}
           </button>
         )}
@@ -94,9 +113,14 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
           showAxisLabels
           locale={locale}
           onZoom={(a, b) => setRange({ kind: "custom", min: a, max: b })}
-          onReset={() => setRange({ kind: "preset", preset: "all" })}
+          onReset={() => setRange(DEFAULT_RANGE)}
         />
       </div>
+      {chosen ? (
+        <WindowFacts stats={stats} unit={panel.unit} locale={locale} />
+      ) : (
+        <p className="hint window-hint">{t.span.hint}</p>
+      )}
     </div>
   );
 }

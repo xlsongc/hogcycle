@@ -59,6 +59,7 @@ export const SERIES = {
   line: "line",
   join: "join",
   coarse: "coarse",
+  revised: "revised",
   probe: "probe",
 } as const;
 
@@ -88,6 +89,12 @@ export function panelOption(
   // smoother sample of the same one, so they are always marked: hollow, which
   // keeps the distinction off colour alone.
   const sparse = panel.points.filter((p) => p.g === "A" || p.g === "Q");
+
+  // A period whose value changed after it was first printed: a ring in ink,
+  // around whatever mark the reading already has, so it adds to the
+  // encoding rather than replacing it (A3). The trail is on the series page.
+  const revisedAt = new Set(panel.revisions.map((r) => r.d));
+  const revised = panel.points.filter((p) => p.v != null && revisedAt.has(p.d));
 
   const endpoint = [...panel.points].reverse().find(
     (p): p is typeof p & { v: number } => p.v != null
@@ -215,6 +222,19 @@ export function panelOption(
                 borderColor: color,
                 borderWidth: 2,
               },
+            },
+          ]
+        : []),
+      ...(revised.length
+        ? [
+            {
+              id: SERIES.revised,
+              type: "scatter" as const,
+              silent: true,
+              z: 4,
+              symbolSize: 14,
+              data: revised.map((p) => [p.d, p.v] as [string, number | null]),
+              itemStyle: { color: "transparent", borderColor: ink, borderWidth: 1 },
             },
           ]
         : []),

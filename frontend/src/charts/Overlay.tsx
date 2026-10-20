@@ -162,6 +162,31 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
         };
       });
 
+      // Revised periods ringed in ink, as on the wall (A3). Unnamed, so the
+      // legend and the tooltip pass over them.
+      const prints = chosen.map(
+        (panel) => new Map(panel.revisions.map((r) => [r.d, r.prints.length]))
+      );
+      const rings = series.flatMap((sr, i) => {
+        const data = sr.data.filter(([x]) => {
+          const p = behind[i]?.get(x);
+          return p != null && (prints[i]?.get(p.d) ?? 0) > 1;
+        });
+        return data.length
+          ? [
+              {
+                type: "scatter" as const,
+                name: "",
+                silent: true,
+                z: 4,
+                symbolSize: 14,
+                data,
+                itemStyle: { color: "transparent", borderColor: ink, borderWidth: 1 },
+              },
+            ]
+          : [];
+      });
+
       // Final value per series, so the legend can carry identity and number
       // in one uncollidable place.
       const finals = new Map<string, number>();
@@ -205,10 +230,12 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
                       ? fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale)
                       : "—";
                   const p = behind[i.seriesIndex ?? -1]?.get(x);
+                  const revised = p ? (prints[i.seriesIndex ?? -1]?.get(p.d) ?? 0) : 0;
                   const notes = p
                     ? [
                         align === "release" ? periodLabel(p.d, p.g, locale) : null,
                         p.p ? t.chart.published(p.p, lagDays(p.d, p.p)) : null,
+                        revised > 1 ? t.chart.revised(revised) : null,
                       ].filter(Boolean)
                     : [];
                   const note = notes.length
@@ -242,6 +269,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
           },
           series: [
             ...series,
+            ...rings,
             // The 100 line is the reading aid that makes an indexed chart
             // legible: everything above it outperformed the window's start.
             ...(indexed

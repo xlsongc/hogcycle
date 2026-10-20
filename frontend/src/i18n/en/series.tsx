@@ -64,5 +64,31 @@ export const series = {
     downloadNote: "Full resolution and full depth; the chart thins daily data.",
     onWall: "See it on the causal-chain wall",
     inCompare: "Compare it with other series",
+    showAll: (n: number) => `Show all ${n} readings`,
+    showRecent: "Show the latest 12",
+    allNote: "Every reading at full resolution, newest first.",
+  },
+
+  span: {
+    heading: "In this window",
+    hint: "Pick a window, or drag across the chart, to see its change, high and low.",
+    note: (n: number) => `${n} readings · computed in your browser from the points shown`,
+    first: "From",
+    last: "To",
+    change: "Change",
+    high: "High",
+    low: "Low",
+    noPct: "no percentage: the window reaches zero or below",
+    rank: (below: number, others: number) =>
+      below === 0 ? (
+        <>The last reading is the lowest in the window.</>
+      ) : below === others ? (
+        <>The last reading is the highest in the window.</>
+      ) : (
+        <>
+          The last reading is above <b className="num">{below}</b> of the other{" "}
+          <b className="num">{others}</b> in the window.
+        </>
+      ),
   },
 };

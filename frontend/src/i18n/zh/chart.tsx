@@ -39,6 +39,7 @@ export const chart: Pick<Dict, "chart" | "tier" | "granularity"> = {
     keys: "左右方向键逐个读数，Home 和 End 跳到两端。",
     spoken: (value: string, unit: string, date: string, kind: string, published?: string) =>
       `${value} ${unit}，${date}，${kind}${published ? `，${published} 发布` : ""}`,
+    revised: (n: number) => `修订过：共记录 ${n} 个数值`,
     coarse: "粗粒度",
   },
 

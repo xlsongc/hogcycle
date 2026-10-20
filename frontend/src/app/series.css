@@ -63,3 +63,52 @@ table.series-table td {
 table.series-table thead th {
   position: static;
 }
+
+/* The window the reader chose, and what happened inside it (A8). Under the
+   chart it describes, on the page's own grid. */
+.window-facts {
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-1);
+}
+
+.window-facts p {
+  margin: 0;
+}
+
+.window-facts dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 22px;
+  margin: 6px 0;
+}
+
+.window-facts dl div {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.window-facts dt {
+  color: var(--muted);
+}
+
+.window-facts dd {
+  margin: 0;
+}
+
+.window-hint {
+  margin: 8px 0 0;
+}
+
+/* Every reading (B9): scrolls inside its frame, with the header in view. */
+.readings-wrap.table-wrap {
+  margin-top: 0;
+  overflow: auto;
+}
+
+.readings-wrap.table-wrap table.series-table thead th {
+  position: sticky;
+}

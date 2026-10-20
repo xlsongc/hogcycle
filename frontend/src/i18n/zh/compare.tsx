@@ -22,6 +22,9 @@ export const compare: Pick<Dict, "compare" | "picker" | "overlay"> = {
       </>
     ),
     share: "这个视图记在地址栏里 —— 复制网址即可分享。",
+    tableCaption: "图上序列的月度表，各用自己的单位：每月取最后一个观测值，只含窗口内，已计入位移。",
+    tableNote: (rows: number) =>
+      `原值、各用自己的单位，按数值描述的月份排列（计入位移）· 每月取最后一个观测值 · 共 ${rows} 行`,
     undated: (names: string[]) =>
       `未画出：${names.join("、")}。它们的源头不写发布日期，本页从不猜测日期。`,
     signed: (names: string[]) =>

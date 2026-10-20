@@ -90,7 +90,7 @@ export function WallView({ panels, start, end, today, locale }: Props) {
         onZoom={zoom}
         onReset={reset}
       />
-      <TableView panels={shown} locale={locale} />
+      <TableView panels={shown} min={min} max={max} locale={locale} />
     </>
   );
 }

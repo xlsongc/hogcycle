@@ -20,6 +20,7 @@ import { useAlign } from "@/lib/useAlign";
 import { nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
+import { TableView } from "@/components/TableView";
 
 // Opens on the project's own thesis: capacity, shifted by the biological lag,
 // against the price it is supposed to lead.
@@ -193,6 +194,17 @@ export function CompareView({ panels, start, end, locale }: Props) {
         locale={locale}
       />
       <p className="hint">{t.compare.share}</p>
+      <TableView
+        panels={selected
+          .map((id) => panels.find((p) => p.id === id))
+          .filter((p): p is Panel => !!p)}
+        min={min}
+        max={max}
+        shift={lag && selected.includes(lag.id) ? lag : null}
+        caption={t.compare.tableCaption}
+        note={t.compare.tableNote}
+        locale={locale}
+      />
     </>
   );
 }
