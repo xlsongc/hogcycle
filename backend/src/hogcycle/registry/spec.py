@@ -19,7 +19,7 @@ from typing import Any, Literal
 
 from ..contracts.schema import GRANULARITIES
 
-Tier = Literal["capacity", "margin", "price", "noise", "equity"]
+Tier = Literal["capacity", "margin", "price", "noise", "equity", "market"]
 
 # The causal chain, in order:
 #   capacity  能繁母猪、仔猪价 → (10-12m) → 出栏     the real leading indicator
@@ -31,7 +31,11 @@ Tier = Literal["capacity", "margin", "price", "noise", "equity"]
 # the physical cycle, it is a claim on it — so it stays out of the causal
 # wall (`in_wall` is False) and lives in the overlay, where the question it
 # actually answers is whether the market leads or lags 能繁母猪.
-TIERS: tuple[str, ...] = ("capacity", "margin", "price", "noise", "equity")
+#
+# market is the futures market's price for a coming month: an expectation
+# with money behind it, not a measurement, so it stays off the wall too
+# (docs/adr/0035).
+TIERS: tuple[str, ...] = ("capacity", "margin", "price", "noise", "equity", "market")
 
 REACHES: tuple[str, ...] = ("anywhere", "cn")
 

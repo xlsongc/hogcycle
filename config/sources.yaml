@@ -756,3 +756,46 @@ indicators:
            start_date: "20150101", end_date: "20991231", adjust: hfq}
     extract: {value: close}
     notes: 屠宰+养殖一体，屠宰端使其对猪价的敞口方向与纯养殖标的不完全一致。
+
+  # ---------- market：期货市场的预期，不是测量（ADR-0035）----------
+  # 大商所自己的接口不给本项目数据（返回的不是 JSON），所以读新浪的镜像，页面上
+  # 写明来源。先放 reach: cn 由本地采集器采；GitHub runner 能不能连上新浪还没试过，
+  # 试过再改。
+
+  - id: lh_futures_main
+    name_zh: 生猪期货（主力连续）
+    name_en: Live hog futures (main continuous)
+    tier: market
+    freq: daily
+    unit: CNY/tonne
+    lo: 3000.0
+    hi: 60000.0
+    adapter: akshare
+    reach: cn
+    call: {fn: futures_zh_daily_sina, symbol: LH0}
+    extract: {period: date, value: settle}
+    # 新浪在没有结算价的日子写 0（2021-12-30、2024-09-25），那是缺数，不是价格。
+    zero_is_null: true
+    notes: >
+      大商所生猪期货主力连续合约的每日结算价，新浪镜像，2021-01-08 上市起。主力换月时
+      连续合约会跳一下，那是换了一个交割月，不是价格变动。单位是交割标准品的元/吨，
+      与现货的元/公斤不是同一口径，不换算。
+
+  - id: lh_futures_curve
+    name_zh: 生猪期货（各交割月）
+    name_en: Live hog futures (by delivery month)
+    tier: market
+    freq: monthly
+    unit: CNY/tonne
+    lo: 3000.0
+    hi: 60000.0
+    adapter: futures_curve
+    reach: cn
+    call: {product: LH, months: [1, 3, 5, 7, 9, 11]}
+    extract: {period: date, value: settle}
+    forecast: true
+    revises: true
+    notes: >
+      每个在挂合约的最新结算价，按交割月记：obs_date 是交割月月末，发布日期是这个
+      结算价的交易日。每个交易日都会重新定价，所以每天的采集都是同一时期的新一版，
+      silver 记下曲线每天的样子。合约到期后它最后的结算价留在原处。

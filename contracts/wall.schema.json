@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.5.0",
+      "const": "1.6.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -65,7 +65,7 @@
             "description": "The indicator's name in Chinese, as the registry defines it. Both names are carried because the caliber lives in the name — \u5b9a\u70b9\u5c60\u5bb0\u91cf\uff08\u5168\u53e3\u5f84\uff09 and \u5b9a\u70b9\u5c60\u5bb0\u91cf\uff08\u89c4\u6a21\u4ee5\u4e0a\uff09 are two different measurements, and a frontend-side lookup table would be free to drift from that distinction."
           },
           "name_en": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity", "market"] },
           "unit": { "type": "string" },
           "freq": { "type": "string" },
           "in_wall": {
@@ -224,7 +224,7 @@
           "id": { "type": "string" },
           "name_zh": { "type": "string" },
           "name_en": { "type": "string" },
-          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity"] },
+          "tier": { "type": "string", "enum": ["capacity", "margin", "price", "noise", "equity", "market"] },
           "in_wall": {
             "type": "boolean",
             "description": "Whether this reading describes the current state of the physical cycle. False for equities (a claim on the cycle, not a measurement of it) and for retired calibers (history, whose last value is not a reading of today)."

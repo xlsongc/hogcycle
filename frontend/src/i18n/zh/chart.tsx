@@ -33,6 +33,7 @@ export const chart: Pick<Dict, "chart" | "tier" | "granularity"> = {
       price: "价格：被预测的结果，不是驱动因素",
       noise: "噪音：短期扰动，影响股价，不改变周期",
       equity: "股票：对周期的索取权，不是周期的一环",
+      market: "市场：期货市场给未来某个月定的价，不是测量",
     },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}，单位 ${unit}，共 ${n} 个观测点`,
@@ -49,6 +50,7 @@ export const chart: Pick<Dict, "chart" | "tier" | "granularity"> = {
     price: "价格",
     noise: "噪音",
     equity: "股票",
+    market: "市场",
   },
 
   granularity: { D: "日", W: "周", M: "月", Q: "季", A: "年" },

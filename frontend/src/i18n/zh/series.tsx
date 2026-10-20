@@ -21,6 +21,7 @@ export const series: Pick<Dict, "series" | "span" | "cycles"> = {
       </>
     ),
     equity: "股价是对周期的索取权，不是周期的一环，所以不在图表墙上。",
+    market: "期货价格是市场用钱下注的预期，不是测量，也不是本项目的预测，所以不在图表墙上。",
     forecast: "这是 USDA 的估计与预测，不是测量，所以不放在图表墙上。",
     releaseForecast: "预测在它描述的时期结束之前发布，并随时期临近而修订。USDA 每年 4 月和 10 月设定中国的数字。",
     ahead: (date: string, days: number) => `${date} 发布，比时期结束早 ${days} 天`,

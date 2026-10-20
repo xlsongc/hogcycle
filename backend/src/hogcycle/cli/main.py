@@ -8,6 +8,7 @@ from pathlib import Path
 
 from ..collectors.akshare import AkshareAdapter
 from ..collectors.failures import ADVICE, BLOCKED
+from ..collectors.futures import FuturesCurveAdapter
 from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..collectors.usda_psd import UsdaPsdAdapter
@@ -125,6 +126,7 @@ def main(argv: list[str] | None = None) -> int:
             "moa": MoaAdapter(months_back=args.months_back),
             "moa_weekly": MoaWeeklyAdapter(pages=args.weekly_pages),
             "usda_psd": UsdaPsdAdapter(),
+            "futures_curve": FuturesCurveAdapter(),
         }
         if args.indicator:
             # `registry[...]` raises naming every known id, which is what you
@@ -190,6 +192,7 @@ def main(argv: list[str] | None = None) -> int:
             "moa": MoaAdapter(),
             "moa_weekly": MoaWeeklyAdapter(),
             "usda_psd": UsdaPsdAdapter(),
+            "futures_curve": FuturesCurveAdapter(),
         }
         ids = args.indicator.split(",") if args.indicator else None
         specs = [registry[i] for i in ids] if ids else list(registry)

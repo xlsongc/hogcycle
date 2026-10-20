@@ -90,16 +90,18 @@ def year_on_year(
     the series, and the contract is the boundary: the page renders numbers, it
     does not work them out. Returns None rather than guessing when no
     observation sits near the anniversary — a series that only starts this
-    year has no year-on-year, and saying so is the honest answer.
+    year has no year-on-year, and saying so is the honest answer. None too
+    when either value is at or below zero: a loss of 382 against one of 349
+    a year before is not "+9.5%" (facts.change says the same).
     """
-    if latest["value"] in (None, 0):
+    if latest["value"] is None or latest["value"] <= 0:
         return None
     target = latest["obs_date"] - dt.timedelta(days=365)
     prior = [r for r in rows if r["value"] and r["obs_date"] < latest["obs_date"]]
     if not prior:
         return None
     best = min(prior, key=lambda r: abs((r["obs_date"] - target).days))
-    if abs((best["obs_date"] - target).days) > YOY_TOLERANCE_DAYS:
+    if abs((best["obs_date"] - target).days) > YOY_TOLERANCE_DAYS or best["value"] <= 0:
         return None
     return round((latest["value"] / best["value"] - 1) * 100, 1)
 
@@ -252,8 +254,13 @@ def build_wall(
                 "breaks": cadence_breaks(
                     [r["obs_date"] for r in rows if r["value"] is not None]
                 ),
+                # A futures settle is re-printed every trading day; its trail
+                # is the curve's history, kept in silver and the CSV, and too
+                # long to ship on every page (docs/adr/0035).
                 "revisions": (
-                    [] if is_derived(spec) else revision_trail(spec, silver, start)
+                    []
+                    if is_derived(spec) or spec.tier == "market"
+                    else revision_trail(spec, silver, start)
                 ),
                 "points": points,
             }

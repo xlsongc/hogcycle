@@ -31,6 +31,7 @@ export const chart = {
       price: "Price: the outcome, not a driver",
       noise: "Noise: short-run disturbance that moves equities, not the cycle",
       equity: "Equity: a claim on the cycle, not a link in it",
+      market: "Market: what the futures market prices a coming month at, not a measurement",
     },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}, unit ${unit}, ${n} observations`,
@@ -47,6 +48,7 @@ export const chart = {
     price: "Price",
     noise: "Noise",
     equity: "Equity",
+    market: "Market",
   },
 
   granularity: { D: "D", W: "W", M: "M", Q: "Q", A: "A" },

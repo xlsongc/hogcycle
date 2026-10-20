@@ -334,3 +334,33 @@ table.readings tr.stale td:nth-child(2) b {
   margin-left: -1px;
   background: var(--tier, var(--ink));
 }
+
+/* ---------- the futures curve (docs/adr/0035) ---------- */
+
+table.futures-curve {
+  width: 100%;
+  max-width: 560px;
+  font-family: var(--mono);
+}
+
+table.futures-curve th,
+table.futures-curve td {
+  padding: 3px 8px 3px 0;
+  border: 0;
+}
+
+table.futures-curve tbody tr + tr td,
+table.futures-curve tbody tr + tr th[scope="row"] {
+  border-top: 0;
+}
+
+.futures-bar {
+  width: 100%;
+}
+
+.futures-bar span {
+  display: block;
+  height: 8px;
+  background: var(--tier);
+  border-radius: 1px;
+}

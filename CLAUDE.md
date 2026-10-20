@@ -243,3 +243,4 @@ so you do not have to re-derive them.
 | 0032 | A payload that changed shape says how (names gone, names new) before it is parsed |
 | 0033 | The browser computes only over what the reader chose (a window, a cycle start), and says so |
 | 0034 | An estimate says it is one: profit and breakeven per hog, modelled on the official months, tested out of sample, its own indicator |
+| 0035 | The futures market is a tier of its own (`market`, off the wall), read from a mirror checked against a second source |

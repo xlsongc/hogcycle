@@ -23,6 +23,7 @@ import { pathOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { HealthStamp } from "@/components/shell/HealthStamp";
 import { Glossary } from "@/components/Glossary";
+import { FuturesCurve } from "@/components/overview/FuturesCurve";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
@@ -39,6 +40,7 @@ const CARDS: [Role, string[]][] = [
 const OUTLOOK: Partial<Record<Role, string>> = { capacity: "usda_sow_stocks" };
 const CAPACITY = "sow_inventory";
 const PRICE = "hog_price_index";
+const FUTURES = "lh_futures_curve";
 
 export function OverviewPage({ data, locale }: { data: WallContract; locale: Locale }) {
   const t = dict(locale);
@@ -48,6 +50,7 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
   const readingOf = (id: string) => data.readings.find((r) => r.id === id);
   const capacity = panelOf(CAPACITY);
   const price = panelOf(PRICE);
+  const futures = panelOf(FUTURES);
   const end = data.window.end ?? data.generated_at.slice(0, 10);
   const asOf = data.generated_at.slice(0, 10);
 
@@ -96,6 +99,8 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
           <ThesisChart capacity={capacity} price={price} end={end} locale={locale} />
         </section>
       )}
+
+      {futures && <FuturesCurve curve={futures} today={end} locale={locale} />}
 
       <div className="ov-two">
         <ReleaseFeed readings={cycle} locale={locale} />

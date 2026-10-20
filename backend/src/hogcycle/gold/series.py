@@ -15,7 +15,7 @@ from ..registry.spec import IndicatorSpec, Registry
 from ..storage.silver import SilverStore
 from .derived import DERIVED
 
-TIER_ORDER = ("capacity", "margin", "price", "noise", "equity")
+TIER_ORDER = ("capacity", "margin", "price", "noise", "equity", "market")
 
 _DERIVED = {d.spec.id: d for d in DERIVED}
 

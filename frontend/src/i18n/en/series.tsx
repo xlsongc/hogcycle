@@ -22,6 +22,8 @@ export const series = {
       </>
     ),
     equity: "A share price is a claim on the cycle, not a link in it, so it is not on the wall.",
+    market:
+      "A futures price is the market's expectation with money behind it, not a measurement and not this project's forecast, so it is not on the wall.",
     forecast:
       "This is USDA's estimate and forecast, not a measurement, so it is kept off the wall.",
     releaseForecast:

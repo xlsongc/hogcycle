@@ -3,11 +3,11 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.5.0";
+export const CONTRACT_VERSION = "1.6.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.5.0";
+  contract_version: "1.6.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
@@ -45,7 +45,7 @@ export interface Panel {
   /** The indicator's name in Chinese, as the registry defines it. Both names are carried because the caliber lives in the name — 定点屠宰量（全口径） and 定点屠宰量（规模以上） are two different measurements, and a frontend-side lookup table would be free to drift from that distinction. */
   name_zh: string;
   name_en: string;
-  tier: "capacity" | "margin" | "price" | "noise" | "equity";
+  tier: "capacity" | "margin" | "price" | "noise" | "equity" | "market";
   unit: string;
   freq?: string;
   /** Whether this series belongs in the causal-chain wall. False for equities: a share price is a claim on the cycle, not a link in it, so it lives in the overlay instead. */
@@ -140,7 +140,7 @@ export interface Reading {
   id: string;
   name_zh: string;
   name_en: string;
-  tier: "capacity" | "margin" | "price" | "noise" | "equity";
+  tier: "capacity" | "margin" | "price" | "noise" | "equity" | "market";
   /** Whether this reading describes the current state of the physical cycle. False for equities (a claim on the cycle, not a measurement of it) and for retired calibers (history, whose last value is not a reading of today). */
   in_wall?: boolean;
   unit: string;

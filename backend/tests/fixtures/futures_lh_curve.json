@@ -1,0 +1,269 @@
+{
+ "product": "LH",
+ "contracts": {
+  "LH2611": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 10055.0,
+     "date": "2026-10-16",
+     "high": 10200.0,
+     "hold": 75962,
+     "low": 10000.0,
+     "open": 10040.0,
+     "settle": 10085.0,
+     "volume": 56720
+    },
+    {
+     "close": 9960.0,
+     "date": "2026-10-19",
+     "high": 10070.0,
+     "hold": 68079,
+     "low": 9935.0,
+     "open": 10010.0,
+     "settle": 10000.0,
+     "volume": 38324
+    },
+    {
+     "close": 9570.0,
+     "date": "2026-10-20",
+     "high": 10045.0,
+     "hold": 54174,
+     "low": 9555.0,
+     "open": 10025.0,
+     "settle": 9750.0,
+     "volume": 60954
+    }
+   ]
+  },
+  "LH2701": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 10490.0,
+     "date": "2026-10-16",
+     "high": 10615.0,
+     "hold": 182448,
+     "low": 10325.0,
+     "open": 10450.0,
+     "settle": 10475.0,
+     "volume": 174035
+    },
+    {
+     "close": 10215.0,
+     "date": "2026-10-19",
+     "high": 10475.0,
+     "hold": 191578,
+     "low": 10210.0,
+     "open": 10445.0,
+     "settle": 10320.0,
+     "volume": 143278
+    },
+    {
+     "close": 9995.0,
+     "date": "2026-10-20",
+     "high": 10280.0,
+     "hold": 207052,
+     "low": 9985.0,
+     "open": 10215.0,
+     "settle": 10110.0,
+     "volume": 170782
+    }
+   ]
+  },
+  "LH2703": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 10240.0,
+     "date": "2026-10-16",
+     "high": 10365.0,
+     "hold": 131296,
+     "low": 10130.0,
+     "open": 10280.0,
+     "settle": 10260.0,
+     "volume": 42322
+    },
+    {
+     "close": 10100.0,
+     "date": "2026-10-19",
+     "high": 10290.0,
+     "hold": 135242,
+     "low": 10100.0,
+     "open": 10290.0,
+     "settle": 10180.0,
+     "volume": 40555
+    },
+    {
+     "close": 9885.0,
+     "date": "2026-10-20",
+     "high": 10190.0,
+     "hold": 141920,
+     "low": 9870.0,
+     "open": 10185.0,
+     "settle": 10010.0,
+     "volume": 57698
+    }
+   ]
+  },
+  "LH2705": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 11235.0,
+     "date": "2026-10-16",
+     "high": 11370.0,
+     "hold": 55951,
+     "low": 11060.0,
+     "open": 11215.0,
+     "settle": 11220.0,
+     "volume": 16349
+    },
+    {
+     "close": 11235.0,
+     "date": "2026-10-19",
+     "high": 11330.0,
+     "hold": 57207,
+     "low": 11185.0,
+     "open": 11250.0,
+     "settle": 11255.0,
+     "volume": 16039
+    },
+    {
+     "close": 11020.0,
+     "date": "2026-10-20",
+     "high": 11390.0,
+     "hold": 57856,
+     "low": 10980.0,
+     "open": 11370.0,
+     "settle": 11155.0,
+     "volume": 21388
+    }
+   ]
+  },
+  "LH2707": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 12155.0,
+     "date": "2026-10-16",
+     "high": 12285.0,
+     "hold": 36508,
+     "low": 11930.0,
+     "open": 12045.0,
+     "settle": 12105.0,
+     "volume": 14415
+    },
+    {
+     "close": 12165.0,
+     "date": "2026-10-19",
+     "high": 12260.0,
+     "hold": 37101,
+     "low": 12080.0,
+     "open": 12200.0,
+     "settle": 12175.0,
+     "volume": 10686
+    },
+    {
+     "close": 11995.0,
+     "date": "2026-10-20",
+     "high": 12385.0,
+     "hold": 38163,
+     "low": 11935.0,
+     "open": 12360.0,
+     "settle": 12120.0,
+     "volume": 15132
+    }
+   ]
+  },
+  "LH2709": {
+   "columns": [
+    "date",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "hold",
+    "settle"
+   ],
+   "records": [
+    {
+     "close": 12930.0,
+     "date": "2026-10-16",
+     "high": 13060.0,
+     "hold": 23989,
+     "low": 12650.0,
+     "open": 12740.0,
+     "settle": 12850.0,
+     "volume": 13966
+    },
+    {
+     "close": 12980.0,
+     "date": "2026-10-19",
+     "high": 13090.0,
+     "hold": 27236,
+     "low": 12845.0,
+     "open": 12930.0,
+     "settle": 12955.0,
+     "volume": 11851
+    },
+    {
+     "close": 12865.0,
+     "date": "2026-10-20",
+     "high": 13215.0,
+     "hold": 30578,
+     "low": 12805.0,
+     "open": 13200.0,
+     "settle": 12965.0,
+     "volume": 17133
+    }
+   ]
+  }
+ }
+}

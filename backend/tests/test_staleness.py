@@ -203,6 +203,17 @@ def test_yoy_is_none_when_nothing_sits_near_the_anniversary():
     assert year_on_year(rows, rows[-1]) is None
 
 
+def test_yoy_is_none_at_or_below_zero():
+    """A loss of 382 per hog against a loss of 349 a year before is not
+    "+9.5%"; neither is a loss against a profit."""
+    from hogcycle.gold.wall import year_on_year
+
+    loss = [_row(dt.date(2025, 10, 15), -349.0), _row(dt.date(2026, 10, 15), -382.0)]
+    assert year_on_year(loss, loss[-1]) is None
+    swing = [_row(dt.date(2025, 10, 15), 120.0), _row(dt.date(2026, 10, 15), -382.0)]
+    assert year_on_year(swing, swing[-1]) is None
+
+
 def test_yoy_ignores_later_observations():
     """Rebuilding the wall as it stood on a past date must not reach forward."""
     from hogcycle.gold.wall import year_on_year

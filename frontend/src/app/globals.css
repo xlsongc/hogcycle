@@ -48,6 +48,11 @@
   --price-ink: #17815b;
   --noise-ink: #72716c;
 
+  /* The futures market (docs/adr/0035): never on the wall, so it borrows the
+     overlay's seventh slot rather than claiming a fourth tier hue. */
+  --market: #4a3aa7;
+  --market-ink: #4a3aa7;
+
   /* Overlay categorical order — validated adjacent-pairs in both modes. */
   --slot-1: #2a78d6;
   --slot-2: #eb6834;
@@ -89,6 +94,8 @@
     --margin-ink: #da5c2a;
     --price-ink: #199e70;
     --noise-ink: #898781;
+    --market: #9085e9;
+    --market-ink: #9085e9;
     /* 4.66:1 on a card; the light value is 3.6:1 here. */
     --critical: #d85c5c;
     --slot-1: #3987e5;
@@ -121,6 +128,8 @@
   --margin-ink: #da5c2a;
   --price-ink: #199e70;
   --noise-ink: #898781;
+  --market: #9085e9;
+  --market-ink: #9085e9;
   --critical: #d85c5c;
   --slot-1: #3987e5;
   --slot-2: #d95926;

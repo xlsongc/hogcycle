@@ -24,7 +24,14 @@ import { nameOf, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { find } from "@/lib/search";
 
-const TIER_ORDER: Panel["tier"][] = ["capacity", "margin", "price", "noise", "equity"];
+const TIER_ORDER: Panel["tier"][] = [
+  "capacity",
+  "margin",
+  "price",
+  "noise",
+  "equity",
+  "market",
+];
 
 type Props = {
   panels: Panel[];

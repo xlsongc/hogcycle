@@ -173,6 +173,24 @@ series:
       zh: 估算的成本 ÷ 校准系数：500 县生猪价要到多少，规模养殖场才不赚不亏。和 500 县生猪价同一口径，可以在对比页上与它画在同一条轴上；价格在它下面就是亏损。估算值，不是官方数，方法与误差见每头净利润估算。
       en: Estimated cost over the calibrated factor, the 500-county hog price at which a scale farm neither earns nor loses. It is on the 500-county price's caliber, so it can share an axis with that price on the compare page; a price below it is a loss. An estimate, not an official figure; the method and its error are on the estimated profit's page.
 
+  lh_futures_main:
+    publisher:
+      zh: 大连商品交易所生猪期货，经新浪财经镜像（交易所接口拒绝本项目访问）
+      en: Dalian Commodity Exchange live hog futures, via Sina Finance's copy (the exchange's own endpoint refuses this project)
+    url: https://www.dce.com.cn/
+    about:
+      zh: 持仓最多的那个合约每天的结算价，接成一条线。它是市场用钱下注的预期，不是测量，所以不上图表墙。换主力合约时线会跳，那是换了交割月。元/吨，交割标准品口径，和现货的元/公斤不是一回事。
+      en: The settle of whichever contract has the most open interest each day, joined into one line. It is an expectation the market puts money behind, not a measurement, so it stays off the wall. The line jumps when the main contract rolls to a new delivery month. CNY per tonne of the delivery grade, not the same caliber as spot prices in CNY per kg.
+
+  lh_futures_curve:
+    publisher:
+      zh: 大连商品交易所生猪期货，经新浪财经镜像，逐个合约读取
+      en: Dalian Commodity Exchange live hog futures, via Sina Finance's copy, read one contract at a time
+    url: https://www.dce.com.cn/
+    about:
+      zh: 每个在挂合约的最新结算价，按交割月排开：市场此刻给未来每个月的猪定的价。它是市场的预期，不是本项目的预测。每个交易日都重新定价，本仓库记下每一天的曲线。元/吨。
+      en: The latest settle of every listed contract, laid out by delivery month — what the market prices hogs at for each coming month, right now. The market's expectation, not this project's forecast. Re-priced every trading day, and this warehouse keeps the curve as it stood each day. CNY per tonne.
+
   hog_price_ndrc:
     publisher:
       zh: 国家发展改革委价格监测中心，五部委月度联合发布

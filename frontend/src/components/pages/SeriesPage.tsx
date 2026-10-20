@@ -80,6 +80,8 @@ export function SeriesPage({ panel, earlier, later, reading: r, start, end, toda
         )}
         {panel.tier === "equity" ? (
           <p className="muted">{s.equity}</p>
+        ) : panel.tier === "market" ? (
+          <p className="muted">{s.market}</p>
         ) : panel.forecast ? (
           <p className="muted">{s.forecast}</p>
         ) : panel.in_wall === false ? (
