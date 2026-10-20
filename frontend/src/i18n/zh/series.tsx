@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { Dict } from "../en";
 
-export const series: Pick<Dict, "series" | "span" | "cycles"> = {
+export const series: Pick<Dict, "series" | "span" | "cycles" | "units" | "seasons"> = {
   series: {
     back: "全部读数",
     publisher: "发布方",
@@ -87,6 +87,22 @@ export const series: Pick<Dict, "series" | "span" | "cycles"> = {
     caption: "每轮周期按距起点的整月排列：取离每个月最近的读数，给出指数和原单位数值。",
     label: (n: number, months: number, indexed: boolean) =>
       `周期叠放，${n} 轮，每轮 ${months} 个月，${indexed ? "以各自起点指数化" : "按序列自己的单位"}`,
+  },
+
+  seasons: {
+    heading: "逐年季节对比",
+    note: "最近六个自然年各画一条线，共用一条 1 月到 12 月的横轴，今年画得最粗。猪价有季节性，同样的涨跌放在 3 月和放在 11 月意思不同。只画读数本身，不画往年平均。",
+    month: (m: number) => `${m}月`,
+    label: (years: number[]) => `逐年季节对比，每年一条线：${years.join("、")}`,
+  },
+
+  units: {
+    label: "单位",
+    level: "原值",
+    yoy: "同比变化",
+    yoypct: "同比 %",
+    pct: "环比 %",
+    note: "由你的浏览器计算；一年前指离 365 天前最近、相差不超过 45 天的读数，和卡片上的同比一致",
   },
 
   span: {

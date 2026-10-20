@@ -16,9 +16,9 @@ import { unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { periodLabel } from "@/lib/period";
 
-type Props = { stats: WindowStats | null; unit: string; locale: Locale };
+type Props = { stats: WindowStats | null; unit: string; pct?: boolean; locale: Locale };
 
-export function WindowFacts({ stats: s, unit, locale }: Props) {
+export function WindowFacts({ stats: s, unit, pct = true, locale }: Props) {
   const t = dict(locale).span;
   if (!s) return null;
   const u = unitOf(unit, locale);
@@ -54,7 +54,7 @@ export function WindowFacts({ stats: s, unit, locale }: Props) {
               {fmt(Math.abs(s.change), unit, locale)}
             </b>{" "}
             <span className="muted">{u}</span>
-            {s.pct != null ? (
+            {!pct ? null : s.pct != null ? (
               <span className="num">
                 {" "}
                 ({sign}

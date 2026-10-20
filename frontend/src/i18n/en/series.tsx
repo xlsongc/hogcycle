@@ -100,6 +100,23 @@ export const series = {
       `Cycles side by side, ${n} cycles over ${months} months, ${indexed ? "indexed to each start" : "in the series' own units"}`,
   },
 
+  seasons: {
+    heading: "Season by season",
+    note: "Each of the last six calendar years over one January to December axis, this year drawn heavier. Hog prices have a season, so a move reads differently in March than in November. The readings only: no average of past years is drawn.",
+    month: (m: number) =>
+      ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] ?? "",
+    label: (years: number[]) => `Season by season, one line per year: ${years.join(", ")}`,
+  },
+
+  units: {
+    label: "Units",
+    level: "Level",
+    yoy: "Change from a year ago",
+    yoypct: "% from a year ago",
+    pct: "% from the reading before",
+    note: "computed in your browser; a year ago is the reading nearest 365 days earlier, within 45 days, as on the cards",
+  },
+
   span: {
     heading: "In this window",
     hint: "Pick a window, or drag across the chart, to see its change, high and low.",

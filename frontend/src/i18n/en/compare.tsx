@@ -39,6 +39,23 @@ export const compare = {
         : `Not drawn: ${names[0]}. It goes below zero, so an index to its first value would mean nothing. Select it with series in its own unit to see it.`,
   },
 
+  lagScan: {
+    heading: "Which shift lines up best",
+    against: "Against",
+    basis: "Compare",
+    yoy: "year-on-year changes",
+    level: "levels",
+    here: (k: number, r: string, n: number) =>
+      `Shifted ${k} months, the correlation is ${r} over ${n} months.`,
+    hereNone: (k: number) => `Shifted ${k} months, too few months overlap for a correlation.`,
+    best: (k: number, r: string, n: number) => `The strongest is at ${k} months: ${r} over ${n}.`,
+    note: (basis: "yoy" | "level") =>
+      `Pearson's r at each shift from 0 to 24 months, over month ends${basis === "yoy" ? ", each compared with the same month a year earlier, which takes out trends and the season" : "; two trending levels correlate whether or not one leads"}. Computed in your browser. About three cycles of history: this describes that history, it does not promise the next one.`,
+    tooFew: "Too few months overlap at any shift for a correlation (24 at least).",
+    label: (lead: string, target: string) =>
+      `Correlation of ${lead}, shifted 0 to 24 months, with ${target}`,
+  },
+
   picker: {
     atCapTitle: (max: number) =>
       `At most ${max} series at once — a ninth would need a generated hue, and a generated hue is indistinguishable from an existing one under colour-vision deficiency`,

@@ -241,3 +241,41 @@ input[type="date"]:focus-visible {
 .picker-list[hidden] {
   display: none;
 }
+
+/* ---------- lag scan (compare) ---------- */
+
+.lag-scan p {
+  margin: 6px 0;
+}
+
+.lag-bars {
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  display: block;
+}
+
+.lag-zero {
+  stroke: var(--axis);
+  stroke-width: 1;
+}
+
+.lag-bar {
+  fill: var(--muted);
+}
+
+.lag-bar.best {
+  fill: var(--ink-2);
+}
+
+/* The reader's own shift, outlined in ink so it reads without colour. */
+.lag-bar.here {
+  fill: var(--ink);
+  stroke: var(--ink);
+}
+
+/* Numerals only, so the face and size come from .num. */
+.lag-tick {
+  fill: var(--muted);
+  text-anchor: middle;
+}

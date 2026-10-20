@@ -2,7 +2,7 @@
 
 import type { Dict } from "../en";
 
-export const compare: Pick<Dict, "compare" | "picker" | "overlay"> = {
+export const compare: Pick<Dict, "compare" | "picker" | "overlay" | "lagScan"> = {
   compare: {
     heading: "对比",
     sub: (
@@ -29,6 +29,21 @@ export const compare: Pick<Dict, "compare" | "picker" | "overlay"> = {
       `未画出：${names.join("、")}。它们的源头不写发布日期，本页从不猜测日期。`,
     signed: (names: string[]) =>
       `未画出：${names.join("、")}。${names.length > 1 ? "它们" : "它"}会跌到零以下，以首值为 100 的指数没有意义；和同单位的序列一起选，就能看到。`,
+  },
+
+  lagScan: {
+    heading: "前移多少个月最对得上",
+    against: "对照",
+    basis: "比较",
+    yoy: "同比变化",
+    level: "原值",
+    here: (k: number, r: string, n: number) => `前移 ${k} 个月时，相关系数 ${r}，基于 ${n} 个月。`,
+    hereNone: (k: number) => `前移 ${k} 个月时，重叠的月份太少，算不出相关系数。`,
+    best: (k: number, r: string, n: number) => `最强在 ${k} 个月：${r}，基于 ${n} 个月。`,
+    note: (basis: "yoy" | "level") =>
+      `从 0 到 24 个月逐个位移算皮尔逊相关系数，用月末值${basis === "yoy" ? "，每月都和一年前同月比，去掉趋势和季节" : "；两条都有趋势的原值，不管谁领先都会相关"}。由你的浏览器计算。历史只有大约三轮周期：这描述的是过去，不保证下一轮。`,
+    tooFew: "任何位移下重叠的月份都不够（至少 24 个），算不出相关系数。",
+    label: (lead: string, target: string) => `${lead} 前移 0 到 24 个月后与 ${target} 的相关系数`,
   },
 
   picker: {

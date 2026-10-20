@@ -17,6 +17,7 @@ import { PanelChart } from "@/charts/PanelChart";
 import { DEFAULT_RANGE, PRESETS, bounds, parseRange, rangeParams, type Range } from "@/lib/range";
 import { readParams, writeParams } from "@/lib/urlState";
 import { windowStats } from "@/lib/windowStats";
+import { UNITS, parseUnits, transform, unitAfter, type Units } from "@/lib/transform";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
@@ -40,14 +41,31 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
   // A window someone zoomed into is a view they can send. The prerendered
   // page cannot know the query, so it is read once mounted and written back
   // only after that, or the first render would erase it.
+  const [units, setUnits] = useState<Units>("level");
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    setRange(parseRange(readParams()));
+    const q = readParams();
+    setRange(parseRange(q));
+    setUnits(parseUnits(q.get("u")));
     setReady(true);
   }, []);
   useEffect(() => {
-    if (ready) writeParams(rangeParams(range));
-  }, [range, ready]);
+    if (ready) writeParams({ ...rangeParams(range), u: units === "level" ? null : units });
+  }, [range, units, ready]);
+  // The series as the reader asked to see it (lib/transform.ts). A threshold
+  // is a level, so it goes with the level view.
+  const drawn = useMemo(
+    () =>
+      units === "level"
+        ? panel
+        : {
+            ...panel,
+            points: transform(panel.points, units),
+            unit: unitAfter(units, panel.unit),
+            threshold: null,
+          },
+    [panel, units]
+  );
   const first = panel.points.find((p) => p.v != null)?.d ?? start;
   // A forecast runs past today; its last point is the reason to look.
   const last = panel.points[panel.points.length - 1]?.d ?? end;
@@ -55,8 +73,8 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
   const [min, max] = bounds(range, first > start ? first : start, until);
   const chosen = range.kind === "custom" || range.preset !== "all";
   const stats = useMemo(
-    () => (chosen ? windowStats(panel.points, min, max, align) : null),
-    [chosen, panel.points, min, max, align]
+    () => (chosen ? windowStats(drawn.points, min, max, align) : null),
+    [chosen, drawn.points, min, max, align]
   );
   const marker = asOf
     ? { date: asOf, label: t.asOf.marker }
@@ -98,9 +116,18 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
           </>
         )}
       </div>
+      <div className="bar">
+        <span className="filter-label">{t.units.label}</span>
+        {UNITS.map((u) => (
+          <button key={u} aria-pressed={units === u} onClick={() => setUnits(u)}>
+            {t.units[u]}
+          </button>
+        ))}
+        {units !== "level" && <span className="hint">{t.units.note}</span>}
+      </div>
       <div className="wall">
         <PanelChart
-          panel={panel}
+          panel={drawn}
           group={GROUP}
           min={min}
           max={max}
@@ -117,7 +144,14 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
         />
       </div>
       {chosen ? (
-        <WindowFacts stats={stats} unit={panel.unit} locale={locale} />
+        <WindowFacts
+          stats={stats}
+          unit={drawn.unit}
+          // A percentage change of a percentage, or of a change, is not
+          // something anyone reads correctly.
+          pct={units === "level"}
+          locale={locale}
+        />
       ) : (
         <p className="hint window-hint">{t.span.hint}</p>
       )}

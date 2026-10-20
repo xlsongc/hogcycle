@@ -21,6 +21,7 @@ import { nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
 import { TableView } from "@/components/TableView";
+import { LagScan } from "./LagScan";
 
 // Opens on the project's own thesis: capacity, shifted by the biological lag,
 // against the price it is supposed to lead.
@@ -193,6 +194,17 @@ export function CompareView({ panels, start, end, locale }: Props) {
         align={align}
         locale={locale}
       />
+      {lag && selected.includes(lag.id) && selected.length > 1 && (
+        <LagScan
+          lead={panels.find((p) => p.id === lag.id) as Panel}
+          targets={selected
+            .filter((id) => id !== lag.id)
+            .map((id) => panels.find((p) => p.id === id))
+            .filter((p): p is Panel => !!p)}
+          months={lag.months}
+          locale={locale}
+        />
+      )}
       <p className="hint">{t.compare.share}</p>
       <TableView
         panels={selected
