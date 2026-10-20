@@ -20,6 +20,15 @@ PY="${HOGCYCLE_PYTHON:-python3}"
 
 log() { printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
 
+# A scheduled run often starts in a maintenance wake that lasts seconds: on
+# 2026-10-20 the Mac went back to sleep six seconds in and the run finished
+# eleven hours later, at the next real wake. Hold an assertion for the run's
+# life. On power it keeps the machine awake; on battery with the lid shut
+# macOS may still sleep, and the run finishes at the next wake, as before.
+if [[ -z "${HOGCYCLE_AWAKE:-}" ]] && command -v caffeinate >/dev/null; then
+  HOGCYCLE_AWAKE=1 exec caffeinate -is /bin/bash "$0" "$@"
+fi
+
 if ! "$PY" -c 'import sys; sys.exit(sys.version_info < (3, 11))' 2>/dev/null; then
   log "need Python 3.11 or later, got $("$PY" --version 2>&1 || echo "no $PY");" \
     "set HOGCYCLE_PYTHON or rerun install.sh from a shell that has one"
