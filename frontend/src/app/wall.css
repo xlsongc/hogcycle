@@ -117,8 +117,12 @@ a.panel-title:hover {
   white-space: nowrap;
 }
 
+/* The label is inverted, so its emphasis takes the label's colour: the
+   page-wide rule paints <b> in ink, which here is the background, and the
+   value under the pointer vanished (2026-10-15 to 10-20). */
 .probe b {
   font-weight: 400;
+  color: inherit;
 }
 
 /* Past the right two-fifths, the label goes to the cursor's left instead of
