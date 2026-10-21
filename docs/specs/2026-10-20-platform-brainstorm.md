@@ -32,6 +32,9 @@ checked, and what was built.
 | 10 | E-mail alerts | Medium | Needs a sending service and addresses: outward-facing, owner's decision | Later, via the feed (6) first |
 | 11 | Weekly digest pages (an archive of "this week") | Medium | Export-time, static. Medium | Later |
 | 12 | Backtest on `published()` | High for the thesis | Medium-large | Next session |
+| 14 | **Margin calculator** (ISU's crush-margin calculator, for Chinese hogs): the reader's weight, cost, price and basis, today and at each futures settle | High for farms, the largest audience | Browser-side over the reader's own inputs (ADR-0033). Small | **Built 10-21** (ADR-0038) |
+| 15 | **Data page**: the stable addresses, the columns, every series' files, citing | Medium: the files existed but could not be found | Static, small | **Built 10-21** (ADR-0038) |
+| 16 | Revenue: an English newsletter first, then a data tier after a rights review | See [making it pay](2026-10-21-making-it-pay.md) | Needs the owner's accounts and decisions | Owner's call |
 | 13 | Visitor countries (asked 10-21) | Medium: who reads it, China or the US | GitHub Pages keeps no logs. Cloudflare Web Analytics: free, no cookies, IP dropped at the edge, country breakdown, a script after load. Mainland visitors whose network cannot reach Cloudflare go uncounted, so China is a floor | Owner's call: a tracker is outward-facing and needs the owner's account |
 
 ## Rules that bend, and how

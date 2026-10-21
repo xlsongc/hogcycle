@@ -16,6 +16,7 @@ next, in order. Item ids are the plan's.
 | 10-20 | A8 window facts on the series page; A9 cycles laid over each other from reader-named starts; B9 every reading on the series page, a month-end table on compare; A3 rings on revised periods | ADR-0033 |
 | decisions | Q4 browser computes only over reader-chosen inputs; Q5 no compaction; Q6 dbt rejected, ADR-0010 closed | ADR-0033, ADR-0010 |
 | 10-21 | The futures market's track record: every contract's life since LH2109, each delivered contract's settle 1/3/6/9 months ahead against its last; both futures series collected from GitHub | ADR-0036 |
+| 10-21 (late) | Readable, premium redesign: Inter on a type scale, the pixel face only for the wordmark and section numbers, zpix removed (it needed a commercial licence); answers before method; a price strip; a footer. A margin calculator (`/calc/`) and a data page (`/datasets/`). How the site could pay: [making it pay](2026-10-21-making-it-pay.md) | ADR-0037, ADR-0038 |
 
 Fixed on 10-20:
 
@@ -67,6 +68,9 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    - 猪粮比价: [the options](2026-10-21-hog-corn-ratio-decision.md). The
      recommendation is A, retire it. Due before 12-17, when the warning
      starts.
+   - How the site could earn money: [making it pay](2026-10-21-making-it-pay.md).
+     The first steps are the owner's: analytics, then a free English
+     newsletter. Nothing outward-facing has been started.
    - Visitor countries: Cloudflare Web Analytics (free, no cookies, IP
      dropped at Cloudflare's edge, country breakdown) was proposed on 10-21.
      It is not built: adding a tracker needs the owner's yes and the
@@ -90,9 +94,12 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    against it. Next estimate candidates, each needing its own holdout test
    first: 自繁自养 vs 外购仔猪 profit, and the sow-culling margin. A track
    record like the market's needs vintages of the estimate, kept from now.
-6. **Platform, next round** (from the brainstorm). A weekly digest page per
-   week, archived. E-mail alerts are the owner's call, because they are
-   outward-facing.
+6. **Platform, next round** (from the brainstorm and the pay memo). A
+   weekly digest page per week, archived, in both languages: the thing a
+   newsletter would send. E-mail alerts are the owner's call, because they
+   are outward-facing. On the calculator: a breakeven line drawn on the
+   futures curve, and the reader's numbers kept in the browser between
+   visits.
 7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a
@@ -116,11 +123,8 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 
 ## Notes for whoever picks this up
 
-- New Chinese copy or a new indicator name: the build fails on a character
-  the font subset lacks. Re-cut with
-  `frontend/scripts/subset-cjk-font.sh <zpix source>` (needs fonttools from
-  `.venv`: `PATH="$PWD/.venv/bin:$PATH"`). The zpix source is not in the repo
-  (licence, see `Zpix-NOTICE.md`).
+- Font sizes come from the `--text-*` tokens (ADR-0037); the build fails
+  on a literal size. Chinese needs no font work any more: zpix is gone.
 - Anything drawn on an inverted background (ink fill) must set its own
   emphasis colour: `b, strong` are ink page-wide.
 - A browser-side computation needs ADR-0033's justification: an input only
