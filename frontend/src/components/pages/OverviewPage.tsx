@@ -104,7 +104,14 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
         </section>
       )}
 
-      {futures && <FuturesCurve curve={futures} today={end} locale={locale} />}
+      {futures && (
+        <FuturesCurve
+          curve={futures}
+          track={data.market?.track_record}
+          today={end}
+          locale={locale}
+        />
+      )}
 
       <div className="ov-two">
         <ReleaseFeed readings={cycle} locale={locale} />

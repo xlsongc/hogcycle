@@ -13,12 +13,13 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
-import type { Panel, Reading } from "@/types/generated/wall";
+import type { Market, Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { SeriesChart } from "@/components/series/SeriesChart";
 import { AsOfControl } from "@/components/AsOfControl";
 import { Cycles } from "@/components/series/Cycles";
 import { Seasons } from "@/components/series/Seasons";
+import { MarketHistory } from "@/components/series/MarketHistory";
 import { pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { firstKnowable, knownOn, panelOn, type Known } from "@/lib/asOf";
@@ -36,10 +37,12 @@ type Props = {
   /** Today, as the contract knows it: the latest day worth asking about. */
   today: string;
   locale: Locale;
+  /** The futures curve's history and track record, on that curve's page only. */
+  market?: Market;
   children: ReactNode;
 };
 
-export function SeriesBody({ panel, reading, start, end, today, locale, children }: Props) {
+export function SeriesBody({ panel, reading, start, end, today, locale, market, children }: Props) {
   const t = dict(locale);
   const [day, setDay] = useAsOf();
   const known = day ? knownOn(panel, day) : null;
@@ -96,6 +99,8 @@ export function SeriesBody({ panel, reading, start, end, today, locale, children
       <Seasons panel={shown} locale={locale} />
 
       {spansCycles(shown) && <Cycles panel={shown} locale={locale} />}
+
+      {market && <MarketHistory market={market} unit={panel.unit} day={day} locale={locale} />}
 
       {children}
 

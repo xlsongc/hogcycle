@@ -343,6 +343,11 @@ table.futures-curve {
   font-family: var(--mono);
 }
 
+/* The track-record line reads as a caveat on the bars, not as their last row. */
+table.futures-curve + .section-note {
+  margin-top: 14px;
+}
+
 table.futures-curve th,
 table.futures-curve td {
   padding: 3px 8px 3px 0;

@@ -14,6 +14,8 @@ export const overview = {
     futuresMonth: "Delivery month",
     futuresSettle: "Settle",
     futuresMore: "every contract, and the main contract since 2021",
+    futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
+      `How far off such prices have been: three months before delivery, a contract's settle sat ${three}% from where it finished, on average; six months before, ${six}%, and ${Math.abs(sixSigned)}% ${sixSigned >= 0 ? "above" : "below"} it on the signed average (${n} delivered contracts since 2021). The past only, and few cycles of it.`,
     thesisNote: (
       <>
         Breeding sow inventory, shifted forward by the lead you pick, above the

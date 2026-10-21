@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.6.0",
+      "const": "1.7.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -35,6 +35,90 @@
               "age_hours": { "type": ["integer", "null"] },
               "limit_hours": { "type": "integer" },
               "silent": { "type": "boolean", "description": "Not reached within its limit: the collector for it has stopped, or cannot reach it." }
+            }
+          }
+        }
+      }
+    },
+    "market": {
+      "type": ["object", "null"],
+      "description": "The futures curve's history and the market's track record (docs/adr/0036): every contract's settles by week, and for each delivered contract what it priced 1, 3, 6 and 9 months before its delivery month against its last settle. Arithmetic on settles, no model. Null when no curve is held. Added in 1.7.0.",
+      "required": ["series", "history", "track_record"],
+      "additionalProperties": false,
+      "properties": {
+        "series": { "type": "string", "description": "The panel these settles are prints of." },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["delivery", "delivered", "settles"],
+            "additionalProperties": false,
+            "properties": {
+              "delivery": { "type": "string", "format": "date", "description": "The end of the contract's delivery month: its obs_date." },
+              "delivered": { "type": "boolean", "description": "Its delivery month is over and its prints reach it: it has a last settle to be judged against." },
+              "settles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["d", "v"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "d": { "type": "string", "format": "date", "description": "Trading day: the last of its ISO week." },
+                    "v": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "track_record": {
+          "type": "object",
+          "required": ["horizons", "deliveries"],
+          "additionalProperties": false,
+          "properties": {
+            "horizons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["months", "n", "mean_abs_pct", "mean_pct", "worst_pct", "worst_delivery"],
+                "additionalProperties": false,
+                "properties": {
+                  "months": { "type": "integer", "description": "Months before the delivery month began." },
+                  "n": { "type": "integer", "description": "Delivered contracts listed by then." },
+                  "mean_abs_pct": { "type": "number", "description": "Mean distance from the last settle, in percent of it." },
+                  "mean_pct": { "type": "number", "description": "Mean signed miss: above zero, the market priced higher than the contract finished." },
+                  "worst_pct": { "type": "number" },
+                  "worst_delivery": { "type": "string", "format": "date" }
+                }
+              }
+            },
+            "deliveries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["delivery", "final", "final_on", "ahead"],
+                "additionalProperties": false,
+                "properties": {
+                  "delivery": { "type": "string", "format": "date" },
+                  "final": { "type": "number", "description": "Its last settle." },
+                  "final_on": { "type": "string", "format": "date" },
+                  "ahead": {
+                    "type": "array",
+                    "description": "Only the horizons it was listed for.",
+                    "items": {
+                      "type": "object",
+                      "required": ["months", "d", "v", "err_pct"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "months": { "type": "integer" },
+                        "d": { "type": "string", "format": "date", "description": "The trading day of the settle in force." },
+                        "v": { "type": "number" },
+                        "err_pct": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }

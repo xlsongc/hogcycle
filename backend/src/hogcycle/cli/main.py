@@ -80,6 +80,14 @@ def _parser() -> argparse.ArgumentParser:
         "(default 2, about eight weeks; 25 is the whole list, back to 2021-12)",
     )
     p.add_argument(
+        "--contracts-back",
+        type=int,
+        default=0,
+        help="collect: how many months before this one to ask for futures "
+        "contracts too (default 0, the ones not yet delivered; 62 reaches "
+        "LH2109, the first). Expired contracts are history, read once",
+    )
+    p.add_argument(
         "--fail-on-stale",
         action="store_true",
         help="status: exit non-zero if any series has stopped advancing "
@@ -128,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
             "moa": MoaAdapter(months_back=args.months_back),
             "moa_weekly": MoaWeeklyAdapter(pages=args.weekly_pages),
             "usda_psd": UsdaPsdAdapter(),
-            "futures_curve": FuturesCurveAdapter(),
+            "futures_curve": FuturesCurveAdapter(back=args.contracts_back),
         }
         if args.indicator:
             # `registry[...]` raises naming every known id, which is what you

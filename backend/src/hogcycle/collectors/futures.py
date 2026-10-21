@@ -13,10 +13,17 @@ odd months from this one onward. A month Sina has nothing for is not
 listed yet. A run that finds no contract at all fails: an empty curve is
 the silent failure this project exists to prevent.
 
-Each contract becomes one observation: obs_date is the end of its delivery
-month, the value its latest settle, and `published_on` the trading day of
-that settle. Tomorrow's settle is a new print of the same period, so silver
-keeps the curve as it stood on every day it was collected.
+Every settle is one observation: obs_date is the end of the contract's
+delivery month, the value that day's settle, and `published_on` its trading
+day. Each trading day is a new print of the same period, and Sina serves a
+contract's whole life, so silver holds the curve as it stood on every day
+since the contract listed, not only the days it was collected. That history
+is what lets the market be checked: what it priced a month at, months
+ahead, against where the contract finished (gold/market.py).
+
+A daily run asks for the contracts not yet delivered. A backfill asks for
+expired ones too (`back`); Sina still serves them, back to LH2109, the
+first.
 """
 
 from __future__ import annotations
@@ -39,6 +46,11 @@ def _month_end(year: int, month: int) -> dt.date:
     return dt.date(year + month // 12, month % 12 + 1, 1) - dt.timedelta(days=1)
 
 
+def _months_before(day: dt.date, n: int) -> dt.date:
+    total = day.year * 12 + day.month - 1 - n
+    return dt.date(total // 12, total % 12 + 1, 1)
+
+
 def contracts_from(
     today: dt.date, product: str, months: list[int], ahead: int
 ) -> list[tuple[str, int, int]]:
@@ -56,9 +68,15 @@ def contracts_from(
 class FuturesCurveAdapter:
     name = "futures_curve"
 
-    def __init__(self, today: Callable[[], dt.date] = dt.date.today, ahead: int = 14):
+    def __init__(
+        self,
+        today: Callable[[], dt.date] = dt.date.today,
+        ahead: int = 14,
+        back: int = 0,
+    ):
         self.today = today
         self.ahead = ahead
+        self.back = back
 
     def fetch(self, spec: IndicatorSpec) -> Any:
         import akshare as ak
@@ -69,7 +87,9 @@ class FuturesCurveAdapter:
         previous = socket.getdefaulttimeout()
         socket.setdefaulttimeout(_TIMEOUT_S)
         try:
-            for code, _, _ in contracts_from(self.today(), product, months, self.ahead):
+            start = _months_before(self.today(), self.back)
+            span = self.ahead + self.back
+            for code, _, _ in contracts_from(start, product, months, span):
                 _throttle()
                 try:
                     df = ak.futures_zh_daily_sina(symbol=code)
@@ -115,23 +135,28 @@ class FuturesCurveAdapter:
                     raise KeyError(
                         f"{spec.id}: {code} has no column {col!r} in {table['columns']}"
                     )
-            rows = [r for r in table["records"] if r.get(value_col) is not None]
-            if not rows:
-                continue
-            last = max(rows, key=lambda r: str(r[date_col]))
             yymm = code.removeprefix(product)
-            year, month = 2000 + int(yymm[:2]), int(yymm[2:])
-            out.append(
-                Observation(
-                    indicator=spec.id,
-                    obs_date=_month_end(year, month),
-                    value=float(last[value_col]),
-                    unit=spec.unit,
-                    granularity="monthly",
-                    source=spec.source,
-                    snapshot_id=snapshot_id,
-                    fetched_at=fetched_at,
-                    published_on=dt.date.fromisoformat(str(last[date_col])[:10]),
+            delivery = _month_end(2000 + int(yymm[:2]), int(yymm[2:]))
+            for r in table["records"]:
+                value = r.get(value_col)
+                if value is None:
+                    continue
+                # A day Sina has no settle for is written 0 where the config
+                # says so: that day did not print, so it is not a price of 0
+                # and not a blank that would supersede the day before.
+                if spec.zero_is_null and float(value) == 0:
+                    continue
+                out.append(
+                    Observation(
+                        indicator=spec.id,
+                        obs_date=delivery,
+                        value=float(value),
+                        unit=spec.unit,
+                        granularity="monthly",
+                        source=spec.source,
+                        snapshot_id=snapshot_id,
+                        fetched_at=fetched_at,
+                        published_on=dt.date.fromisoformat(str(r[date_col])[:10]),
+                    )
                 )
-            )
         return out

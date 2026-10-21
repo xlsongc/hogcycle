@@ -17,6 +17,7 @@ import {
   MarkPointComponent,
   TooltipComponent,
 } from "echarts/components";
+import { LabelLayout } from "echarts/features";
 import { CanvasRenderer } from "echarts/renderers";
 
 echarts.use([
@@ -29,6 +30,9 @@ echarts.use([
   MarkAreaComponent,
   MarkLineComponent,
   MarkPointComponent,
+  // The live futures contracts end on the same week, a hundred yuan apart:
+  // their end labels are moved apart rather than drawn over each other.
+  LabelLayout,
   CanvasRenderer,
 ]);
 

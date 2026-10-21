@@ -188,8 +188,8 @@ series:
       en: Dalian Commodity Exchange live hog futures, via Sina Finance's copy, read one contract at a time
     url: https://www.dce.com.cn/
     about:
-      zh: 每个在挂合约的最新结算价，按交割月排开：市场此刻给未来每个月的猪定的价。它是市场的预期，不是本项目的预测。每个交易日都重新定价，本仓库记下每一天的曲线。元/吨。
-      en: The latest settle of every listed contract, laid out by delivery month — what the market prices hogs at for each coming month, right now. The market's expectation, not this project's forecast. Re-priced every trading day, and this warehouse keeps the curve as it stood each day. CNY per tonne.
+      zh: 每个在挂合约的最新结算价，按交割月排开：市场此刻给未来每个月的猪定的价。它是市场的预期，不是本项目的预测。每个交易日都重新定价，本仓库记下每个合约从上市到交割的每一天，最早到 2021 年的 LH2109，所以也能看出市场以往的定价离合约最后的结算价有多远。元/吨。
+      en: The latest settle of every listed contract, laid out by delivery month — what the market prices hogs at for each coming month, right now. The market's expectation, not this project's forecast. Re-priced every trading day; this warehouse keeps every contract's every day from listing to delivery, back to LH2109 in 2021, so it can also show how far the market's prices have been from where its contracts finished. CNY per tonne.
 
   hog_price_ndrc:
     publisher:

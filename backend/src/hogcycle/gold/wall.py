@@ -24,6 +24,7 @@ from ..storage.silver import SilverStore
 from .breaks import cadence_breaks, caliber_of
 from .calendar import next_release
 from .facts import change, extreme, first_seen_date, streak, threshold_run
+from .market import build_market
 from .series import all_specs, first_seen_of, is_derived, rows_of
 from .vintage import learned_on, stamp_learned
 
@@ -327,4 +328,7 @@ def build_wall(
         },
         "panels": panels,
         "readings": readings,
+        # The curve's history and the market's track record, apart from the
+        # panels so only the pages that draw it carry it (docs/adr/0036).
+        "market": build_market(registry, silver, moment=moment),
     }

@@ -3,15 +3,17 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.6.0";
+export const CONTRACT_VERSION = "1.7.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.6.0";
+  contract_version: "1.7.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
   health?: Health | null;
+  /** The futures curve's history and the market's track record (docs/adr/0036): every contract's settles by week, and for each delivered contract what it priced 1, 3, 6 and 9 months before its delivery month against its last settle. Arithmetic on settles, no model. Null when no curve is held. Added in 1.7.0. */
+  market?: Market | null;
   window: Window;
   /** Ordered by the causal chain: capacity leads price by 10-12 months, margin decides whether a capacity move persists. */
   panels: Panel[];
@@ -33,6 +35,62 @@ export interface Group {
   limit_hours: number;
   /** Not reached within its limit: the collector for it has stopped, or cannot reach it. */
   silent: boolean;
+}
+
+export interface Market {
+  /** The panel these settles are prints of. */
+  series: string;
+  history: History[];
+  track_record: TrackRecord;
+}
+
+export interface History {
+  /** The end of the contract's delivery month: its obs_date. */
+  delivery: string;
+  /** Its delivery month is over and its prints reach it: it has a last settle to be judged against. */
+  delivered: boolean;
+  settles: Settle[];
+}
+
+export interface Settle {
+  /** Trading day: the last of its ISO week. */
+  d: string;
+  v: number;
+}
+
+export interface TrackRecord {
+  horizons: Horizon[];
+  deliveries: Deliverie[];
+}
+
+export interface Horizon {
+  /** Months before the delivery month began. */
+  months: number;
+  /** Delivered contracts listed by then. */
+  n: number;
+  /** Mean distance from the last settle, in percent of it. */
+  mean_abs_pct: number;
+  /** Mean signed miss: above zero, the market priced higher than the contract finished. */
+  mean_pct: number;
+  worst_pct: number;
+  worst_delivery: string;
+}
+
+export interface Deliverie {
+  delivery: string;
+  /** Its last settle. */
+  final: number;
+  final_on: string;
+  /** Only the horizons it was listed for. */
+  ahead: Ahead[];
+}
+
+export interface Ahead {
+  months: number;
+  /** The trading day of the settle in force. */
+  d: string;
+  v: number;
+  err_pct: number;
 }
 
 export interface Window {

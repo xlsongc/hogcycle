@@ -10,7 +10,7 @@
  */
 
 import Link from "next/link";
-import type { Panel, Reading } from "@/types/generated/wall";
+import type { Market, Panel, Reading } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { SeriesBody } from "@/components/series/SeriesBody";
 import { nameOf, pathOf, seriesPath, type Locale } from "@/i18n/locale";
@@ -40,10 +40,22 @@ type Props = {
   end: string;
   /** The day the contract was generated: the latest a reader can stand on. */
   today: string;
+  /** The futures curve's history and track record, when this is that curve. */
+  market?: Market;
   locale: Locale;
 };
 
-export function SeriesPage({ panel, earlier, later, reading: r, start, end, today, locale }: Props) {
+export function SeriesPage({
+  panel,
+  earlier,
+  later,
+  reading: r,
+  start,
+  end,
+  today,
+  market,
+  locale,
+}: Props) {
   const t = dict(locale);
   const s = t.series;
   const zh = locale === "zh";
@@ -113,6 +125,7 @@ export function SeriesPage({ panel, earlier, later, reading: r, start, end, toda
         end={end}
         today={today}
         locale={locale}
+        market={market}
       >
         <div className="ov-two">
           <section aria-labelledby="release-h">

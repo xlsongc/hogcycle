@@ -8,15 +8,15 @@
  */
 
 import Link from "next/link";
-import type { Panel } from "@/types/generated/wall";
+import type { Panel, TrackRecord } from "@/types/generated/wall";
 import { fmt } from "@/charts/base/theme";
 import { seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { tierVars } from "@/lib/tier";
 
-type Props = { curve: Panel; today: string; locale: Locale };
+type Props = { curve: Panel; track?: TrackRecord; today: string; locale: Locale };
 
-export function FuturesCurve({ curve, today, locale }: Props) {
+export function FuturesCurve({ curve, track, today, locale }: Props) {
   const o = dict(locale).overview;
   // Contracts not yet delivered; an expired one keeps its last settle in
   // the series, but it is history, not an expectation.
@@ -24,6 +24,11 @@ export function FuturesCurve({ curve, today, locale }: Props) {
   if (!ahead.length) return null;
   const top = Math.max(...ahead.map((p) => p.v as number));
   const settled = ahead.map((p) => p.p).filter((p): p is string => !!p).sort().pop();
+  // How far off such prices have been, so the bars are read with that in
+  // mind (docs/adr/0036). The six-month count is the smaller one: fewer
+  // contracts were listed that far ahead.
+  const three = track?.horizons.find((h) => h.months === 3);
+  const six = track?.horizons.find((h) => h.months === 6);
 
   return (
     <section aria-labelledby="futures-h" style={tierVars("market")}>
@@ -53,6 +58,11 @@ export function FuturesCurve({ curve, today, locale }: Props) {
           ))}
         </tbody>
       </table>
+      {three && six && (
+        <p className="section-note">
+          {o.futuresTrack(three.mean_abs_pct, six.mean_abs_pct, six.mean_pct, six.n)}
+        </p>
+      )}
       <p className="hint">
         {unitOf(curve.unit, locale)} · <Link href={seriesPath(locale, curve.id)}>{o.futuresMore}</Link>
       </p>

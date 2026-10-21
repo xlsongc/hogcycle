@@ -14,6 +14,8 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     futuresMonth: "交割月",
     futuresSettle: "结算价",
     futuresMore: "全部合约，以及 2021 年以来的主力连续",
+    futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
+      `这类定价以往偏离多少：交割前 3 个月，合约结算价与它最后的结算价平均相差 ${three}%；交割前 6 个月相差 ${six}%，带方向平均${sixSigned >= 0 ? "高出" : "低于"} ${Math.abs(sixSigned)}%（2021 年以来 ${n} 个已交割合约）。只是过去，而且只有几轮周期。`,
     thesisHeading: "产能领先价格",
     thesisNote: (
       <>

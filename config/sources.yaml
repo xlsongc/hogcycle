@@ -771,7 +771,7 @@ indicators:
     lo: 3000.0
     hi: 60000.0
     adapter: akshare
-    reach: cn
+    reach: anywhere
     call: {fn: futures_zh_daily_sina, symbol: LH0}
     extract: {period: date, value: settle}
     # 新浪在没有结算价的日子写 0（2021-12-30、2024-09-25），那是缺数，不是价格。
@@ -790,12 +790,16 @@ indicators:
     lo: 3000.0
     hi: 60000.0
     adapter: futures_curve
-    reach: cn
+    reach: anywhere
     call: {product: LH, months: [1, 3, 5, 7, 9, 11]}
     extract: {period: date, value: settle}
+    # 同样的两天（2021-12-30、2024-09-25），当时在挂的每个合约都写了 0：那天没有
+    # 结算价，不记一版，也不覆盖前一天的。
+    zero_is_null: true
     forecast: true
     revises: true
     notes: >
-      每个在挂合约的最新结算价，按交割月记：obs_date 是交割月月末，发布日期是这个
-      结算价的交易日。每个交易日都会重新定价，所以每天的采集都是同一时期的新一版，
-      silver 记下曲线每天的样子。合约到期后它最后的结算价留在原处。
+      每个合约的每日结算价，按交割月记：obs_date 是交割月月末，发布日期是这个
+      结算价的交易日。每个交易日都是同一时期的新一版。新浪提供合约从上市到交割的
+      全部历史，所以 silver 里有曲线在每一个交易日的样子，不只是采集过的那几天；
+      2026-10-21 补齐了已到期的合约，最早到 LH2109（docs/adr/0036）。

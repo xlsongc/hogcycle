@@ -185,7 +185,9 @@ hogcycle collect --indicator a,b --weekly-pages 25   # backfill the weekly repor
 hogcycle replay                      # re-parse every bronze snapshot, zero HTTP; indicators on one
                                      # upstream call read each other's (a new series gets its history)
 hogcycle collect --reach anywhere    # what the GitHub run collects
+hogcycle collect --indicator lh_futures_curve --contracts-back 62   # expired contracts too, once
 scripts/local-collector/collect.sh   # the `reach: cn` sources, from an ordinary network
+gh workflow run probe.yml -f indicators=a,b   # does a source answer a GitHub runner? keeps nothing
 hogcycle status                      # coverage, latest obs_date, and age per series; source
                                      # groups with their last run (data/runs, ADR-0028)
 hogcycle status --fail-on-stale      # exit 1 if any series has stopped advancing
@@ -244,3 +246,4 @@ so you do not have to re-derive them.
 | 0033 | The browser computes only over what the reader chose (a window, a cycle start), and says so |
 | 0034 | An estimate says it is one: profit and breakeven per hog, modelled on the official months, tested out of sample, its own indicator |
 | 0035 | The futures market is a tier of its own (`market`, off the wall), read from a mirror checked against a second source |
+| 0036 | The futures market is checked against itself: every settle is a print, and each delivered contract's price months ahead is set against its last settle |
