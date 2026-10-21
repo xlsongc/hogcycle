@@ -1,4 +1,4 @@
-# Next steps (written 2026-10-19, updated 2026-10-20)
+# Next steps (written 2026-10-19, updated 2026-10-21)
 
 Where phase 2 ([plan](2026-10-14-phase-2-upgrade.md)) stands, and what to do
 next, in order. Item ids are the plan's.
@@ -15,6 +15,7 @@ next, in order. Item ids are the plan's.
 | readers | B3 phone layout; B4 theme before paint; B5 terms in place; B6 percentile depth; B8 focus and table semantics; A6 series search (`/`, ⌘K); A7 keyboard reading; B10 `next-env.d.ts` ignored | — |
 | 10-20 | A8 window facts on the series page; A9 cycles laid over each other from reader-named starts; B9 every reading on the series page, a month-end table on compare; A3 rings on revised periods | ADR-0033 |
 | decisions | Q4 browser computes only over reader-chosen inputs; Q5 no compaction; Q6 dbt rejected, ADR-0010 closed | ADR-0033, ADR-0010 |
+| 10-21 | The futures market's track record: every contract's life since LH2109, each delivered contract's settle 1/3/6/9 months ahead against its last; both futures series collected from GitHub | ADR-0036 |
 
 Fixed on 10-20:
 
@@ -27,6 +28,16 @@ Fixed on 10-20:
   machine up. On battery with the lid shut macOS may still sleep.
 - Frontend tests run under `node --test` (`npm test`, in CI). CI and deploy
   are on Node 24.
+
+Fixed on 10-21:
+
+- **Silver made an older release current when it was learned after a newer
+  one** (543ee2b). Found before it fired: the futures backfill would have
+  shown each contract's previous settle as today's. Dated rows are now
+  judged against the release in force on their own day, and a fourth
+  property test checks any arrival order. No current value changed.
+- The local run of 10-21 took one minute (07:30:07 to 07:31:06): the
+  `caffeinate` fix holds on power.
 
 ## B7 weight: measured, deferred
 
@@ -45,39 +56,43 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 
 ## Tomorrow, in order
 
-1. **Check the morning runs.** Run `gh run list --limit 6` and check
-   `tail -5 ~/Library/Logs/hogcycle-collect.log`. The local run's
-   `started`/`finished` in `data/runs/cn/2026-10.jsonl` should now be
-   minutes apart when the Mac is on power. **New:** the local run collects
-   `lh_futures_main` and `lh_futures_curve` for the first time (`reach: cn`).
-   Check both are `ok` and that the curve gained a day's prints. Then probe
-   Sina from a runner. If it answers, move both to `reach: anywhere` so
-   GitHub collects them too (ADR-0035).
-2. **Watch the first real calendar event.** The 202609 joint release is
+1. **Check the first GitHub run with the futures.** `lh_futures_main` and
+   `lh_futures_curve` are `reach: anywhere` since 10-21 (the `probe`
+   workflow reached Sina from a runner). In `gh run list` the 01:00 UTC
+   collect should be green and show both `ok`. In
+   `data/runs/anywhere/2026-10.jsonl` the curve should gain 10-21's settles,
+   and the local run should no longer list them. If Sina refuses runners
+   after all, move them back to `cn`; never route around a refusal.
+2. **Two decisions for the owner, both written up.**
+   - 猪粮比价: [the options](2026-10-21-hog-corn-ratio-decision.md). The
+     recommendation is A, retire it. Due before 12-17, when the warning
+     starts.
+   - Visitor countries: Cloudflare Web Analytics (free, no cookies, IP
+     dropped at Cloudflare's edge, country breakdown) was proposed on 10-21.
+     It is not built: adding a tracker needs the owner's yes and the
+     owner's own Cloudflare account. If yes, the beacon goes in behind a
+     repo variable, loaded after the page, with a line on the overview
+     saying visits are counted (an ADR).
+3. **Watch the first real calendar event.** The 202609 joint release is
    expected around 10-26 to 10-30 (`usual` 10-26/10-28, `by` 11-03 for the
    quarterly series). When it lands, check: 2026Q3 sow and hog inventory, the
    Q3 YTD 出栏 and 产量 totals, and `hog_output_quarter` gaining 2026Q3, which
    should equal 前3季度 − 上半年 on its series page. Shape drift (ADR-0032)
    will name anything the workbook renamed.
-3. **Q2 / C6 — prepare the 猪粮比价 decision (due 12-31).** The evidence is
-   already on hand. The 500-county weekly ratio tracks the NDRC one at
-   r=0.996, 0.26 lower on average (ADR-0018 and the quality check). The
-   monthly 猪粮比价 stopped in the 202508 joint release. Write the options
-   for the owner: retire `hog_corn_ratio` and point to the 500-county
-   ratio, or renew with a reason. Never auto-retire.
 4. **The verification layer (P3, the reason for the storage).** A backtest
    that reads only `published()`. Start with a CLI that answers, per month,
    what 能繁母猪 the public could see on that day, and how long after the
    period. That is the input any lead test must use. Gold computes; it does
-   not call turns.
+   not call turns. The futures record (ADR-0036) is the same idea done for
+   the market; the sow figure deserves it more.
 5. **Watch the estimate (ADR-0034).** It is fitted on 41 frozen months.
    If the joint release ever prints 规模养殖成本 again, re-check the model
    against it. Next estimate candidates, each needing its own holdout test
-   first: 自繁自养 vs 外购仔猪 profit, and the sow-culling margin.
+   first: 自繁自养 vs 外购仔猪 profit, and the sow-culling margin. A track
+   record like the market's needs vintages of the estimate, kept from now.
 6. **Platform, next round** (from the brainstorm). A weekly digest page per
-   week, archived. The full futures curve's history as a chart: how the
-   market's view of a month moved, from silver's daily prints. E-mail
-   alerts are the owner's call, because they are outward-facing.
+   week, archived. E-mail alerts are the owner's call, because they are
+   outward-facing.
 7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a
@@ -95,8 +110,7 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 ## Later (P3)
 
 - C4 listed companies' monthly sales reports (cninfo PDFs, new dependency,
-  tier decision). C5 大商所 LH (needs a runner reach probe and a market-tier
-  ADR, no mirror without a week-by-week check). C3 remainder (白条猪批发价
+  tier decision). C5 大商所 LH: done through Sina's mirror (ADR-0035, 0036). C3 remainder (白条猪批发价
   ×2, 县乡零售, 36城后腿肉): config plus replay, each a new caliber panel,
   worth it only if the price tier can stay readable.
 

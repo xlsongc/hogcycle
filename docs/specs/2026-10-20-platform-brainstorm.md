@@ -32,6 +32,7 @@ checked, and what was built.
 | 10 | E-mail alerts | Medium | Needs a sending service and addresses: outward-facing, owner's decision | Later, via the feed (6) first |
 | 11 | Weekly digest pages (an archive of "this week") | Medium | Export-time, static. Medium | Later |
 | 12 | Backtest on `published()` | High for the thesis | Medium-large | Next session |
+| 13 | Visitor countries (asked 10-21) | Medium: who reads it, China or the US | GitHub Pages keeps no logs. Cloudflare Web Analytics: free, no cookies, IP dropped at the edge, country breakdown, a script after load. Mainland visitors whose network cannot reach Cloudflare go uncounted, so China is a floor | Owner's call: a tracker is outward-facing and needs the owner's account |
 
 ## Rules that bend, and how
 
@@ -59,6 +60,7 @@ checked, and what was built.
 | 4 | Season by season on daily, weekly and monthly series | `lib/seasons.ts` |
 | 5 | Which shift lines up best, under the compare overlay | `lib/leadLag.ts` |
 | 6 | `feed.xml`, `zh/feed.xml`, `data/index.json`, `data/series/<id>.json` | `export/feeds.py` |
+| 2b (10-21) | Every contract's life since LH2109, and the market's track record: six months before delivery, the 31 delivered contracts sat 24.6% from their last settle on average, 18.4% above it on the signed mean | ADR-0036, `gold/market.py` |
 
 Found on the way: gold's week-on-week and year-on-year changes gave
 percentages across zero, so a deepening loss read "+8.5%" and "+9.5% YoY".
