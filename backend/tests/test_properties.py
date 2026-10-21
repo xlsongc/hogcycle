@@ -8,6 +8,8 @@ backtest stands on (ADR-0001, 0017):
   1. What was known at a moment never changes when later rows arrive.
   2. What was published by a day, as known at a moment, never changes either.
   3. Reading the same payload again writes nothing.
+  4. The latest release read is the value, whatever order the releases were
+     learned in, and each day's view is the latest release out by then.
 
 A generated payload is shaped like a real one: per period, either one value
 with no release date, or one or more releases on distinct days.
@@ -104,3 +106,52 @@ def test_reading_the_same_payload_again_writes_nothing(history):
             store.append_changes(observations(rows, t))
         again = at[-1] + dt.timedelta(hours=1)
         assert store.append_changes(observations(history[-1][0], again)) == []
+
+
+DAYS = 20
+FIRST_RELEASE = dt.date(2026, 7, 1)
+
+
+@st.composite
+def world(draw: st.DrawFn) -> dict[tuple[dt.date, dt.date], float]:
+    """Every release there is: (period, release day) -> value."""
+    out: dict[tuple[dt.date, dt.date], float] = {}
+    periods = st.lists(st.sampled_from(PERIODS), min_size=1, max_size=3, unique=True)
+    for period in draw(periods):
+        days = draw(st.lists(st.integers(0, DAYS), min_size=1, max_size=5, unique=True))
+        for k in days:
+            out[(period, FIRST_RELEASE + dt.timedelta(days=k))] = draw(VALUES)
+    return out
+
+
+# A payload holds the releases of a window of days ending on the day it was
+# read: a source serves its history up to now, and a backfill reaches
+# further back than a daily read. Read days only move forward.
+WINDOWS = st.lists(
+    st.tuples(st.integers(0, DAYS), st.integers(0, DAYS)), min_size=1, max_size=4
+)
+
+
+@settings(max_examples=80, deadline=None)
+@given(releases=world(), windows=WINDOWS)
+def test_the_latest_release_read_is_the_value_in_any_order(releases, windows):
+    ends = list(accumulate((b for _, b in windows), max))
+    reads = [(min(a, end), end) for (a, _), end in zip(windows, ends, strict=True)]
+    seen: set[tuple[dt.date, dt.date]] = set()
+    with tempfile.TemporaryDirectory() as root:
+        store = SilverStore(root)
+        at = START
+        for a, b in reads:
+            lo, hi = (FIRST_RELEASE + dt.timedelta(days=k) for k in (a, b))
+            batch = sorted(k for k in releases if lo <= k[1] <= hi)
+            seen |= set(batch)
+            at += dt.timedelta(hours=1)
+            rows = [(p, d, releases[(p, d)]) for p, d in batch]
+            store.append_changes(observations(rows, at))
+
+        latest = {p: releases[(p, d)] for p, d in sorted(seen)}
+        assert {r["obs_date"]: r["value"] for r in store.series("sow", moment=at)} == latest
+        for by in sorted({d for _, d in seen}):
+            out_by = {p: releases[(p, d)] for p, d in sorted(seen) if d <= by}
+            got = store.published("sow", by=by, moment=at)
+            assert {r["obs_date"]: r["value"] for r in got} == out_by

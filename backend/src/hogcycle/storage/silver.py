@@ -44,7 +44,35 @@ _SOURCE = "read_parquet('{glob}', hive_partitioning := false, union_by_name := t
 # rows learned at once — a backfill reads every edition in one run — the
 # latest the publisher released. NULLS LAST so a dated print outranks an
 # undated row of the same fetch, and DESC puts the winner first.
-_LATEST = "ORDER BY fetched_at DESC, published_on DESC NULLS LAST"
+#
+# Except a row something later has superseded: a later-dated release with a
+# different value, or a later reading of the same release that differs (a
+# parser fix replayed). Without that, a backfill reaching further back than
+# what is held (a futures contract's every past settle, an old edition read
+# after a newer one) made the oldest release current, because it was
+# learned last. A reprint of the current value is not superseded, so the
+# earliest release of it still dates it.
+_LATEST = "ORDER BY superseded, fetched_at DESC, published_on DESC NULLS LAST"
+
+
+def _held(where: str, columns: str) -> str:
+    """The rows matching `where`, each with whether a later release says
+    otherwise, for `_LATEST` to rank. Superseded is judged among the same
+    rows, so an as-of view is not overruled by a release learned after it.
+
+    A self-join rather than a correlated EXISTS: DuckDB 1.5.5 answers that
+    EXISTS false when it has three conditions, where count(*) finds the row."""
+    return f"""
+        WITH held AS (SELECT * FROM silver WHERE {where})
+        SELECT {columns}, count(later.obs_date) > 0 AS superseded
+        FROM held AS h
+        LEFT JOIN held AS later
+          ON later.obs_date = h.obs_date
+         AND (later.published_on > h.published_on
+              OR (later.published_on = h.published_on AND later.fetched_at > h.fetched_at))
+         AND later.value IS DISTINCT FROM h.value
+        GROUP BY ALL
+    """
 
 
 def _sql_literal(path: str) -> str:
@@ -129,7 +157,13 @@ class SilverStore:
             if not _is_news(o, current.get(o.obs_date), printed):
                 continue
             changed.append(o)
-            current[o.obs_date] = (o.value, o.published_on)
+            # An older release joins the history; it does not displace the
+            # latest one as what the rest of the batch is judged against.
+            held = current.get(o.obs_date)
+            if held is None or held[1] is None or o.published_on is None or (
+                o.published_on >= held[1]
+            ):
+                current[o.obs_date] = (o.value, o.published_on)
             if o.published_on is not None:
                 printed[(o.obs_date, o.published_on)] = o.value
         if not changed:
@@ -159,7 +193,7 @@ class SilverStore:
             SELECT obs_date, value, published_on FROM (
                 SELECT obs_date, value, published_on,
                        ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
-                FROM silver WHERE indicator = $indicator
+                FROM ({_held("indicator = $indicator", "h.*")})
             ) WHERE rn = 1
             """,
             {"indicator": indicator},
@@ -199,8 +233,7 @@ class SilverStore:
             SELECT obs_date, value FROM (
                 SELECT obs_date, value,
                        ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
-                FROM silver
-                WHERE indicator = $indicator AND fetched_at <= $moment
+                FROM ({_held("indicator = $indicator AND fetched_at <= $moment", "h.*")})
             ) WHERE rn = 1
             """,
             {"moment": moment, "indicator": indicator},
@@ -219,8 +252,7 @@ class SilverStore:
             SELECT obs_date, value, granularity, unit, published_on, fetched_at FROM (
                 SELECT obs_date, value, granularity, unit, published_on, fetched_at,
                        ROW_NUMBER() OVER (PARTITION BY obs_date {_LATEST}) AS rn
-                FROM silver
-                WHERE indicator = $indicator AND fetched_at <= $moment
+                FROM ({_held("indicator = $indicator AND fetched_at <= $moment", "h.*")})
             ) WHERE rn = 1
             ORDER BY obs_date
             """,
@@ -396,23 +428,19 @@ def _is_news(
     """Whether `o` tells silver something it does not already hold."""
     if current is None:
         return True
-    value, published_on = current
     if o.published_on is None:
-        return not _same(value, o.value)
+        # An undated value says only what the source says now.
+        return not _same(current[0], o.value)
     release = (o.obs_date, o.published_on)
     if release in printed:
         # The same release read again. Only a different reading of it — a
         # parser fix replayed from bronze — is news.
         return not _same(printed[release], o.value)
-    if published_on is not None and o.published_on < published_on:
-        # Older than the release held as current: judge it against the release
-        # in force on its own day, not against a later revision. A payload
-        # listing a reprint and a revision of one period otherwise wrote the
-        # reprint the second time it was read (found by tests/test_properties).
-        before = [p for (d, p) in printed if d == o.obs_date and p <= o.published_on]
-        return not before or not _same(printed[(o.obs_date, max(before))], o.value)
-    # A later release repeating the value adds nothing: the earliest one is
-    # when it became knowable. An earlier one, or a first date for a value
-    # held undated, does.
-    dated_earlier = published_on is not None and published_on <= o.published_on
-    return not (_same(value, o.value) and dated_earlier)
+    # Judged against the release in force on its own day, whatever order the
+    # releases arrive in: a reprint of it adds nothing, because the earliest
+    # release is when the value became knowable. A first release of the
+    # period, or a first date for a value held undated, does. Judging against
+    # the current row instead let a backfill of older releases skip a later
+    # one (found by tests/test_properties).
+    before = [p for (d, p) in printed if d == o.obs_date and p <= o.published_on]
+    return not before or not _same(printed[(o.obs_date, max(before))], o.value)

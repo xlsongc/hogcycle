@@ -169,6 +169,28 @@ def test_learning_a_release_date_is_written_once(tmp_path):
     assert silver.revisions("sow_inventory") == [], "a date is not a restatement"
 
 
+def test_an_older_release_learned_later_does_not_become_current(tmp_path):
+    """A backfill that reaches further back than what is held writes older
+    releases after newer ones: every past settle of a futures contract, or an
+    old edition read after a newer one. The latest release stays the value;
+    the older one is history, there for `published()` to find."""
+    silver = SilverStore(tmp_path)
+    first, later, after = (dt.datetime(2026, m, 6, tzinfo=UTC) for m in (8, 9, 10))
+    silver.append_changes([row(3904.0, fetched=first, published=D(2026, 5, 22))])
+    older = row(3920.0, fetched=later, published=D(2026, 4, 24))
+    # It was public on 04-24, which we did not know.
+    assert len(silver.append_changes([older])) == 1
+
+    now = silver.series("sow_inventory")[0]
+    assert (now["value"], now["published_on"]) == (3904.0, D(2026, 5, 22))
+    assert silver.as_of(later, indicator="sow_inventory")[MARCH] == 3904.0
+    on = {r["value"] for r in silver.published("sow_inventory", by=D(2026, 5, 1))}
+    assert on == {3920.0}
+    # The next release is judged against the latest, not the backfilled one.
+    reprint = row(3904.0, fetched=after, published=D(2026, 6, 20))
+    assert silver.append_changes([reprint]) == []
+
+
 def test_published_answers_with_what_was_public_on_the_day(tmp_path):
     """Loaded long after the fact, yet each day sees only the releases out by then."""
     silver = SilverStore(tmp_path)
