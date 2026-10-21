@@ -46,7 +46,7 @@ export function ThemeToggle({ locale }: { locale: Locale }) {
   const current = mode ?? "system";
   const next: Record<Mode, Mode> = { system: "light", light: "dark", dark: "system" };
   return (
-    <button onClick={() => setMode(next[current])} title={t.switch}>
+    <button className="theme-toggle" onClick={() => setMode(next[current])} title={t.switch}>
       {t[current]}
     </button>
   );

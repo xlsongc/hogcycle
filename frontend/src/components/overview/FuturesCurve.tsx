@@ -13,10 +13,11 @@ import { fmt } from "@/charts/base/theme";
 import { seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { tierVars } from "@/lib/tier";
+import { SectionHead } from "@/components/shell/SectionHead";
 
-type Props = { curve: Panel; track?: TrackRecord; today: string; locale: Locale };
+type Props = { curve: Panel; track?: TrackRecord; today: string; locale: Locale; index?: string };
 
-export function FuturesCurve({ curve, track, today, locale }: Props) {
+export function FuturesCurve({ curve, track, today, locale, index }: Props) {
   const o = dict(locale).overview;
   // Contracts not yet delivered; an expired one keeps its last settle in
   // the series, but it is history, not an expectation.
@@ -32,40 +33,46 @@ export function FuturesCurve({ curve, track, today, locale }: Props) {
 
   return (
     <section aria-labelledby="futures-h" style={tierVars("market")}>
-      <h2 className="section" id="futures-h">
-        {o.futuresHeading}
-      </h2>
-      <p className="section-note">{o.futuresNote(settled ?? "")}</p>
-      <table className="futures-curve">
-        <caption className="sr-only">{o.futuresCaption}</caption>
-        <thead className="sr-only">
-          <tr>
-            <th scope="col">{o.futuresMonth}</th>
-            <th scope="col">{o.futuresSettle}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ahead.map((p) => (
-            <tr key={p.d}>
-              <th scope="row" className="num">
-                {p.d.slice(0, 7)}
-              </th>
-              <td className="futures-bar" aria-hidden="true">
-                <span style={{ width: `${(100 * (p.v as number)) / top}%` }} />
-              </td>
-              <td className="num">{fmt(p.v, curve.unit, locale)}</td>
+      <SectionHead
+        id="futures-h"
+        index={index}
+        title={o.futuresHeading}
+        note={o.futuresNote(settled ?? "")}
+        method={<p>{o.futuresMethod}</p>}
+        locale={locale}
+      />
+      <div className="futures-card">
+        <table className="futures-curve">
+          <caption className="sr-only">{o.futuresCaption}</caption>
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">{o.futuresMonth}</th>
+              <th scope="col">{o.futuresSettle}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {three && six && (
-        <p className="section-note">
-          {o.futuresTrack(three.mean_abs_pct, six.mean_abs_pct, six.mean_pct, six.n)}
+          </thead>
+          <tbody>
+            {ahead.map((p) => (
+              <tr key={p.d}>
+                <th scope="row" className="num">
+                  {p.d.slice(0, 7)}
+                </th>
+                <td className="futures-bar" aria-hidden="true">
+                  <span style={{ width: `${(100 * (p.v as number)) / top}%` }} />
+                </td>
+                <td className="num">{fmt(p.v, curve.unit, locale)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {three && six && (
+          <p className="section-note">
+            {o.futuresTrack(three.mean_abs_pct, six.mean_abs_pct, six.mean_pct, six.n)}
+          </p>
+        )}
+        <p className="hint">
+          {unitOf(curve.unit, locale)} · <Link href={seriesPath(locale, curve.id)}>{o.futuresMore}</Link>
         </p>
-      )}
-      <p className="hint">
-        {unitOf(curve.unit, locale)} · <Link href={seriesPath(locale, curve.id)}>{o.futuresMore}</Link>
-      </p>
+      </div>
     </section>
   );
 }

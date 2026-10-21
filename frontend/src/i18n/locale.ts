@@ -16,11 +16,17 @@ export const PATH: Record<Locale, string> = { en: "/", zh: "/zh/" };
 
 /** The site's pages. Each is prerendered once per locale, so a page is a
  *  (locale, page) pair and every one of them has its own shareable URL. */
-export type Page = "overview" | "wall" | "compare";
+export type Page = "overview" | "wall" | "compare" | "calc" | "datasets";
 
-export const PAGES: readonly Page[] = ["overview", "wall", "compare"] as const;
+export const PAGES: readonly Page[] = ["overview", "wall", "compare", "calc", "datasets"] as const;
 
-const SLUG: Record<Page, string> = { overview: "", wall: "wall/", compare: "compare/" };
+const SLUG: Record<Page, string> = {
+  overview: "",
+  wall: "wall/",
+  compare: "compare/",
+  calc: "calc/",
+  datasets: "datasets/",
+};
 
 /** Trailing slash included: GitHub Pages serves /wall/ as /wall/index.html,
  *  and next.config sets trailingSlash for the same reason. */

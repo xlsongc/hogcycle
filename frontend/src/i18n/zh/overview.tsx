@@ -5,11 +5,14 @@ import type { Dict } from "../en";
 
 export const overview: Pick<Dict, "overview" | "readings"> = {
   overview: {
+    tickerLabel: "最新价格",
     feed: "订阅（Atom）",
-    api: "全部序列的 JSON",
+    api: "数据下载与接口",
     futuresHeading: "期货市场给未来的定价",
     futuresNote: (date: string) =>
-      `大商所生猪期货每个在挂合约的最新结算价，按交割月排开，${date} 结算，读自新浪的镜像。这是市场用钱下注的预期，不是本站的预测。单位是交割标准品的元/吨，和上面现货价格不是同一口径。`,
+      `市场今天为未来各月交割的生猪出的价（${date} 结算）。这是真金白银下注的预期，不是本站的预测。`,
+    futuresMethod:
+      "大商所生猪期货每个在挂合约的最新结算价，按交割月排开，读自新浪的镜像。单位是交割标准品的元/吨，和上面的现货价格不是同一口径。柱子从零开始画，长短可以直接比较。",
     futuresCaption: "生猪期货：各交割月的最新结算价",
     futuresMonth: "交割月",
     futuresSettle: "结算价",
@@ -17,21 +20,20 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
       `这类定价以往偏离多少：交割前 3 个月，合约结算价与它最后的结算价平均相差 ${three}%；交割前 6 个月相差 ${six}%，带方向平均${sixSigned >= 0 ? "高出" : "低于"} ${Math.abs(sixSigned)}%（2021 年以来 ${n} 个已交割合约）。只是过去，而且只有几轮周期。`,
     thesisHeading: "产能领先价格",
-    thesisNote: (
+    thesisNote: "把能繁母猪存栏前移到它变成商品猪所需的时间，放在它领先的猪价上方。",
+    thesisMethod: (
       <>
-        把能繁母猪存栏按所选月数整体前移，放在它理应领先的猪价上方。这个滞后由生物学钉死在 10–12 个月（妊娠 114 天 + 育肥约 6 个月），所以位移量不是拟合出来的参数。两格共用一条时间轴、各自一套纵轴：<b>不是双轴图</b>。今天之后的那段前移曲线，是已经存在的产能被画在生物学让它上市的位置 —— 这是对齐，<b>不是预测</b>。
+        <p>这个滞后由生物学钉死在 10–12 个月（妊娠 114 天 + 育肥约 6 个月），所以位移量不是拟合出来的参数。</p>
+        <p>
+          两格共用一条时间轴、各自一套纵轴：<b>不是双轴图</b>。今天之后的那段前移曲线，是已经存在的产能被画在生物学让它上市的位置 —— 这是对齐，<b>不是预测</b>。
+        </p>
       </>
     ),
     lead: "前移",
     leadOption: (n: number) => (n ? `${n} 个月` : "不前移"),
     shifted: (n: number) => (n ? `（前移 ${n} 个月）` : ""),
     today: "今天",
-    changesNote: (
-      <>
-        由管道按固定定义计算出的事实：相对阈值的连续位置、多年极值、停止更新的序列。
-        <b>没有一条是阶段判定</b> —— 判断留给读者。
-      </>
-    ),
+    changesNote: "管道按固定定义算出的事实：阈值上下的连续期数、多年极值、停更与逾期。没有一条是阶段判定。",
     groups: {
       runs: "阈值",
       extremes: "多年极值",
@@ -48,11 +50,7 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     nothing: "按这些定义，暂无可报告的事实。",
 
     heading: "猪周期现在在哪",
-    lede: (
-      <>
-        三个读数，按因果顺序排列：能繁母猪决定 10–12 个月后的生猪供给，猪价是这批供给落地的地方，猪粮比决定养殖户还愿不愿意补栏。每个数字都注明了它描述的时期和公开的日期。没有一个是阶段判定。
-      </>
-    ),
+    lede: "三个读数按因果顺序排列：能繁母猪决定 10–12 个月后的生猪供给，猪价是这批供给落地的地方，养殖利润决定养殖户还愿不愿意补栏。每个数字都注明它描述的时期和公开的日期。",
     stamp: (asOf: string) => `数据截至 ${asOf}`,
     lastRelease: (date: string) => `最近一次发布 ${date}`,
     role: {

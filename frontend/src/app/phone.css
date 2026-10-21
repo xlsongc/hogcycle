@@ -3,26 +3,74 @@
    nav taking two rows and the readings table 814px wide inside 349, its
    status column, the one a reader most needs, off-screen with no hint. */
 
+@media (max-width: 900px) {
+  .site-nav-inner {
+    gap: 16px;
+    padding: 0 16px;
+  }
+
+  .search-open {
+    min-width: 0;
+  }
+
+  .search-open .search-label {
+    display: none;
+  }
+}
+
 @media (max-width: 560px) {
   .wrap {
-    padding: 20px 14px 48px;
+    padding: 24px 16px 56px;
   }
 
-  /* ---------- one-row nav ---------- */
+  main > header h1,
+  .page-head h1,
+  .ov-head h1,
+  .series-head h1 {
+    font-size: var(--text-xl);
+  }
 
+  .ov-lede,
+  .series-about,
+  main > header .sub,
+  .page-head .sub {
+    font-size: var(--text-base);
+  }
+
+  h2.section {
+    margin-top: 40px;
+  }
+
+  .signal-value b {
+    font-size: var(--text-2xl);
+  }
+
+  /* ---------- the nav ---------- */
+
+  /* Two rows: the wordmark and the controls, then every page in a row that
+     scrolls sideways, so none of the five is hidden behind a menu. */
   .site-nav-inner {
-    flex-wrap: nowrap;
-    gap: 8px;
-    padding: 8px 12px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0 8px;
+    padding: 8px 12px 0;
   }
 
-  /* The overview link is the way home; the wordmark is not needed for it. */
-  .brand {
+  .site-nav ul {
+    order: 3;
+    flex: 1 0 100%;
+    margin: 6px -12px 0;
+    padding: 0 8px 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .site-nav ul::-webkit-scrollbar {
     display: none;
   }
 
   .site-nav ul a {
-    padding: 4px 6px;
+    padding: 5px 10px;
   }
 
   .site-nav-end {
@@ -34,8 +82,17 @@
     display: none;
   }
 
+  .lang {
+    border: 0;
+    padding: 0;
+  }
+
   .site-nav-end button {
-    padding: 5px 7px;
+    padding: 5px 8px;
+  }
+
+  .wall-toolbar {
+    top: 88px;
   }
 
   /* ---------- the readings table as stacked rows ---------- */
@@ -55,13 +112,13 @@
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 2px 12px;
-    padding: 9px 12px;
+    padding: 12px 14px;
     border-top: 1px solid var(--grid);
   }
 
   table.readings tr.tier-row th {
     display: block;
-    padding: 7px 12px;
+    padding: 8px 14px;
   }
 
   table.readings td {
@@ -100,17 +157,14 @@
   table.readings td[data-label]::before {
     content: attr(data-label) " ";
     color: var(--muted);
-    font-family: var(--sans);
-    font-size: var(--type);
+    font-size: var(--text-xs);
   }
 
   .readings-wrap {
     overflow-x: visible;
   }
 
-  /* ---------- tables elsewhere scroll inside their box ---------- */
-
-  .series-table {
-    font-size: var(--type);
+  .site-foot-inner {
+    padding: 28px 16px 36px;
   }
 }

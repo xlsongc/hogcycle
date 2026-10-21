@@ -23,7 +23,12 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
       <header>
         <h1>{w.heading}</h1>
         <p className="sub">{w.sub(panels.length)}</p>
-        <p className="section-note how-to">{w.howTo}</p>
+        <details className="method how-to">
+          <summary>{t.more.howTo}</summary>
+          <div>
+            <p>{w.howTo}</p>
+          </div>
+        </details>
         <Glossary
           ids={["sowHerd", "normalHolding", "caliber", "hogCornRatio", "releaseVsPeriod", "hollowMarkers"]}
           locale={locale}

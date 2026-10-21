@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 import type { Season } from "@/lib/seasons";
 import { echarts } from "./base/echarts";
 import { fmt, slotColor } from "./base/theme";
-import { NUM_PX, cssVar, labelPx, monoFont } from "./base/ink";
+import { NUM_PX, cssVar, labelPx, chartFont } from "./base/ink";
 import { unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
@@ -48,13 +48,13 @@ export function SeasonChart({ seasons, unit, locale }: Props) {
             icon: "roundRect",
             itemWidth: 12,
             itemHeight: 2,
-            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: chartFont() },
           },
           tooltip: {
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: chartFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             formatter: (raw: unknown) => {
               const items = (Array.isArray(raw) ? raw : [raw]) as {
@@ -88,10 +88,17 @@ export function SeasonChart({ seasons, unit, locale }: Props) {
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
+              // The ticks step 30.5 days from day 1, so they drift either
+              // side of the month starts: label each by the start nearest it.
+              // Taking the start at or before it named the 31.5 tick January
+              // twice and dropped February; the axis end (366) is no start.
               formatter: (v: number) => {
-                const m = MONTH_STARTS.findIndex((s, i) => v >= s && v < (MONTH_STARTS[i + 1] ?? 367));
-                return m >= 0 ? t.month(m + 1) : "";
+                let m = 0;
+                MONTH_STARTS.forEach((s, i) => {
+                  if (Math.abs(v - s) < Math.abs(v - (MONTH_STARTS[m] ?? 1))) m = i;
+                });
+                return Math.abs(v - (MONTH_STARTS[m] ?? 1)) <= 3 ? t.month(m + 1) : "";
               },
             },
           },
@@ -104,7 +111,7 @@ export function SeasonChart({ seasons, unit, locale }: Props) {
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               formatter: (v: number) => fmt(v, unit, locale),
             },
           },

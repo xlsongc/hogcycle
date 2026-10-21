@@ -25,19 +25,18 @@ export function tierColor(tier: Tier): string {
   return cssVar(`--${tier}`, "#2a78d6");
 }
 
-/** next/font generates a hashed family name, so the literal "Departure Mono"
- *  resolves to nothing inside a canvas. Read the variables the loader sets —
- *  both of them, so Chinese in a canvas label (数据始于, 盈亏线) lands on the
- *  same pixel face as the page instead of a heavy system fallback. */
-export function monoFont(): string {
-  const faces = [cssVar("--font-departure", ""), cssVar("--font-zpix", "")].filter(Boolean);
-  return faces.length ? `${faces.join(", ")}, monospace` : "ui-monospace, monospace";
+/** next/font generates a hashed family name, so the literal "Inter" resolves
+ *  to nothing inside a canvas. Read the variable the loader sets, and list the
+ *  system Chinese faces behind it as the page does (docs/adr/0037). */
+export function chartFont(): string {
+  const inter = cssVar("--font-inter", "");
+  const cjk = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif';
+  return inter ? `${inter}, ${cjk}` : `system-ui, ${cjk}`;
 }
 
-/** Canvas text that can carry Chinese — a threshold's label, "today", the
- *  coverage note, a legend of series names — sits on zpix's 12px grid on the
- *  Chinese page. Numerals and dates stay on Departure Mono's 11px in both:
- *  either face drawn off its own grid is resampled and goes soft. */
+/** Numerals and dates on a canvas: Inter's tabular figures at 11px keep a
+ *  y-axis column aligned. Text that can carry Chinese takes a pixel more,
+ *  because a Han character at 11px loses its inner strokes. */
 export const NUM_PX = 11;
 export function labelPx(locale: Locale): number {
   return locale === "zh" ? 12 : NUM_PX;
@@ -51,6 +50,6 @@ export function textWidth(text: string, px: number): number {
   if (typeof document === "undefined") return text.length * px;
   measure ??= document.createElement("canvas").getContext("2d");
   if (!measure) return text.length * px;
-  measure.font = `${px}px ${monoFont()}`;
+  measure.font = `${px}px ${chartFont()}`;
   return measure.measureText(text).width;
 }

@@ -4,40 +4,43 @@ import { ordinal, UNIT_EN } from "./words";
 
 export const overview = {
   overview: {
+    tickerLabel: "Latest prices",
     thesisHeading: "Capacity leads price",
     feed: "Subscribe (Atom)",
-    api: "Every series as JSON",
+    api: "Downloads and API",
     futuresHeading: "What the futures market prices ahead",
     futuresNote: (date: string) =>
-      `The latest settle of every listed Dalian live-hog contract, by delivery month, as of ${date}, from Sina's copy of the exchange's prices. The market's expectation with money behind it, not this site's forecast. Per tonne of the delivery grade, a different caliber from the spot prices above.`,
+      `What the market pays today for hogs delivered in each coming month (settles of ${date}). An expectation with money behind it, not this site's forecast.`,
+    futuresMethod:
+      "The latest settle of every listed Dalian live-hog contract, by delivery month, from Sina's copy of the exchange's prices. Per tonne of the delivery grade, a different caliber from the spot prices above. Bars start at zero, so their lengths compare honestly.",
     futuresCaption: "Live hog futures: the latest settle by delivery month",
     futuresMonth: "Delivery month",
     futuresSettle: "Settle",
     futuresMore: "every contract, and the main contract since 2021",
     futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
       `How far off such prices have been: three months before delivery, a contract's settle sat ${three}% from where it finished, on average; six months before, ${six}%, and ${Math.abs(sixSigned)}% ${sixSigned >= 0 ? "above" : "below"} it on the signed average (${n} delivered contracts since 2021). The past only, and few cycles of it.`,
-    thesisNote: (
+    thesisNote:
+      "Breeding sows, shifted forward by the time biology takes to turn them into market hogs, drawn above the hog price they lead.",
+    thesisMethod: (
       <>
-        Breeding sow inventory, shifted forward by the lead you pick, above the
-        hog price it is supposed to lead. Biology fixes the lag at 10–12
-        months — 114 days&rsquo; gestation plus about six months to finish — so
-        the shift is not a fitted parameter. Two panels on one time axis, each
-        on its own scale: <b>not a dual axis</b>. Past today the shifted line
-        is capacity that already exists, drawn where biology puts it on the
-        market. It is an alignment, <b>not a forecast</b>.
+        <p>
+          Biology fixes the lag at 10–12 months — 114 days&rsquo; gestation plus
+          about six months to finish — so the shift is not a fitted parameter.
+        </p>
+        <p>
+          Two panels on one time axis, each on its own scale: <b>not a dual
+          axis</b>. Past today the shifted line is capacity that already exists,
+          drawn where biology puts it on the market. It is an alignment,{" "}
+          <b>not a forecast</b>.
+        </p>
       </>
     ),
     lead: "Lead",
     leadOption: (n: number) => (n ? `+${n} mo` : "None"),
     shifted: (n: number) => (n ? ` · shifted +${n} mo` : ""),
     today: "today",
-    changesNote: (
-      <>
-        Facts with fixed definitions, computed in the pipeline: runs against a
-        threshold, multi-year extremes, series that stopped updating.{" "}
-        <b>None of them is a call on the phase</b> — that stays with the reader.
-      </>
-    ),
+    changesNote:
+      "Facts with fixed definitions, computed in the pipeline: runs against a threshold, multi-year extremes, series that stopped. None of them is a call on the phase.",
     groups: {
       runs: "Thresholds",
       extremes: "Multi-year extremes",
@@ -54,15 +57,7 @@ export const overview = {
     nothing: "Nothing to report under these definitions.",
 
     heading: "Where the hog cycle stands",
-    lede: (
-      <>
-        Three readings in causal order. Breeding sows fix hog supply 10–12
-        months out; the hog price is where that supply lands; the hog-to-corn
-        ratio decides whether farmers keep breeding. Each number says which
-        period it describes and the day it became public. None of them is a
-        call on the phase.
-      </>
-    ),
+    lede: "Three readings in causal order. Breeding sows fix hog supply 10–12 months out, the hog price is where that supply lands, and farm margins decide whether the herd is rebuilt. Each number says which period it describes and when it became public.",
     stamp: (asOf: string) => `Data as of ${asOf}`,
     lastRelease: (date: string) => `latest release ${date}`,
     role: {

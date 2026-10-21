@@ -32,7 +32,7 @@ import { hasReleases, type Align } from "@/lib/useAlign";
 import type { Panel, Point } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
 import { fmt, slotColor } from "./base/theme";
-import { NUM_PX, cssVar, labelPx, monoFont } from "./base/ink";
+import { NUM_PX, cssVar, labelPx, chartFont } from "./base/ink";
 
 export type LagSpec = { id: string; months: number };
 
@@ -205,7 +205,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
             icon: "roundRect",
             itemWidth: 12,
             itemHeight: 2,
-            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: chartFont() },
             formatter: (name: string) => {
               const v = finals.get(name);
               return v == null ? name : `${name}  ${fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale)}`;
@@ -215,7 +215,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: chartFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             formatter: (raw: unknown) => {
               const items = (Array.isArray(raw) ? raw : [raw]) as TipItem[];
@@ -252,7 +252,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
             max,
             axisLine: { lineStyle: { color: grid } },
             axisTick: { show: false },
-            axisLabel: { color: muted, fontSize: NUM_PX, fontFamily: monoFont() },
+            axisLabel: { color: muted, fontSize: NUM_PX, fontFamily: chartFont() },
           },
           yAxis: {
             type: log ? "log" : "value",
@@ -263,7 +263,7 @@ export function Overlay({ panels, selected, slots, min, max, lag, align = "perio
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               formatter: (v: number) => fmt(v, indexed ? "index" : (chosen[0]?.unit ?? ""), locale),
             },
           },

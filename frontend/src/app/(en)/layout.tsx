@@ -12,12 +12,15 @@ import "../globals.css";
 import "../nav.css";
 import "../wall.css";
 import "../overview.css";
+import "../market.css";
 import "../series.css";
 import "../controls.css";
 import "../search.css";
+import "../tools.css";
 import "../phone.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
+import { SiteFoot } from "@/components/shell/SiteFoot";
 import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
 import { HTML_LANG, staticPath } from "@/i18n/locale";
@@ -40,6 +43,7 @@ export default function EnLayout({ children }: { children: React.ReactNode }) {
       <body>
         <SiteNav locale="en" series={searchItems} />
         {children}
+        <SiteFoot locale="en" />
       </body>
     </html>
   );

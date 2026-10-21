@@ -24,6 +24,8 @@ import { dict } from "@/i18n/dict";
 import { HealthStamp } from "@/components/shell/HealthStamp";
 import { Glossary } from "@/components/Glossary";
 import { FuturesCurve } from "@/components/overview/FuturesCurve";
+import { SectionHead } from "@/components/shell/SectionHead";
+import { Ticker } from "@/components/overview/Ticker";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
@@ -74,32 +76,47 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
     <main className="wrap overview">
       <header className="ov-head">
         <h1>{o.heading}</h1>
-        <p className="ov-stamp">
-          {o.stamp(asOf)}
-          {lastRelease && <> · {o.lastRelease(lastRelease)}</>}
-          {data.health && " · "}
-          <HealthStamp health={data.health} locale={locale} />
-          {" · "}
+        <p className="ov-lede">{o.lede}</p>
+        <ul className="ov-stamp">
+          <li>
+            <span className="live-dot" aria-hidden="true" />
+            <span className="num">{o.stamp(asOf)}</span>
+          </li>
+          {lastRelease && <li className="num">{o.lastRelease(lastRelease)}</li>}
+          {data.health && (
+            <li>
+              <HealthStamp health={data.health} locale={locale} />
+            </li>
+          )}
           {/* The overview stays on today; standing on a past day is the
               wall's job (docs/adr/0025). */}
-          <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
-          {" · "}
-          <a href={staticPath(locale === "zh" ? "/zh/feed.xml" : "/feed.xml")}>{o.feed}</a>
-          {" · "}
-          <a href={staticPath("/data/index.json")}>{o.api}</a>
-        </p>
-        <p className="ov-lede">{o.lede}</p>
+          <li>
+            <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
+          </li>
+          <li>
+            <a href={staticPath(locale === "zh" ? "/zh/feed.xml" : "/feed.xml")}>{o.feed}</a>
+          </li>
+          <li>
+            <Link href={pathOf(locale, "datasets")}>{o.api}</Link>
+          </li>
+        </ul>
         <Glossary ids={["sowHerd", "normalHolding", "releaseVsPeriod", "caliber"]} locale={locale} />
       </header>
+
+      <Ticker readings={data.readings} locale={locale} />
 
       <Signals signals={signals} end={end} locale={locale} />
 
       {capacity && price && (
         <section aria-labelledby="thesis-h">
-          <h2 className="section" id="thesis-h">
-            {o.thesisHeading}
-          </h2>
-          <p className="section-note">{o.thesisNote}</p>
+          <SectionHead
+            id="thesis-h"
+            index="01"
+            title={o.thesisHeading}
+            note={o.thesisNote}
+            method={o.thesisMethod}
+            locale={locale}
+          />
           <ThesisChart capacity={capacity} price={price} end={end} locale={locale} />
         </section>
       )}
@@ -110,18 +127,20 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
           track={data.market?.track_record}
           today={end}
           locale={locale}
+          index="02"
         />
       )}
 
       <div className="ov-two">
-        <ReleaseFeed readings={cycle} locale={locale} />
+        <ReleaseFeed readings={cycle} locale={locale} index="03" />
         <Highlights
           readings={cycle}
           panels={data.panels.filter((p) => p.threshold)}
           locale={locale}
+          index="04"
         />
       </div>
-      <ReadingsTable readings={cycle} locale={locale} />
+      <ReadingsTable readings={cycle} locale={locale} index="05" />
     </main>
   );
 }

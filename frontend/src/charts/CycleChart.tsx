@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { Cycle } from "@/lib/cycles";
 import { echarts } from "./base/echarts";
 import { fmt, slotColor } from "./base/theme";
-import { NUM_PX, cssVar, labelPx, monoFont } from "./base/ink";
+import { NUM_PX, cssVar, labelPx, chartFont } from "./base/ink";
 import { unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { periodLabel } from "@/lib/period";
@@ -58,13 +58,13 @@ export function CycleChart({ cycles, horizon, indexed, unit, locale }: Props) {
             icon: "roundRect",
             itemWidth: 12,
             itemHeight: 2,
-            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: muted, fontSize: labelPx(locale), fontFamily: chartFont() },
           },
           tooltip: {
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: chartFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             formatter: (raw: unknown) => {
               const items = (Array.isArray(raw) ? raw : [raw]) as {
@@ -101,7 +101,7 @@ export function CycleChart({ cycles, horizon, indexed, unit, locale }: Props) {
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               formatter: (v: number) => t.tick(v),
             },
           },
@@ -114,7 +114,7 @@ export function CycleChart({ cycles, horizon, indexed, unit, locale }: Props) {
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               formatter: (v: number) => fmt(v, yUnit, locale),
             },
           },

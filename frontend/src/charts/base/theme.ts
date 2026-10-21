@@ -11,7 +11,7 @@ import type { Panel } from "@/types/generated/wall";
 import { NUMBER_LOCALE, nameOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { domain } from "./domain";
-import { cssVar, monoFont, NUM_PX, tierColor } from "./ink";
+import { cssVar, chartFont, NUM_PX, tierColor } from "./ink";
 import { PLOT_INSET, markLines, startBand, type Marker } from "./marks";
 import { splitByGap } from "./segments";
 
@@ -31,10 +31,14 @@ export function fmt(
 ): string {
   if (value == null) return "—";
   const digits = WHOLE.has(unit) ? 0 : unit === "kg" ? 1 : 2;
-  return value.toLocaleString(NUMBER_LOCALE[locale], {
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
-  });
+  // A true minus: the hyphen toLocaleString gives is shorter than a digit
+  // and sits low beside tabular figures.
+  return value
+    .toLocaleString(NUMBER_LOCALE[locale], {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    })
+    .replace(/^-/, "\u2212");
 }
 
 type BaseArgs = {
@@ -117,7 +121,7 @@ export function panelOption(
       axisLabel: {
         show: showAxisLabels,
         color: muted,
-        fontFamily: monoFont(),
+        fontFamily: chartFont(),
         fontSize: NUM_PX,
       },
       splitLine: { show: false },
@@ -144,7 +148,7 @@ export function panelOption(
       splitLine: { lineStyle: { color: grid } },
       axisLabel: {
         color: muted,
-        fontFamily: monoFont(),
+        fontFamily: chartFont(),
         fontSize: NUM_PX,
         formatter: (v: number) => fmt(v, panel.unit, locale),
       },
@@ -174,7 +178,7 @@ export function panelOption(
             distance: 8,
             color: ink,
             fontSize: NUM_PX,
-            fontFamily: monoFont(),
+            fontFamily: chartFont(),
             formatter: (p: { value?: unknown }) =>
               fmt(typeof p.value === "number" ? p.value : null, panel.unit, locale),
           },

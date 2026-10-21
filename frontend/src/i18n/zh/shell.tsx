@@ -13,6 +13,8 @@ export const shell: Pick<
       overview: "总览",
       wall: "因果链图表墙",
       compare: "对比",
+      calc: "养殖利润计算器",
+      datasets: "数据与接口",
     },
   },
 
@@ -22,6 +24,8 @@ export const shell: Pick<
     overview: "总览",
     wall: "因果链",
     compare: "对比",
+    calc: "利润计算",
+    datasets: "数据",
   },
 
   gauge: {

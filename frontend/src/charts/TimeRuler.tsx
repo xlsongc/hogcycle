@@ -13,7 +13,7 @@
 
 import { useEffect, useRef } from "react";
 import { echarts } from "./base/echarts";
-import { NUM_PX, cssVar, monoFont } from "./base/ink";
+import { NUM_PX, cssVar, chartFont } from "./base/ink";
 import { syncPointer } from "./base/pointerSync";
 import { toIso } from "@/lib/dates";
 
@@ -39,7 +39,7 @@ export function TimeRuler({ group, min, max }: Props) {
           max,
           axisLine: { lineStyle: { color: grid } },
           axisTick: { show: true, lineStyle: { color: grid } },
-          axisLabel: { color: muted, fontFamily: monoFont(), fontSize: NUM_PX },
+          axisLabel: { color: muted, fontFamily: chartFont(), fontSize: NUM_PX },
           splitLine: { show: false },
           axisPointer: {
             show: true,
@@ -48,7 +48,7 @@ export function TimeRuler({ group, min, max }: Props) {
             label: {
               show: true,
               formatter: (p: { value: unknown }) => toIso(Number(p.value)),
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               fontSize: NUM_PX,
               padding: [3, 6],
               color: cssVar("--page", "#fff"),

@@ -3,39 +3,56 @@
 .search-open {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  min-width: 170px;
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .search-open kbd {
+  margin-left: auto;
+}
+
+.search-icon {
+  flex: none;
+}
+
+.search-open kbd {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
   color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 0 4px;
-  line-height: 1.4;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 0 5px;
+  line-height: 1.5;
 }
 
 dialog.search {
-  width: min(560px, calc(100vw - 24px));
+  width: min(600px, calc(100vw - 24px));
   margin: 12vh auto auto;
   padding: 0;
   color: var(--ink);
   background: var(--surface-1);
-  border: 1px solid var(--axis);
-  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
 }
 
 dialog.search::backdrop {
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
 dialog.search input {
   width: 100%;
-  font: var(--type) var(--sans);
+  font: var(--text-md) var(--font-ui);
   color: var(--ink);
-  background: var(--page);
+  background: var(--surface-1);
   border: 0;
   border-bottom: 1px solid var(--grid);
-  padding: 12px 14px;
+  padding: 16px 18px;
   outline: none;
 }
 
@@ -45,7 +62,7 @@ dialog.search ul {
   display: block;
   list-style: none;
   margin: 0;
-  padding: 4px 0;
+  padding: 6px;
   max-height: 52vh;
   overflow-y: auto;
 }
@@ -54,11 +71,13 @@ dialog.search li {
   display: flex;
   align-items: baseline;
   gap: 10px;
-  padding: 6px 14px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 
-/* The option the arrows are on: a rule and ink, not colour alone. */
+/* The option the arrows are on: a fill and a rule, not colour alone. */
 dialog.search li[aria-selected="true"] {
   background: var(--chip);
   box-shadow: inset 2px 0 0 var(--ink);
@@ -70,20 +89,26 @@ dialog.search li[aria-selected="true"] {
 
 dialog.search .search-compare {
   color: var(--muted);
-  font-size: var(--type);
+  font-size: var(--text-xs);
   padding: 0;
   border: 0;
+  background: transparent;
   text-decoration: underline;
   text-decoration-color: var(--axis);
 }
 
 .search-hint {
   margin: 0;
-  padding: 8px 14px 10px;
+  padding: 10px 18px 12px;
   border-top: 1px solid var(--grid);
+  background: var(--surface-2);
 }
 
 @media (max-width: 560px) {
+  .search-open {
+    min-width: 0;
+  }
+
   .search-open kbd {
     display: none;
   }

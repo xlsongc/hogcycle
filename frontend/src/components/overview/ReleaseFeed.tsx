@@ -14,10 +14,19 @@ import { fmt } from "@/charts/base/theme";
 import { nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { periodLabel, shortDate } from "@/lib/period";
+import { SectionHead } from "@/components/shell/SectionHead";
 
 const SHOWN = 8;
 
-export function ReleaseFeed({ readings, locale }: { readings: Reading[]; locale: Locale }) {
+export function ReleaseFeed({
+  readings,
+  locale,
+  index,
+}: {
+  readings: Reading[];
+  locale: Locale;
+  index?: string;
+}) {
   const o = dict(locale).overview;
   const dated = readings
     .filter((r): r is Reading & { published_on: string } => r.published_on != null)
@@ -27,10 +36,7 @@ export function ReleaseFeed({ readings, locale }: { readings: Reading[]; locale:
 
   return (
     <section className="feed" aria-labelledby="feed-h">
-      <h2 className="section" id="feed-h">
-        {o.feedHeading}
-      </h2>
-      <p className="section-note">{o.feedNote}</p>
+      <SectionHead id="feed-h" index={index} title={o.feedHeading} note={o.feedNote} locale={locale} />
       <ol>
         {dated.map((r) => (
           <li key={r.id} className={r.stale ? "stale" : undefined}>

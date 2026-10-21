@@ -9,6 +9,8 @@ export const shell = {
       overview: "Overview",
       wall: "Causal-chain wall",
       compare: "Compare",
+      calc: "Hog margin calculator",
+      datasets: "Data and API",
     },
   },
 
@@ -18,6 +20,8 @@ export const shell = {
     overview: "Overview",
     wall: "Wall",
     compare: "Compare",
+    calc: "Calculator",
+    datasets: "Data",
   },
 
   gauge: {

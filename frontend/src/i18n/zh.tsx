@@ -15,6 +15,8 @@ import { compare } from "./zh/compare";
 import { chart } from "./zh/chart";
 import { terms } from "./zh/terms";
 import { futures } from "./zh/futures";
+import { calc } from "./zh/calc";
+import { site } from "./zh/site";
 
 // 每页一个对象（src/i18n/zh/），各自按 en 的同名部分定型。
 export const zh: Dict = {
@@ -26,4 +28,6 @@ export const zh: Dict = {
   ...chart,
   ...terms,
   ...futures,
+  ...calc,
+  ...site,
 };

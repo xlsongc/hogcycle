@@ -13,7 +13,7 @@ import { useEffect, useRef } from "react";
 import type { History } from "@/types/generated/wall";
 import { echarts } from "./base/echarts";
 import { fmt } from "./base/theme";
-import { NUM_PX, cssVar, labelPx, monoFont, tierColor } from "./base/ink";
+import { NUM_PX, cssVar, labelPx, chartFont, tierColor } from "./base/ink";
 import type { Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 
@@ -47,7 +47,7 @@ export function CurveHistoryChart({ history, unit, locale }: Props) {
             trigger: "axis",
             backgroundColor: surface,
             borderColor: cssVar("--border", "rgba(0,0,0,.1)"),
-            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: monoFont() },
+            textStyle: { color: ink, fontSize: labelPx(locale), fontFamily: chartFont() },
             axisPointer: { type: "line", lineStyle: { color: muted, width: 1 } },
             formatter: (raw: unknown) => {
               const first = (Array.isArray(raw) ? raw : [raw])[0] as { axisValue?: unknown };
@@ -74,7 +74,7 @@ export function CurveHistoryChart({ history, unit, locale }: Props) {
             axisLine: { lineStyle: { color: grid } },
             axisTick: { show: false },
             splitLine: { show: false },
-            axisLabel: { color: muted, fontSize: NUM_PX, fontFamily: monoFont() },
+            axisLabel: { color: muted, fontSize: NUM_PX, fontFamily: chartFont() },
           },
           yAxis: {
             type: "value",
@@ -85,7 +85,7 @@ export function CurveHistoryChart({ history, unit, locale }: Props) {
             axisLabel: {
               color: muted,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
               formatter: (v: number) => fmt(v, unit, locale),
             },
           },
@@ -104,7 +104,7 @@ export function CurveHistoryChart({ history, unit, locale }: Props) {
               formatter: () => t.contract(h.delivery),
               color: live,
               fontSize: NUM_PX,
-              fontFamily: monoFont(),
+              fontFamily: chartFont(),
             },
             labelLayout: { moveOverlap: "shiftY" as const },
             emphasis: { focus: "series" as const },

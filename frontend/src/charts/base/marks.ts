@@ -11,7 +11,7 @@ import type { MarkAreaComponentOption, MarkLineComponentOption } from "echarts";
 import type { Panel } from "@/types/generated/wall";
 import { labelOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-import { cssVar, labelPx, monoFont, textWidth } from "./ink";
+import { cssVar, labelPx, chartFont, textWidth } from "./ink";
 
 export type Marker = { date: string; label: string };
 
@@ -77,7 +77,7 @@ export function markLines(
 ): { option: MarkLineComponentOption | undefined; headroom: boolean } {
   const muted = cssVar("--muted", "#72716c");
   const critical = cssVar("--critical", "#d03b3b");
-  const text = { fontSize: labelPx(locale), fontFamily: monoFont() };
+  const text = { fontSize: labelPx(locale), fontFamily: chartFont() };
   const marks = verticals(panel, span, marker, locale);
   const data: NonNullable<MarkLineComponentOption["data"]> = [
     ...(panel.threshold
@@ -147,7 +147,7 @@ export function startBand(
       position: "insideRight",
       color: cssVar("--muted", "#72716c"),
       fontSize: labelPx(locale),
-      fontFamily: monoFont(),
+      fontFamily: chartFont(),
       formatter: note,
     },
     data: [[{ xAxis: span.min }, { xAxis: first }]],

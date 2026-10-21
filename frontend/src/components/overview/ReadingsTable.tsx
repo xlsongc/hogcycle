@@ -16,6 +16,7 @@ import { dict } from "@/i18n/dict";
 import { Term } from "@/components/Term";
 import { tierVars } from "@/lib/tier";
 import { periodLabel } from "@/lib/period";
+import { SectionHead } from "@/components/shell/SectionHead";
 
 const TIERS: Reading["tier"][] = ["capacity", "margin", "price", "noise"];
 
@@ -27,16 +28,21 @@ const GRAN: Record<string, "D" | "W" | "M" | "Q" | "A"> = {
   annual: "A",
 };
 
-export function ReadingsTable({ readings, locale }: { readings: Reading[]; locale: Locale }) {
+export function ReadingsTable({
+  readings,
+  locale,
+  index,
+}: {
+  readings: Reading[];
+  locale: Locale;
+  index?: string;
+}) {
   const t = dict(locale);
   const copy = t.readings;
 
   return (
     <section aria-labelledby="readings-h">
-      <h2 className="section" id="readings-h">
-        {copy.heading}
-      </h2>
-      <p className="section-note">{copy.note}</p>
+      <SectionHead id="readings-h" index={index} title={copy.heading} note={copy.note} locale={locale} />
       <div className="readings-wrap">
         <table className="readings">
           <thead>

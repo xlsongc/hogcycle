@@ -1,0 +1,380 @@
+/* The calculator (docs/adr/0038) and the data page: the two pages a reader
+   uses rather than reads. */
+
+/* ---------- calculator ---------- */
+
+.calc {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.calc-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  padding: 20px 22px;
+}
+
+.calc-card h2 {
+  margin: 0 0 14px;
+  font-size: var(--text-md);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.calc-inputs {
+  position: sticky;
+  top: 78px;
+}
+
+.calc-field {
+  margin: 0 0 16px;
+}
+
+.calc-field label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.calc-field .hint {
+  margin: 6px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+
+.calc-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.calc-input:focus-within {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px var(--chip);
+}
+
+.calc-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 9px 12px;
+  font: 500 var(--text-md) var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.calc-input span {
+  padding: 0 12px;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: var(--text-xs);
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link-button:hover {
+  background: transparent;
+}
+
+.calc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--grid);
+}
+
+.calc-actions .hint {
+  font-size: var(--text-xs);
+}
+
+.calc-out {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.calc-big {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+}
+
+.calc-big b {
+  font-size: var(--text-num);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.calc-big span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.calc-batch {
+  margin: 6px 0 14px;
+  color: var(--ink-2);
+  font-size: var(--text-base);
+}
+
+.calc-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  margin: 0 0 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--grid);
+  border-bottom: 1px solid var(--grid);
+  font-size: var(--text-sm);
+}
+
+.calc-split div {
+  display: flex;
+  gap: 8px;
+}
+
+.calc-split dt {
+  color: var(--muted);
+}
+
+.calc-split dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.calc-gap,
+.calc-note {
+  margin: 0 0 12px;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.calc-gap {
+  margin: 0;
+}
+
+.calc-table {
+  overflow-x: auto;
+}
+
+.calc-table table th small {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.calc-table td,
+.calc-table th {
+  padding: 8px 10px;
+}
+
+.calc-table thead th {
+  position: static;
+}
+
+/* Loss and gain read from the sign and the weight of the type, not from red
+   and green: the same table is read by a farmer and by a pork buyer. */
+.calc-card td.gain {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.calc-card td.loss,
+.calc-big b.loss {
+  color: var(--ink);
+}
+
+.calc-grid-section .calc-card {
+  padding: 8px 10px;
+  max-width: 760px;
+}
+
+table.calc-grid {
+  table-layout: fixed;
+}
+
+table.calc-grid td {
+  text-align: center;
+}
+
+table.calc-grid td.loss {
+  color: var(--ink-2);
+  font-weight: 400;
+  background: var(--chip);
+}
+
+table.calc-grid td.here {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.calc-disclaimer {
+  margin: 18px 0 0;
+  max-width: 72ch;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+/* ---------- data page ---------- */
+
+.endpoints {
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.endpoints div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px 24px;
+  padding: 12px 18px;
+  font-size: var(--text-sm);
+}
+
+.endpoints div + div {
+  border-top: 1px solid var(--grid);
+}
+
+.endpoints.columns div {
+  grid-template-columns: 16ch minmax(0, 1fr);
+}
+
+.endpoints dt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.endpoints dd {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+code {
+  font-family: var(--font-code);
+  font-size: 0.92em;
+}
+
+.endpoints code {
+  color: var(--ink);
+}
+
+pre.code {
+  margin: 8px 0 0;
+  padding: 14px 18px;
+  overflow-x: auto;
+  background: var(--ink);
+  color: var(--page);
+  border-radius: var(--r-md);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.datasets-table {
+  font-size: var(--text-sm);
+}
+
+/* Scrolls inside its frame on a phone: the phone rules unframe the readings
+   table to stack it, and this one stays a table. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-1);
+}
+
+.datasets-table th,
+.datasets-table td {
+  padding: 9px 14px;
+}
+
+.datasets-table thead th {
+  position: static;
+}
+
+.datasets-table td:first-child a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.datasets-table td:first-child a:hover {
+  text-decoration: underline;
+}
+
+.datasets-table .tier-row th {
+  text-align: left;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--tier-ink, var(--muted));
+  background: var(--surface-2);
+}
+
+.datasets-table td.files {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.datasets-table td.files a {
+  padding: 2px 9px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+}
+
+.datasets-table td.files a:hover {
+  border-color: var(--ink);
+}
+
+.cite {
+  margin: 0 0 12px;
+  padding: 14px 18px;
+  max-width: 76ch;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ink);
+  border-radius: var(--r-sm);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 860px) {
+  .calc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .calc-inputs {
+    position: static;
+  }
+
+  .endpoints div,
+  .endpoints.columns div {
+    grid-template-columns: 1fr;
+  }
+}

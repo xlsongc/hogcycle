@@ -15,10 +15,11 @@ import { fmt } from "@/charts/base/theme";
 import { labelOf, nameOf, seriesPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { granularityLetter, periodLabel } from "@/lib/period";
+import { SectionHead } from "@/components/shell/SectionHead";
 
-type Props = { readings: Reading[]; panels: Panel[]; locale: Locale };
+type Props = { readings: Reading[]; panels: Panel[]; locale: Locale; index?: string };
 
-export function Highlights({ readings, panels, locale }: Props) {
+export function Highlights({ readings, panels, locale, index }: Props) {
   const t = dict(locale);
   const o = t.overview;
   const runs = readings.filter((r) => r.threshold_run);
@@ -94,10 +95,7 @@ export function Highlights({ readings, panels, locale }: Props) {
 
   return (
     <section className="highlights" aria-labelledby="highlights-h">
-      <h2 className="section" id="highlights-h">
-        {o.factsHeading}
-      </h2>
-      <p className="section-note">{o.changesNote}</p>
+      <SectionHead id="highlights-h" index={index} title={o.factsHeading} note={o.changesNote} locale={locale} />
       {shown.length ? (
         <div className="fact-groups">
           {shown.map((g) => (

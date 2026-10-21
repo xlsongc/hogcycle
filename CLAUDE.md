@@ -146,23 +146,18 @@ value to suit a unit label.
   the code does not.
 - Python: `ruff check` must be clean. Type hints everywhere.
 - TypeScript: `strict`. No `any`.
-- **Two pixel grids, and each page picks one.** Departure Mono is drawn on
-  11px, zpix on 12px; at any other size a pixel face is resampled and goes
-  soft. The `--type` token carries the current page's grid: 12px by default,
-  11px under `html:lang(en)`, because the English page is entirely Latin.
-  Prose sizes read `var(--type)` rather than hard-coding one language's
-  number; numerals-only elements take `.num` (11px) in both.
-  `--mono`/`--sans` list Departure Mono first so Latin resolves there and CJK
-  falls through to zpix.
+- **Prose is Inter on a type scale; the pixel face is an accent**
+  (ADR-0037). Sizes come from the `--text-*` tokens in `globals.css`;
+  `check-type-scale.mjs` fails the build on any other size. Departure Mono
+  (`--font-pixel`) sets only the wordmark and section index numbers, at a
+  whole multiple of 11px. Chinese comes from the reader's system face: no
+  CJK web font. Canvas text reads `chartFont()`, `NUM_PX` and
+  `labelPx(locale)` from `charts/base/ink.ts`.
 
 - **UI copy lives in `frontend/src/i18n/`, never inline in a component.**
   `en.tsx` is the reference shape and `zh.tsx` is typed `Dict = typeof en`, so
   a missing translation is a compile error instead of an English sentence in a
   Chinese paragraph. Add copy to both, or neither.
-- **The CJK font is subset to what the app renders.** Add UI copy or an
-  indicator whose name uses a new character and it will fall back to a system
-  face mid-sentence. Re-cut with `frontend/scripts/subset-cjk-font.sh`.
-  zpix is *not* an open licence — see `frontend/src/fonts/Zpix-NOTICE.md`.
 - **Small-multiple panels sync by time, never by index.** `echarts.connect()`
   links pointers by data index, which puts panels of different frequencies
   on different dates. Use `charts/base/pointerSync.ts` (ADR-0016).
@@ -247,3 +242,5 @@ so you do not have to re-derive them.
 | 0034 | An estimate says it is one: profit and breakeven per hog, modelled on the official months, tested out of sample, its own indicator |
 | 0035 | The futures market is a tier of its own (`market`, off the wall), read from a mirror checked against a second source |
 | 0036 | The futures market is checked against itself: every settle is a print, and each delivered contract's price months ahead is set against its last settle |
+| 0037 | Pixel type is an accent; prose is Inter on a type scale, Chinese from the system face, answers before method |
+| 0038 | Tools a reader uses: the margin calculator (`/calc/`) and the data page (`/datasets/`) |

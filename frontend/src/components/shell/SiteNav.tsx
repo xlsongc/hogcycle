@@ -25,6 +25,7 @@ import {
 import { dict } from "@/i18n/dict";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SeriesSearch, type SearchItem } from "@/components/search/SeriesSearch";
+import { BrandMark } from "./BrandMark";
 
 export function SiteNav({ locale, series }: { locale: Locale; series: SearchItem[] }) {
   const t = dict(locale).nav;
@@ -34,8 +35,9 @@ export function SiteNav({ locale, series }: { locale: Locale; series: SearchItem
   return (
     <nav className="site-nav" aria-label={t.pages}>
       <div className="site-nav-inner">
-        <Link href={pathOf(locale, "overview")} className="brand">
-          hogcycle
+        <Link href={pathOf(locale, "overview")} className="brand" aria-label="hogcycle">
+          <BrandMark />
+          <span className="brand-word">hogcycle</span>
         </Link>
         <ul>
           {PAGES.map((p) => (
