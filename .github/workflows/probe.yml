@@ -1,0 +1,29 @@
+name: probe
+
+# Does a source answer a datacenter address? Run by hand before moving a
+# series from `reach: cn` to `reach: anywhere` (docs/adr/0022). It collects
+# into the runner's own checkout and throws that away: it never commits, and
+# deploy does not follow it.
+on:
+  workflow_dispatch:
+    inputs:
+      indicators:
+        description: "Indicator ids, comma-separated"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e "./backend"
+      # Through the environment, not interpolated into the script, so an id
+      # is only ever an argument.
+      - run: hogcycle collect --indicator "$IDS"
+        env:
+          IDS: ${{ inputs.indicators }}
