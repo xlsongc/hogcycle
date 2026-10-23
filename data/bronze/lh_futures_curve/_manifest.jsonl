@@ -3,3 +3,4 @@
 {"fetched_at": "2026-10-21T07:31:25.233317+00:00", "snapshot_id": "a95d14e9b7efc88c4e8b2c0194ff381abb1635730a8ebf7398daa61b84789b7b", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 1128755, "new_content": true}
 {"fetched_at": "2026-10-21T07:33:06.159862+00:00", "snapshot_id": "0d679f9b2252d94ebe5b9cbaefb7f527a3fd02f028c53c7dfd5b987a3c6bb7e7", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 99156, "new_content": false}
 {"fetched_at": "2026-10-22T05:34:58.615784+00:00", "snapshot_id": "fd390d1b7649c653de61e7edc8e5cea3378fb6547be63568927ff0cf4614d91b", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 100009, "new_content": true}
+{"fetched_at": "2026-10-23T05:33:30.727737+00:00", "snapshot_id": "c6dc8c025f04d9df107cefcbd7171a63828dea84175c966b10595ac822dae1b7", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 100859, "new_content": true}
