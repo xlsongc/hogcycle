@@ -26,6 +26,7 @@ import { Glossary } from "@/components/Glossary";
 import { FuturesCurve } from "@/components/overview/FuturesCurve";
 import { SectionHead } from "@/components/shell/SectionHead";
 import { Ticker } from "@/components/overview/Ticker";
+import { headline } from "@/lib/weekHeadline";
 
 // The reading each card shows, first available wins. 行情宝 platform
 // transactions are the deepest hog-price series (2015-) and the one the
@@ -55,6 +56,7 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
   const futures = panelOf(FUTURES);
   const end = data.window.end ?? data.generated_at.slice(0, 10);
   const asOf = data.generated_at.slice(0, 10);
+  const week = data.weeks?.at(-1);
 
   const signals = CARDS.flatMap(([role, ids]): Signal[] => {
     const id = ids.find((i) => readingOf(i) && panelOf(i));
@@ -102,6 +104,16 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
         </ul>
         <Glossary ids={["sowHerd", "normalHolding", "releaseVsPeriod", "caliber"]} locale={locale} />
       </header>
+
+      {week && (
+        <Link className="week-banner" href={pathOf(locale, "week")}>
+          <span className="week-banner-label">{t.week.fromOverview}</span>
+          <span className="week-banner-text">
+            {headline(week, new Map(data.panels.map((p) => [p.id, p])), locale) ?? t.week.noHeadline}
+          </span>
+          <span className="week-banner-go">{t.week.read} →</span>
+        </Link>
+      )}
 
       <Ticker readings={data.readings} locale={locale} />
 

@@ -11,6 +11,7 @@ export const shell: Pick<
     description: "把猪周期的因果链放在一条共享时间轴上，供人判断，不代人判断。",
     pages: {
       overview: "总览",
+      week: "猪市周报",
       wall: "因果链图表墙",
       compare: "对比",
       calc: "养殖利润计算器",
@@ -22,6 +23,7 @@ export const shell: Pick<
     pages: "页面",
     language: "语言",
     overview: "总览",
+    week: "周报",
     wall: "因果链",
     compare: "对比",
     calc: "利润计算",

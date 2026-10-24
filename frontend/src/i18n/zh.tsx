@@ -17,6 +17,7 @@ import { terms } from "./zh/terms";
 import { futures } from "./zh/futures";
 import { calc } from "./zh/calc";
 import { site } from "./zh/site";
+import { week } from "./zh/week";
 
 // 每页一个对象（src/i18n/zh/），各自按 en 的同名部分定型。
 export const zh: Dict = {
@@ -30,4 +31,5 @@ export const zh: Dict = {
   ...futures,
   ...calc,
   ...site,
+  ...week,
 };

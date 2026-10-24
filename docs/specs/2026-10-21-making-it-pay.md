@@ -56,9 +56,16 @@ for commercial use).
 
 1. **Measure.** Cloudflare Web Analytics, country-level and cookie-free
    (owner's yes and account; asked 10-21). Without it there is no way to
-   know who reads the site or whether anything below is working.
-2. **Make it findable.** A weekly digest page in both languages, generated
-   at export (next steps #6), so there is something to send and to share.
+   know who reads the site or whether anything below is working. **The
+   owner said not for now on 10-24.** What it would take, if that changes:
+   a free Cloudflare account, the site added under Web Analytics (no DNS
+   change for a GitHub Pages site), and the snippet's token pasted back.
+   It counts by country, page, referrer and device, never by IP or city,
+   and keeps six months. Ad blockers hide it, and mainland readers may be
+   undercounted where Cloudflare is slow.
+2. **Make it findable.** Done 10-24: the weekly digest, an issue per week in
+   both languages with its own address and a feed (ADR-0039), so there is
+   something to send and to share. Next: a sitemap and Open Graph tags.
 3. **Build a list.** A free English newsletter and a Chinese 公众号, both
    linking to the digest. Owner accounts.
 4. **Test paying.** When the English list is a few hundred readers, add a
@@ -67,7 +74,7 @@ for commercial use).
 
 ## What the owner needs to decide
 
-- Analytics: yes or no.
+- Analytics: not for now (10-24).
 - Whether to write commentary personally. The site stays descriptive; a
   newsletter can carry an opinion if it is signed and kept apart.
 - Newsletter platform and which language first (English recommended: it is

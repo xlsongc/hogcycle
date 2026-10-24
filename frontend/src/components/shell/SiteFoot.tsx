@@ -46,6 +46,9 @@ export function SiteFoot({ locale }: { locale: Locale }) {
             <li>
               <a href={staticPath(locale === "zh" ? "/zh/feed.xml" : "/feed.xml")}>{f.feed}</a>
             </li>
+            <li>
+              <a href={staticPath(locale === "zh" ? "/zh/week.xml" : "/week.xml")}>{f.weekFeed}</a>
+            </li>
           </ul>
         </div>
         <div>

@@ -17,6 +17,7 @@ import "../series.css";
 import "../controls.css";
 import "../search.css";
 import "../tools.css";
+import "../week.css";
 import "../phone.css";
 import { fontVars } from "../fonts";
 import { SiteNav } from "@/components/shell/SiteNav";
@@ -30,7 +31,14 @@ export const metadata: Metadata = {
   title: en.meta.title,
   description: en.meta.description,
   // So a feed reader pointed at the site finds the feed (export/feeds.py).
-  alternates: { types: { "application/atom+xml": staticPath("/feed.xml") } },
+  alternates: {
+    types: {
+      "application/atom+xml": [
+        { url: staticPath("/feed.xml"), title: en.foot.feed },
+        { url: staticPath("/week.xml"), title: en.foot.weekFeed },
+      ],
+    },
+  },
 };
 
 export default function EnLayout({ children }: { children: React.ReactNode }) {

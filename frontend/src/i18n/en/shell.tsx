@@ -7,6 +7,7 @@ export const shell = {
       "The causal chain of China's hog cycle on one shared time axis, laid out for a human to judge — not judged for them.",
     pages: {
       overview: "Overview",
+      week: "Weekly digest",
       wall: "Causal-chain wall",
       compare: "Compare",
       calc: "Hog margin calculator",
@@ -18,6 +19,7 @@ export const shell = {
     pages: "Pages",
     language: "Language",
     overview: "Overview",
+    week: "This week",
     wall: "Wall",
     compare: "Compare",
     calc: "Calculator",

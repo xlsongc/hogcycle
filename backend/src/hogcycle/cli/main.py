@@ -17,7 +17,9 @@ from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
 from ..export.feeds import write_feeds, write_index, write_series_json
 from ..export.series_csv import DEFAULT_DIR as CSV_DIR
 from ..export.series_csv import write_series_csv
+from ..export.week_feed import write_week_feeds
 from ..gold.about import DEFAULT_ABOUT, load_about
+from ..gold.digest import build_weeks
 from ..gold.series import all_specs
 from ..gold.wall import build_wall
 from ..pipeline import collect_all, replay_one
@@ -265,6 +267,9 @@ def main(argv: list[str] | None = None) -> int:
         # Today's export says when each source was last reached; an as-of
         # export answers a different day's question, so it carries none.
         payload["health"] = None if moment is not None else health(registry, bronze)
+        payload["weeks"] = build_weeks(
+            registry, silver, moment=dt.datetime.fromisoformat(payload["generated_at"])
+        )
         if not payload["panels"]:
             if moment is not None:
                 # The audit view: nothing had been *learned* by then. Usually
@@ -290,6 +295,7 @@ def main(argv: list[str] | None = None) -> int:
             write_series_json(registry, silver, moment=dt.datetime.now(dt.UTC))
             write_index(doc)
             write_feeds(doc)
+            write_week_feeds(doc)
         pts = sum(len(p["points"]) for p in payload["panels"])
         print(
             f"wrote {path} — {len(payload['panels'])} panel(s), {pts} points, "

@@ -58,6 +58,18 @@ def stamp_learned(points: list[dict[str, Any]]) -> str | None:
     return default
 
 
+Periods = dict[dt.date, list[dict[str, Any]]]
+
+
+def periods(spec: IndicatorSpec, prints: list[dict[str, Any]]) -> Periods:
+    """Every print inside the caliber, grouped by the period it describes."""
+    by_period: Periods = {}
+    for r in prints:
+        if spec.covers(r["obs_date"]):
+            by_period.setdefault(r["obs_date"], []).append(r)
+    return by_period
+
+
 def knowable_on(
     spec: IndicatorSpec, silver: SilverStore, day: dt.date
 ) -> list[dict[str, Any]]:
@@ -65,11 +77,12 @@ def knowable_on(
     in force then, with `basis` saying which clock placed it ("published" or
     "learned"). Inside the caliber; a mirror's misdated copy of a dated
     reading is left out, as on the wall."""
-    by_period: dict[dt.date, list[dict[str, Any]]] = {}
-    for r in silver.prints(spec.id):
-        if spec.covers(r["obs_date"]):
-            by_period.setdefault(r["obs_date"], []).append(r)
+    return in_force(periods(spec, silver.prints(spec.id)), day)
 
+
+def in_force(by_period: Periods, day: dt.date) -> list[dict[str, Any]]:
+    """`knowable_on` over prints already grouped, so a caller asking about
+    many days reads silver once."""
     out: list[dict[str, Any]] = []
     for obs_date in sorted(by_period):
         rows = by_period[obs_date]

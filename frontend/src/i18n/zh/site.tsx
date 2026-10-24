@@ -16,6 +16,7 @@ export const site: Pick<Dict, "more" | "foot" | "datasets"> = {
     project: "项目",
     index: "全部序列（JSON）",
     feed: "发布订阅（Atom）",
+    weekFeed: "周报订阅（Atom）",
     downloads: "下载与接口",
     code: "源代码",
     decisions: "设计决策记录",
@@ -32,6 +33,7 @@ export const site: Pick<Dict, "more" | "foot" | "datasets"> = {
       ["data/series/<id>.csv", "一个序列的全部读数，可以直接用表格打开。"],
       ["data/series/<id>.json", "同样的行，JSON 格式。"],
       ["feed.xml", "新发布的数据，Atom 订阅格式，可用阅读器订阅。"],
+      ["week.xml", "猪市周报的 Atom 订阅，每过完一周新增一条。"],
     ],
     columnsHeading: "各列的含义",
     columns: [

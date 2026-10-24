@@ -1,5 +1,6 @@
-/* The overview's two market blocks: the strip of the day's prices under the
-   heading, and the futures curve (docs/adr/0035). Split out of overview.css
+/* The overview's market blocks: the strip of the day's prices under the
+   heading, the futures curve (docs/adr/0035) and the line to the weekly
+   digest (docs/adr/0039). Split out of overview.css
    to stay under the 500-line ceiling. */
 
 /* ---------- the day's prices ---------- */
@@ -138,4 +139,66 @@ table.futures-curve tbody tr + tr th[scope="row"] {
   height: 10px;
   background: var(--tier);
   border-radius: 3px;
+}
+
+/* ---------- the weekly digest's line on the overview (docs/adr/0039) ---------- */
+
+.week-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-1);
+  text-decoration: none;
+  transition: border-color 0.12s;
+}
+
+.week-banner:hover {
+  border-color: var(--axis);
+}
+
+.week-banner-label {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--page);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.week-banner-text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-banner-go {
+  flex: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .week-banner {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .week-banner-text {
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .week-banner-go {
+    margin-left: auto;
+  }
 }

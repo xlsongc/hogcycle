@@ -24,10 +24,12 @@ site/
 frontend/tsconfig.tsbuildinfo
 
 # Derived at export time, like gold: one CSV and one JSON per series, the
-# index and the feeds, rebuilt on deploy (export/feeds.py).
+# index and the feeds, rebuilt on deploy (export/feeds.py, export/week_feed.py).
 frontend/public/data/
 frontend/public/feed.xml
 frontend/public/zh/feed.xml
+frontend/public/week.xml
+frontend/public/zh/week.xml
 
 # Written by next dev and next build with different paths, so it flipped on
 # every run; Next asks for it to be ignored (api-reference/config/typescript).

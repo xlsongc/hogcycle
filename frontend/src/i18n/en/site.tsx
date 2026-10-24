@@ -15,6 +15,7 @@ export const site = {
     project: "Project",
     index: "Every series (JSON)",
     feed: "Release feed (Atom)",
+    weekFeed: "Weekly digest (Atom)",
     downloads: "Downloads and API",
     code: "Source code",
     decisions: "Design decisions",
@@ -31,6 +32,7 @@ export const site = {
       ["data/series/<id>.csv", "One series, every reading. Open it straight in a spreadsheet."],
       ["data/series/<id>.json", "The same rows as JSON."],
       ["feed.xml", "New releases as an Atom feed, for a feed reader."],
+      ["week.xml", "The weekly digest as an Atom feed: one entry per finished week."],
     ] as [string, string][],
     columnsHeading: "What the columns mean",
     columns: [

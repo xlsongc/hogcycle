@@ -3,15 +3,17 @@
 // Regenerate: npm run types
 
 /** The contract shape this frontend was built against. */
-export const CONTRACT_VERSION = "1.7.0";
+export const CONTRACT_VERSION = "1.8.0";
 
 export interface WallContract {
   /** Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build. */
-  contract_version: "1.7.0";
+  contract_version: "1.8.0";
   /** The knowledge moment this payload reconstructs. Not merely a build timestamp: the store is bitemporal, so a wall can be rebuilt as it stood on any past date. */
   generated_at: string;
   /** When each source group was last reached, as the export saw it: the heartbeat of docs/adr/0023, so a reader can tell fresh data from a collector that has stopped. Null in an as-of export, whose question is a different day. Added in 1.3.0. */
   health?: Health | null;
+  /** The weekly digest (docs/adr/0039), oldest week first: for each ISO week since collection began, the difference between every series as it could be known at the week's end and at the end of the week before (the as-of rule of docs/adr/0025). A past week reads as it stood then. Added in 1.8.0. */
+  weeks?: Week[];
   /** The futures curve's history and the market's track record (docs/adr/0036): every contract's settles by week, and for each delivered contract what it priced 1, 3, 6 and 9 months before its delivery month against its last settle. Arithmetic on settles, no model. Null when no curve is held. Added in 1.7.0. */
   market?: Market | null;
   window: Window;
@@ -35,6 +37,82 @@ export interface Group {
   limit_hours: number;
   /** Not reached within its limit: the collector for it has stopped, or cannot reach it. */
   silent: boolean;
+}
+
+export interface Week {
+  /** ISO year and week, e.g. 2026-W43. */
+  id: string;
+  /** Monday. */
+  start: string;
+  /** Sunday. */
+  end: string;
+  /** The day the snapshot stands on: the Sunday for a week that is over, the export's day for the current one. */
+  cut: string;
+  complete: boolean;
+  /** Daily and weekly series: the latest reading at the cut against the latest at the week before's end. prev_d equal to d means no new reading came out. */
+  moves: Move[];
+  /** Monthly, quarterly and annual series: periods that came out during the week (past the latest held a week earlier), and periods whose value changed. Ordered by the day each became knowable. */
+  released: Released[];
+  /** Each listed futures contract's settle at the cut against a week earlier, nearest delivery first. */
+  curve: Curve[];
+  /** Releases the calendar (docs/adr/0031) expects within seven days of the cut, or that are overdue. An expectation, never a date. */
+  upcoming: Upcoming[];
+}
+
+export interface Move {
+  /** A panel id. */
+  id: string;
+  d: string;
+  v: number;
+  /** Null when the series was not yet knowable a week earlier. */
+  prev_d: string | null;
+  prev_v: number | null;
+  /** v − prev_v, in the series' unit. */
+  delta: number | null;
+  /** Null when either value is at or below zero. */
+  pct: number | null;
+  /** The highest daily reading this week; null for a weekly series or fewer than two days. */
+  hi: number | null;
+  lo: number | null;
+}
+
+export interface Released {
+  id: string;
+  /** The period's end. */
+  d: string;
+  v: number;
+  granularity: string;
+  /** The release date, or the day this warehouse learned an undated value. */
+  on: string;
+  basis: "published" | "learned";
+  /** The period before, at the same cadence. */
+  prior_d: string | null;
+  prior_v: number | null;
+  /** Against the period before; null at or below zero. */
+  pct: number | null;
+  yoy: number | null;
+  /** The value held a week earlier for the same period, when this one replaced it. */
+  revised_from: number | null;
+}
+
+export interface Curve {
+  delivery: string;
+  v: number;
+  /** The trading day of the settle. */
+  on: string;
+  prev_v: number | null;
+  delta: number | null;
+  pct: number | null;
+}
+
+export interface Upcoming {
+  id: string;
+  /** The cadence of the period expected: the latest reading's. */
+  granularity: string;
+  period: string;
+  usual: string;
+  by: string;
+  overdue: boolean;
 }
 
 export interface Market {

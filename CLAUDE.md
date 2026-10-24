@@ -244,3 +244,4 @@ so you do not have to re-derive them.
 | 0036 | The futures market is checked against itself: every settle is a print, and each delivered contract's price months ahead is set against its last settle |
 | 0037 | Pixel type is an accent; prose is Inter on a type scale, Chinese from the system face, answers before method |
 | 0038 | Tools a reader uses: the margin calculator (`/calc/`) and the data page (`/datasets/`) |
+| 0039 | The weekly digest (`/week/`, `week.xml`): each week is the difference between what was knowable at two Sundays |

@@ -23,6 +23,7 @@ import { terms } from "./en/terms";
 import { futures } from "./en/futures";
 import { calc } from "./en/calc";
 import { site } from "./en/site";
+import { week } from "./en/week";
 
 // One object per page (src/i18n/en/), so no file grows past the ceiling;
 // spread back together, the type is still the whole shape.
@@ -37,6 +38,7 @@ export const en = {
   ...futures,
   ...calc,
   ...site,
+  ...week,
 };
 
 export type Dict = typeof en;

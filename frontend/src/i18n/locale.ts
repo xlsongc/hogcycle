@@ -16,12 +16,20 @@ export const PATH: Record<Locale, string> = { en: "/", zh: "/zh/" };
 
 /** The site's pages. Each is prerendered once per locale, so a page is a
  *  (locale, page) pair and every one of them has its own shareable URL. */
-export type Page = "overview" | "wall" | "compare" | "calc" | "datasets";
+export type Page = "overview" | "week" | "wall" | "compare" | "calc" | "datasets";
 
-export const PAGES: readonly Page[] = ["overview", "wall", "compare", "calc", "datasets"] as const;
+export const PAGES: readonly Page[] = [
+  "overview",
+  "week",
+  "wall",
+  "compare",
+  "calc",
+  "datasets",
+] as const;
 
 const SLUG: Record<Page, string> = {
   overview: "",
+  week: "week/",
   wall: "wall/",
   compare: "compare/",
   calc: "calc/",
@@ -36,16 +44,27 @@ export function pathOf(locale: Locale, page: Page): string {
 
 /** Which nav page a pathname is, from either locale, or null for a page the
  *  nav does not list (a series page). `usePathname` already has the basePath
- *  removed, so this only has to strip the language prefix. */
+ *  removed, so this only has to strip the language prefix. A past week's
+ *  issue sits under the weekly page, and counts as it. */
 export function pageOf(pathname: string): Page | null {
   const rest = pathname.replace(/^\/zh(?=\/|$)/, "").replace(/\/+$/, "");
   if (rest === "") return "overview";
-  return PAGES.find((p) => SLUG[p] && rest === `/${SLUG[p].slice(0, -1)}`) ?? null;
+  return (
+    PAGES.find((p) => {
+      const slug = SLUG[p].slice(0, -1);
+      return slug && (rest === `/${slug}` || rest.startsWith(`/${slug}/`));
+    }) ?? null
+  );
 }
 
 /** A series' own page. Every series name on the site links here. */
 export function seriesPath(locale: Locale, id: string): string {
   return `${PATH[locale]}series/${id}/`;
+}
+
+/** One week's issue of the digest (docs/adr/0039), by its ISO week id. */
+export function weekPath(locale: Locale, id: string): string {
+  return `${PATH[locale]}week/${id.toLowerCase()}/`;
 }
 
 /** The same page in another language: swap the prefix, keep the rest. */
@@ -94,6 +113,7 @@ const UNIT_DISPLAY: Record<Locale, Record<string, string>> = {
     "CNY/kg": "元/公斤",
     "CNY/tonne": "元/吨",
     "CNY/head": "元/头",
+    CNY: "元",
     kg: "公斤",
     ratio: ": 1",
     "1000 head": "千头",

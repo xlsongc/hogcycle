@@ -9,7 +9,7 @@
   "properties": {
     "contract_version": {
       "type": "string",
-      "const": "1.7.0",
+      "const": "1.8.0",
       "description": "Which shape this document is (docs/adr/0024). An added optional field is a minor bump; anything else is major, and a page built for another major refuses to build."
     },
     "generated_at": {
@@ -35,6 +35,98 @@
               "age_hours": { "type": ["integer", "null"] },
               "limit_hours": { "type": "integer" },
               "silent": { "type": "boolean", "description": "Not reached within its limit: the collector for it has stopped, or cannot reach it." }
+            }
+          }
+        }
+      }
+    },
+    "weeks": {
+      "type": "array",
+      "description": "The weekly digest (docs/adr/0039), oldest week first: for each ISO week since collection began, the difference between every series as it could be known at the week's end and at the end of the week before (the as-of rule of docs/adr/0025). A past week reads as it stood then. Added in 1.8.0.",
+      "items": {
+        "type": "object",
+        "required": ["id", "start", "end", "cut", "complete", "moves", "released", "curve", "upcoming"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "description": "ISO year and week, e.g. 2026-W43." },
+          "start": { "type": "string", "format": "date", "description": "Monday." },
+          "end": { "type": "string", "format": "date", "description": "Sunday." },
+          "cut": { "type": "string", "format": "date", "description": "The day the snapshot stands on: the Sunday for a week that is over, the export's day for the current one." },
+          "complete": { "type": "boolean" },
+          "moves": {
+            "type": "array",
+            "description": "Daily and weekly series: the latest reading at the cut against the latest at the week before's end. prev_d equal to d means no new reading came out.",
+            "items": {
+              "type": "object",
+              "required": ["id", "d", "v", "prev_d", "prev_v", "delta", "pct", "hi", "lo"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string", "description": "A panel id." },
+                "d": { "type": "string", "format": "date" },
+                "v": { "type": "number" },
+                "prev_d": { "type": ["string", "null"], "description": "Null when the series was not yet knowable a week earlier." },
+                "prev_v": { "type": ["number", "null"] },
+                "delta": { "type": ["number", "null"], "description": "v − prev_v, in the series' unit." },
+                "pct": { "type": ["number", "null"], "description": "Null when either value is at or below zero." },
+                "hi": { "type": ["number", "null"], "description": "The highest daily reading this week; null for a weekly series or fewer than two days." },
+                "lo": { "type": ["number", "null"] }
+              }
+            }
+          },
+          "released": {
+            "type": "array",
+            "description": "Monthly, quarterly and annual series: periods that came out during the week (past the latest held a week earlier), and periods whose value changed. Ordered by the day each became knowable.",
+            "items": {
+              "type": "object",
+              "required": ["id", "d", "v", "granularity", "on", "basis", "prior_d", "prior_v", "pct", "yoy", "revised_from"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string" },
+                "d": { "type": "string", "format": "date", "description": "The period's end." },
+                "v": { "type": "number" },
+                "granularity": { "type": "string" },
+                "on": { "type": "string", "format": "date", "description": "The release date, or the day this warehouse learned an undated value." },
+                "basis": { "type": "string", "enum": ["published", "learned"] },
+                "prior_d": { "type": ["string", "null"], "description": "The period before, at the same cadence." },
+                "prior_v": { "type": ["number", "null"] },
+                "pct": { "type": ["number", "null"], "description": "Against the period before; null at or below zero." },
+                "yoy": { "type": ["number", "null"] },
+                "revised_from": { "type": ["number", "null"], "description": "The value held a week earlier for the same period, when this one replaced it." }
+              }
+            }
+          },
+          "curve": {
+            "type": "array",
+            "description": "Each listed futures contract's settle at the cut against a week earlier, nearest delivery first.",
+            "items": {
+              "type": "object",
+              "required": ["delivery", "v", "on", "prev_v", "delta", "pct"],
+              "additionalProperties": false,
+              "properties": {
+                "delivery": { "type": "string", "format": "date" },
+                "v": { "type": "number" },
+                "on": { "type": "string", "format": "date", "description": "The trading day of the settle." },
+                "prev_v": { "type": ["number", "null"] },
+                "delta": { "type": ["number", "null"] },
+                "pct": { "type": ["number", "null"] }
+              }
+            }
+          },
+          "upcoming": {
+            "type": "array",
+            "description": "Releases the calendar (docs/adr/0031) expects within seven days of the cut, or that are overdue. An expectation, never a date.",
+            "items": {
+              "type": "object",
+              "required": ["id", "granularity", "period", "usual", "by", "overdue"],
+              "additionalProperties": false,
+              "properties": {
+                "id": { "type": "string" },
+                "granularity": { "type": "string", "description": "The cadence of the period expected: the latest reading's." },
+                "period": { "type": "string" },
+                "usual": { "type": "string" },
+                "by": { "type": "string" },
+                "overdue": { "type": "boolean" }
+              }
             }
           }
         }

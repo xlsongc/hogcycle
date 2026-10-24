@@ -1,4 +1,4 @@
-# Next steps (written 2026-10-19, updated 2026-10-21)
+# Next steps (written 2026-10-19, updated 2026-10-24)
 
 Where phase 2 ([plan](2026-10-14-phase-2-upgrade.md)) stands, and what to do
 next, in order. Item ids are the plan's.
@@ -16,6 +16,7 @@ next, in order. Item ids are the plan's.
 | 10-20 | A8 window facts on the series page; A9 cycles laid over each other from reader-named starts; B9 every reading on the series page, a month-end table on compare; A3 rings on revised periods | ADR-0033 |
 | decisions | Q4 browser computes only over reader-chosen inputs; Q5 no compaction; Q6 dbt rejected, ADR-0010 closed | ADR-0033, ADR-0010 |
 | 10-21 | The futures market's track record: every contract's life since LH2109, each delivered contract's settle 1/3/6/9 months ahead against its last; both futures series collected from GitHub | ADR-0036 |
+| 10-24 | The weekly digest: `/week/` and an issue per ISO week since W37, each the difference between what was knowable at two Sundays (moves, releases, the curve, what is due); a line on the overview; `week.xml` per language. Futures confirmed collected from GitHub 10-22 to 10-24, both `ok` | ADR-0039 |
 | 10-21 (late) | Readable, premium redesign: Inter on a type scale, the pixel face only for the wordmark and section numbers, zpix removed (it needed a commercial licence); answers before method; a price strip; a footer. A margin calculator (`/calc/`) and a data page (`/datasets/`). How the site could pay: [making it pay](2026-10-21-making-it-pay.md) | ADR-0037, ADR-0038 |
 
 Fixed on 10-20:
@@ -57,26 +58,20 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 
 ## Tomorrow, in order
 
-1. **Check the first GitHub run with the futures.** `lh_futures_main` and
-   `lh_futures_curve` are `reach: anywhere` since 10-21 (the `probe`
-   workflow reached Sina from a runner). In `gh run list` the 01:00 UTC
-   collect should be green and show both `ok`. In
-   `data/runs/anywhere/2026-10.jsonl` the curve should gain 10-21's settles,
-   and the local run should no longer list them. If Sina refuses runners
-   after all, move them back to `cn`; never route around a refusal.
-2. **Two decisions for the owner, both written up.**
+1. **Done 10-24: the futures from GitHub.** The 01:00 UTC collect (it
+   starts nearer 05:00) was green 10-22, 10-23 and 10-24 with
+   `lh_futures_main` and `lh_futures_curve` both `ok`, and the local run no
+   longer lists them.
+2. **Decisions for the owner, both written up.**
    - 猪粮比价: [the options](2026-10-21-hog-corn-ratio-decision.md). The
      recommendation is A, retire it. Due before 12-17, when the warning
      starts.
    - How the site could earn money: [making it pay](2026-10-21-making-it-pay.md).
-     The first steps are the owner's: analytics, then a free English
-     newsletter. Nothing outward-facing has been started.
-   - Visitor countries: Cloudflare Web Analytics (free, no cookies, IP
-     dropped at Cloudflare's edge, country breakdown) was proposed on 10-21.
-     It is not built: adding a tracker needs the owner's yes and the
-     owner's own Cloudflare account. If yes, the beacon goes in behind a
-     repo variable, loaded after the page, with a line on the overview
-     saying visits are counted (an ADR).
+     Nothing outward-facing has been started.
+   - Visitor analytics: **the owner said not for now (10-24).** Do not add a
+     beacon or ask again unprompted; the setup (Cloudflare Web Analytics,
+     the owner's account, the token pasted back) is in the pay memo if the
+     owner raises it.
 3. **Watch the first real calendar event.** The 202609 joint release is
    expected around 10-26 to 10-30 (`usual` 10-26/10-28, `by` 11-03 for the
    quarterly series). When it lands, check: 2026Q3 sow and hog inventory, the
@@ -94,12 +89,15 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    against it. Next estimate candidates, each needing its own holdout test
    first: 自繁自养 vs 外购仔猪 profit, and the sow-culling margin. A track
    record like the market's needs vintages of the estimate, kept from now.
-6. **Platform, next round** (from the brainstorm and the pay memo). A
-   weekly digest page per week, archived, in both languages: the thing a
-   newsletter would send. E-mail alerts are the owner's call, because they
-   are outward-facing. On the calculator: a breakeven line drawn on the
-   futures curve, and the reader's numbers kept in the browser between
-   visits.
+6. **Platform, next round** (from the brainstorm and the pay memo). The
+   weekly digest is done (ADR-0039). Next: check the first issue that holds
+   a joint release (W44, around 10-26 to 10-30) reads right, with
+   `released` filled and nothing due twice. Then findability, which needs
+   no account: a sitemap and Open Graph tags, so an issue shared to a chat
+   shows its headline. E-mail is the owner's call, because it is
+   outward-facing; `week.xml` is what a mailing tool would read. On the
+   calculator: a breakeven line drawn on the futures curve, and the
+   reader's numbers kept in the browser between visits.
 7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a
