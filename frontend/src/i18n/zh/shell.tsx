@@ -4,11 +4,12 @@ import type { Dict } from "../en";
 
 export const shell: Pick<
   Dict,
-  "meta" | "nav" | "gauge" | "search" | "theme" | "health" | "asOf" | "window"
+  "meta" | "nav" | "gauge" | "search" | "theme" | "health" | "asOf" | "window" | "notFound"
 > = {
   meta: {
     title: "猪周期图表墙",
     description: "把猪周期的因果链放在一条共享时间轴上，供人判断，不代人判断。",
+    card: "hogcycle：中国猪周期一手数据，附每周猪市周报",
     pages: {
       overview: "总览",
       week: "猪市周报",
@@ -91,5 +92,13 @@ export const shell: Pick<
     ranges: { all: "全部", "8y": "近 8 年", "5y": "近 5 年", "3y": "近 3 年", "1y": "近 1 年" },
     stamp: (known: string, start: string, end: string) =>
       `知识时点 ${known} · 数据窗口 ${start} → ${end}`,
+  },
+
+  notFound: {
+    title: "找不到这个页面",
+    body: "地址可能打错了，或者那一期周报还没出。",
+    home: "总览",
+    week: "本周周报",
+    data: "数据与接口",
   },
 };

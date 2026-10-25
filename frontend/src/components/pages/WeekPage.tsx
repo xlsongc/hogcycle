@@ -15,8 +15,10 @@ import { nameOf, staticPath, weekPath, type Locale } from "@/i18n/locale";
 import { SectionHead } from "@/components/shell/SectionHead";
 import { WeekMoves } from "@/components/week/WeekMoves";
 import { WeekCurve, WeekReleased, WeekUpcoming } from "@/components/week/WeekLists";
+import { ShareWeek } from "@/components/week/ShareWeek";
 import { dayLabel, signedPct, spot, weekNumber, weekRange } from "@/lib/week";
 import { headline } from "@/lib/weekHeadline";
+import { SITE } from "@/lib/site";
 
 type Props = { data: WallContract; week: Week; locale: Locale };
 
@@ -112,6 +114,12 @@ export function WeekPage({ data, week, locale }: Props) {
             <a href={staticPath(locale === "zh" ? "/zh/week.xml" : "/week.xml")}>{t.feed}</a>
           </li>
         </ul>
+        <ShareWeek
+          title={t.kicker(year, n)}
+          text={lede ?? t.noHeadline}
+          url={`${SITE}${weekPath(locale, week.id)}`}
+          locale={locale}
+        />
       </header>
 
       <section aria-labelledby="wk-moves-h">

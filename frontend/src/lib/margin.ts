@@ -96,3 +96,10 @@ export function parsed(text: string, fallback: number): number {
   const v = Number(text.replace(/,/g, "").trim());
   return text.trim() !== "" && Number.isFinite(v) ? v : fallback;
 }
+
+/** How many contracts, at the reader's basis, sell at or above their cost,
+ *  and the first of them by delivery: the line the curve has to clear. */
+export function clearing(rows: Forward[], cost: number): { above: number; first: string | null } {
+  const above = rows.filter((r) => r.local >= cost);
+  return { above: above.length, first: above[0]?.month ?? null };
+}

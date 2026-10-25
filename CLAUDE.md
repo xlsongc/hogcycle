@@ -245,3 +245,4 @@ so you do not have to re-derive them.
 | 0037 | Pixel type is an accent; prose is Inter on a type scale, Chinese from the system face, answers before method |
 | 0038 | Tools a reader uses: the margin calculator (`/calc/`) and the data page (`/datasets/`) |
 | 0039 | The weekly digest (`/week/`, `week.xml`): each week is the difference between what was knowable at two Sundays |
+| 0040 | A link carries its page: canonical, hreflang and card on every page (`lib/site.ts`), a sitemap, a bilingual 404, an issue copied as text; the calculator keeps the farm's numbers in the browser and draws the curve against the cost |

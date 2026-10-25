@@ -17,17 +17,19 @@ import { SiteNav } from "@/components/shell/SiteNav";
 import { SiteFoot } from "@/components/shell/SiteFoot";
 import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
-import { HTML_LANG, staticPath } from "@/i18n/locale";
+import { HTML_LANG } from "@/i18n/locale";
+import { SITE_URL } from "@/lib/site";
 import { zh } from "@/i18n/zh";
 
 export const metadata: Metadata = {
+  metadataBase: SITE_URL,
   title: zh.meta.title,
   description: zh.meta.description,
   alternates: {
     types: {
       "application/atom+xml": [
-        { url: staticPath("/zh/feed.xml"), title: zh.foot.feed },
-        { url: staticPath("/zh/week.xml"), title: zh.foot.weekFeed },
+        { url: "/zh/feed.xml", title: zh.foot.feed },
+        { url: "/zh/week.xml", title: zh.foot.weekFeed },
       ],
     },
   },

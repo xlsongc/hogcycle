@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { contract } from "@/lib/contract";
 import { WeekPage } from "@/components/pages/WeekPage";
 import { zh } from "@/i18n/zh";
+import { pageMeta } from "@/lib/site";
 import { weekNumber } from "@/lib/week";
 import { headline } from "@/lib/weekHeadline";
 
@@ -25,11 +26,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const week = find((await params).id);
   if (!week) return {};
   const { year, n } = weekNumber(week.id);
-  return {
+  return pageMeta({
+    locale: "zh",
+    rest: `week/${week.id.toLowerCase()}/`,
     title: `${zh.week.metaTitle(year, n)} · ${zh.meta.title}`,
     description:
       headline(week, new Map(data.panels.map((p) => [p.id, p])), "zh") ?? zh.week.metaDescription,
-  };
+  });
 }
 
 export default async function Page({ params }: Params) {

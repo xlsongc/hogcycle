@@ -24,18 +24,22 @@ import { SiteNav } from "@/components/shell/SiteNav";
 import { SiteFoot } from "@/components/shell/SiteFoot";
 import { searchItems } from "@/components/search/items";
 import { THEME_BOOT } from "@/components/shell/themeBoot";
-import { HTML_LANG, staticPath } from "@/i18n/locale";
+import { HTML_LANG } from "@/i18n/locale";
+import { SITE_URL } from "@/lib/site";
 import { en } from "@/i18n/en";
 
 export const metadata: Metadata = {
+  // Every page's metadata addresses (canonical, the other language, the
+  // card) resolve against the published site, base path included.
+  metadataBase: SITE_URL,
   title: en.meta.title,
   description: en.meta.description,
   // So a feed reader pointed at the site finds the feed (export/feeds.py).
   alternates: {
     types: {
       "application/atom+xml": [
-        { url: staticPath("/feed.xml"), title: en.foot.feed },
-        { url: staticPath("/week.xml"), title: en.foot.weekFeed },
+        { url: "/feed.xml", title: en.foot.feed },
+        { url: "/week.xml", title: en.foot.weekFeed },
       ],
     },
   },

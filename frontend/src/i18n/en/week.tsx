@@ -22,6 +22,13 @@ export const week = {
     prev: "Previous week",
     next: "Next week",
     feed: "Subscribe (Atom)",
+    share: {
+      copy: "Copy this week's summary",
+      copied: "Copied",
+      copiedAll: "Copied: the summary and the link",
+      share: "Share…",
+      failed: "This browser would not copy. Select the text below:",
+    },
     method: (
       <>
         <p>

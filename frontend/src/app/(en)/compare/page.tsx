@@ -2,15 +2,18 @@ import type { Metadata } from "next";
 import { contract } from "@/lib/contract";
 import { ComparePage } from "@/components/pages/ComparePage";
 import { en } from "@/i18n/en";
+import { pageMeta } from "@/lib/site";
 
 // The contract is the only thing crossing the boundary, loaded and checked
 // in one place (lib/contract.ts; docs/adr/0007, 0024).
 const data = contract;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
+  locale: "en",
+  rest: "compare/",
   title: `${en.meta.pages.compare} · ${en.meta.title}`,
   description: en.meta.description,
-};
+});
 
 export default function Page() {
   return <ComparePage data={data} locale="en" />;

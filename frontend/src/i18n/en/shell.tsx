@@ -5,6 +5,7 @@ export const shell = {
     title: "The Hog Cycle Wall",
     description:
       "The causal chain of China's hog cycle on one shared time axis, laid out for a human to judge — not judged for them.",
+    card: "hogcycle: China's hog cycle from primary sources, with a weekly digest",
     pages: {
       overview: "Overview",
       week: "Weekly digest",
@@ -91,5 +92,15 @@ export const shell = {
     ranges: { all: "All", "8y": "8Y", "5y": "5Y", "3y": "3Y", "1y": "1Y" },
     stamp: (known: string, start: string, end: string) =>
       `Knowledge as of ${known} · data window ${start} → ${end}`,
+  },
+
+  // The 404 page has no language of its own (one page answers every wrong
+  // address, /zh/ or not), so it shows both.
+  notFound: {
+    title: "Page not found",
+    body: "The address may be mistyped, or that week's issue is not out yet.",
+    home: "Overview",
+    week: "This week's digest",
+    data: "Data and API",
   },
 };

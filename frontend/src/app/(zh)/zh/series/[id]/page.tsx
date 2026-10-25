@@ -3,6 +3,7 @@ import { contract } from "@/lib/contract";
 import { SeriesPage } from "@/components/pages/SeriesPage";
 import { nameOf } from "@/i18n/locale";
 import { zh } from "@/i18n/zh";
+import { pageMeta } from "@/lib/site";
 
 // One page per series, prerendered at build time: the static export cannot
 // render a path it did not generate, so an id outside the contract is a 404.
@@ -20,10 +21,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { id } = await params;
   const panel = data.panels.find((p) => p.id === id);
   if (!panel) return {};
-  return {
+  return pageMeta({
+    locale: "zh",
+    rest: `series/${id}/`,
     title: `${nameOf(panel, "zh")} · ${zh.meta.title}`,
     description: panel.about?.about_zh ?? zh.meta.description,
-  };
+  });
 }
 
 export default async function Page({ params }: Params) {

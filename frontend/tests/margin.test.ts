@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { forwards, grid, LOT_KG, parsed, perHead, toBreakeven } from "../src/lib/margin.ts";
+import { clearing, forwards, grid, LOT_KG, parsed, perHead, toBreakeven } from "../src/lib/margin.ts";
 
 const x = { weight: 128, cost: 13.7, price: 10.89, basis: 0, heads: 100 };
 
@@ -55,4 +55,21 @@ test("an empty or unreadable field keeps the last good number, never zero", () =
   assert.equal(parsed("1,200", 0), 1200);
   assert.equal(parsed(" 12.5 ", 0), 12.5);
   assert.equal(parsed("-0.8", 0), -0.8);
+});
+
+test("the contracts that clear the cost, and the first of them", () => {
+  const rows = forwards(
+    [
+      { d: "2026-11-01", v: 11000 },
+      { d: "2027-01-01", v: 13800 },
+      { d: "2027-03-01", v: 12000 },
+      { d: "2027-05-01", v: 14500 },
+    ],
+    "2026-10-25",
+    { ...x, basis: 0 }
+  );
+  assert.deepEqual(clearing(rows, 13.7), { above: 2, first: "2027-01" });
+  assert.deepEqual(clearing(rows, 20), { above: 0, first: null });
+  // At the cost exactly, a hog breaks even: it clears.
+  assert.equal(clearing(rows, 11).above, 4);
 });

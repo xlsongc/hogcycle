@@ -24,6 +24,13 @@ export const week: Pick<Dict, "week"> = {
     prev: "上一期",
     next: "下一期",
     feed: "订阅（Atom）",
+    share: {
+      copy: "复制本周总结",
+      copied: "已复制",
+      copiedAll: "已复制总结和链接",
+      share: "分享…",
+      failed: "这个浏览器不允许自动复制，请手动选择下面的文字：",
+    },
     method: (
       <>
         <p>

@@ -20,6 +20,12 @@ export const calc = {
     useBasis: "Use that gap",
     reset: "Back to the site's figures",
     share: "The link in the address bar keeps these numbers.",
+    memory:
+      "Your weight, cost, basis and batch size are kept in this browser for your next visit, and go nowhere else. Today's price always starts from the latest figure.",
+    restored: (fields: string) => `Filled in from your last visit: ${fields}.`,
+    kept: { weight: "weight", cost: "cost", basis: "basis", heads: "batch size" },
+    listJoin: ", ",
+    forget: "Forget them",
     nowHeading: "Selling today",
     perHead: "per hog",
     perBatch: (n: string) => `for ${n} hogs`,
@@ -33,6 +39,13 @@ export const calc = {
     forwardTrack: (six: number, signed: number, n: number) =>
       `How far off such prices have been: six months before delivery, a settle sat ${six}% from where its contract finished on average, ${Math.abs(signed)}% ${signed >= 0 ? "above" : "below"} on the signed average (${n} contracts since 2021).`,
     forwardCaption: "Profit or loss per hog at each futures contract's latest settle",
+    clears: (above: number, total: number, first: string | null) =>
+      above === 0
+        ? `At your cost and basis, none of the ${total} contracts reaches breakeven.`
+        : above === total
+          ? `At your cost and basis, all ${total} contracts are at or above breakeven.`
+          : `At your cost and basis, ${above} of ${total} contracts are at or above breakeven, the first for ${first} delivery.`,
+    chart: { today: "Today", cost: (v: string) => `Your cost ${v}` },
     cols: {
       month: "Delivery",
       settle: "Settle",

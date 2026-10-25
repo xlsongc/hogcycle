@@ -175,6 +175,97 @@
   margin: 0;
 }
 
+/* The numbers kept from last time say so, and can be let go of. */
+.calc-restored {
+  margin: -4px 0 16px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: var(--chip);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+}
+
+.calc-restored .link-button {
+  font-size: var(--text-sm);
+}
+
+.hint.calc-memory {
+  margin: 10px 0 0;
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+
+/* The answer to the chart under it, in a sentence. */
+.calc-clears {
+  margin: 0 0 4px;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+/* ---------- the curve against the reader's cost ---------- */
+
+.cvc {
+  overflow: hidden;
+  margin: 0 0 12px;
+}
+
+.cvc svg {
+  display: block;
+}
+
+.cvc-grid {
+  stroke: var(--grid);
+}
+
+.cvc-tick,
+.cvc-x {
+  fill: var(--muted);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.cvc-x.today {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+/* Below the line a hog sells at a loss: shaded, not coloured red, as the
+   tables read loss from the sign rather than a hue. */
+.cvc-loss {
+  fill: var(--chip);
+}
+
+.cvc-cost {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.cvc-cost-label {
+  fill: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.cvc-line {
+  fill: none;
+  stroke: var(--market);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* A contract that clears the cost is filled; one that does not is hollow. */
+.cvc-dot {
+  fill: var(--surface-1);
+  stroke: var(--market);
+  stroke-width: 2;
+}
+
+.cvc-dot.above {
+  fill: var(--market);
+}
+
 .calc-table {
   overflow-x: auto;
 }

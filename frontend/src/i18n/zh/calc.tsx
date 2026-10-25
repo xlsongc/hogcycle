@@ -22,6 +22,11 @@ export const calc: Pick<Dict, "calc"> = {
     useBasis: "用这个差",
     reset: "恢复本站数据",
     share: "地址栏里的链接会保留这些数字。",
+    memory: "你填的出栏体重、成本、基差和头数会记在这个浏览器里，下次打开还在，不会上传。售价每次都从最新数据开始。",
+    restored: (fields: string) => `已填入你上次的数字：${fields}。`,
+    kept: { weight: "出栏体重", cost: "成本", basis: "基差", heads: "头数" },
+    listJoin: "、",
+    forget: "清除",
     nowHeading: "现在出栏",
     perHead: "每头",
     perBatch: (n: string) => `这批 ${n} 头`,
@@ -35,6 +40,13 @@ export const calc: Pick<Dict, "calc"> = {
     forwardTrack: (six: number, signed: number, n: number) =>
       `这类价格以往偏离多少：交割前 6 个月，结算价与合约最后的结算价平均相差 ${six}%，带方向平均${signed >= 0 ? "高出" : "低于"} ${Math.abs(signed)}%（2021 年以来 ${n} 个合约）。`,
     forwardCaption: "按各期货合约最新结算价，每头猪的盈亏",
+    clears: (above: number, total: number, first: string | null) =>
+      above === 0
+        ? `按你的成本和基差，${total} 个合约都没到盈亏平衡价。`
+        : above === total
+          ? `按你的成本和基差，全部 ${total} 个合约都在盈亏平衡价以上。`
+          : `按你的成本和基差，${total} 个合约里有 ${above} 个在盈亏平衡价以上，最早的是 ${first} 合约。`,
+    chart: { today: "今天", cost: (v: string) => `你的成本 ${v}` },
     cols: {
       month: "交割月",
       settle: "结算价",

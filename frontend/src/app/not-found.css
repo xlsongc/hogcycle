@@ -1,0 +1,61 @@
+/* The 404 page (app/global-not-found.tsx): the wordmark, the code, and the
+   same three ways back in each language. */
+
+.nf {
+  max-width: 560px;
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+
+.nf .brand {
+  margin-bottom: 40px;
+}
+
+.nf-code {
+  margin: 0 0 8px;
+  font-size: var(--text-num);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: var(--muted);
+}
+
+.nf section {
+  padding: 20px 0;
+  border-top: 1px solid var(--grid);
+}
+
+.nf h1,
+.nf h2 {
+  margin: 0 0 6px;
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.nf p {
+  margin: 0 0 14px;
+  color: var(--ink-2);
+}
+
+.nf ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nf ul a {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-1);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.nf ul a:hover {
+  border-color: var(--ink);
+}

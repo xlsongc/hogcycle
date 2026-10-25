@@ -17,5 +17,8 @@ const nextConfig = {
   // GitHub Pages serves /path/ as /path/index.html; without this, every route
   // but the root 404s.
   trailingSlash: true,
+  // The site has two root layouts, one per language, and no shared one to
+  // put a not-found page in; app/global-not-found.tsx is the whole 404 page.
+  experimental: { globalNotFound: true },
 };
 export default nextConfig;

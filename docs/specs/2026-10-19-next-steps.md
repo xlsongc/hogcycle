@@ -1,4 +1,4 @@
-# Next steps (written 2026-10-19, updated 2026-10-24)
+# Next steps (written 2026-10-19, updated 2026-10-25)
 
 Where phase 2 ([plan](2026-10-14-phase-2-upgrade.md)) stands, and what to do
 next, in order. Item ids are the plan's.
@@ -17,6 +17,7 @@ next, in order. Item ids are the plan's.
 | decisions | Q4 browser computes only over reader-chosen inputs; Q5 no compaction; Q6 dbt rejected, ADR-0010 closed | ADR-0033, ADR-0010 |
 | 10-21 | The futures market's track record: every contract's life since LH2109, each delivered contract's settle 1/3/6/9 months ahead against its last; both futures series collected from GitHub | ADR-0036 |
 | 10-24 | The weekly digest: `/week/` and an issue per ISO week since W37, each the difference between what was knowable at two Sundays (moves, releases, the curve, what is due); a line on the overview; `week.xml` per language. Futures confirmed collected from GitHub 10-22 to 10-24, both `ok` | ADR-0039 |
+| 10-25 | Findable and shareable: canonical, other-language and card metadata on every page, one site card (`public/og.png`, `scripts/og-card.mjs`), `sitemap.xml` (114 pages), a bilingual 404, an issue's summary copied as text. The calculator keeps weight, cost, basis and batch size in the reader's browser and draws the futures curve against the cost | ADR-0040 |
 | 10-21 (late) | Readable, premium redesign: Inter on a type scale, the pixel face only for the wordmark and section numbers, zpix removed (it needed a commercial licence); answers before method; a price strip; a footer. A margin calculator (`/calc/`) and a data page (`/datasets/`). How the site could pay: [making it pay](2026-10-21-making-it-pay.md) | ADR-0037, ADR-0038 |
 
 Fixed on 10-20:
@@ -92,12 +93,13 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 6. **Platform, next round** (from the brainstorm and the pay memo). The
    weekly digest is done (ADR-0039). Next: check the first issue that holds
    a joint release (W44, around 10-26 to 10-30) reads right, with
-   `released` filled and nothing due twice. Then findability, which needs
-   no account: a sitemap and Open Graph tags, so an issue shared to a chat
-   shows its headline. E-mail is the owner's call, because it is
-   outward-facing; `week.xml` is what a mailing tool would read. On the
-   calculator: a breakeven line drawn on the futures curve, and the
-   reader's numbers kept in the browser between visits.
+   `released` filled and nothing due twice. Findability and the
+   calculator's memory and breakeven chart are done (ADR-0040). What is left
+   there is the owner's: submitting `sitemap.xml` to a search console needs
+   their account, and a root `robots.txt` would need a user-site repository
+   (`xlsongc.github.io`). E-mail is the owner's call, because it is
+   outward-facing; `week.xml` is what a mailing tool would read. Small one
+   left: the English price strip truncates long names.
 7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a

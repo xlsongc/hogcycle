@@ -33,6 +33,34 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Copy the issue as text; share it where the browser has a sheet. */
+.wk-share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+}
+
+.wk-share-fallback {
+  display: grid;
+  gap: 6px;
+  flex-basis: 100%;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.wk-share-fallback textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
 /* ---------- cards and tables ---------- */
 
 .wk-card {

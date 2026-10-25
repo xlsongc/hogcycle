@@ -7,14 +7,19 @@
  *
  * The fields start from the site's own latest figures and say which; the
  * arithmetic is lib/margin.ts. The numbers travel in the query string, so a
- * farmer can send a calculation to a partner as a link.
+ * farmer can send a calculation to a partner as a link, and the farm's own
+ * numbers are kept in the reader's browser for the next visit
+ * (lib/calcMemory.ts). A shared link wins over what is kept: it is someone
+ * else's calculation, and mixing the two would answer neither.
  */
 
 import { useEffect, useState, type ReactNode } from "react";
 import { NUMBER_LOCALE, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
-import { forwards, grid, parsed, perHead, toBreakeven, type Inputs } from "@/lib/margin";
+import { clearing, forwards, grid, parsed, perHead, toBreakeven, type Inputs } from "@/lib/margin";
 import { readParams, writeParams } from "@/lib/urlState";
+import { KEPT, load, save, type Kept } from "@/lib/calcMemory";
+import { CurveVsCost } from "./CurveVsCost";
 
 export type Default = { value: number; name: string; date: string };
 
@@ -56,9 +61,13 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
   const asText = (x: Inputs) =>
     Object.fromEntries(Object.entries(x).map(([k, v]) => [k, String(v)])) as Record<Field, string>;
   const [text, setText] = useState<Record<Field, string>>(() => asText(start));
+  // The kept fields this reader has typed, or that came back from last time.
+  const [mine, setMine] = useState<Kept[]>([]);
+  const [restored, setRestored] = useState<Kept[]>([]);
 
-  // The prerendered page shows the defaults; a shared link's numbers arrive
-  // after mount, since a static page has no server to read the query.
+  // The prerendered page shows the defaults; a shared link's numbers, or the
+  // reader's kept ones, arrive after mount, since a static page has no
+  // server to read either.
   useEffect(() => {
     const q = readParams();
     const from = Object.fromEntries(
@@ -67,16 +76,35 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
         return v == null ? [] : [[k, v]];
       })
     );
-    if (Object.keys(from).length) setText((t) => ({ ...t, ...from }));
+    if (Object.keys(from).length) {
+      setText((t) => ({ ...t, ...from }));
+      return;
+    }
+    const kept = load();
+    const keys = KEPT.filter((k) => kept[k] != null);
+    if (keys.length) {
+      setText((t) => ({ ...t, ...kept }));
+      setMine(keys);
+      setRestored(keys);
+    }
   }, []);
 
   const set = (k: Field, v: string) => {
-    setText((t) => ({ ...t, [k]: v }));
+    const next = { ...text, [k]: v };
+    setText(next);
     writeParams({ [KEYS[k]]: v });
+    if ((KEPT as readonly Field[]).includes(k)) {
+      const fields = mine.includes(k as Kept) ? mine : [...mine, k as Kept];
+      setMine(fields);
+      save(Object.fromEntries(fields.map((f) => [f, next[f]])));
+    }
   };
   const reset = () => {
     setText(asText(start));
     writeParams(Object.fromEntries(Object.values(KEYS).map((k) => [k, null])));
+    setMine([]);
+    setRestored([]);
+    save({});
   };
 
   const x: Inputs = {
@@ -91,6 +119,7 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
   const rows = forwards(curve, today, x);
   const table = grid(x, STEPS);
   const front = forwards(curve, today, { ...x, basis: 0 })[0];
+  const clears = clearing(rows, x.cost);
   const todayGap = price && front ? price.value - front.local : null;
 
   const field = (k: Field, label: string, unit: string, note?: ReactNode) => (
@@ -116,6 +145,14 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
       <div className="calc">
         <form className="calc-card calc-inputs" onSubmit={(e) => e.preventDefault()}>
           <h2>{c.inputs}</h2>
+          {restored.length > 0 && (
+            <p className="calc-restored">
+              {c.restored(restored.map((k) => c.kept[k]).join(c.listJoin))}{" "}
+              <button type="button" className="link-button" onClick={reset}>
+                {c.forget}
+              </button>
+            </p>
+          )}
           {field("weight", c.weight, u.kg, weight && c.from(weight.name, `${n(weight.value)} ${u.kg}`, weight.date))}
           {field("cost", c.cost, u.perKg, cost && c.costFrom(`${n(cost.value, 2)} ${u.perKg}`, cost.date))}
           {field("price", c.price, u.perKg, price && c.from(price.name, `${n(price.value, 2)} ${u.perKg}`, price.date))}
@@ -148,6 +185,7 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
             </button>
             <span className="hint">{c.share}</span>
           </div>
+          <p className="hint calc-memory">{c.memory}</p>
         </form>
 
         <div className="calc-out">
@@ -182,6 +220,22 @@ export function MarginCalc({ locale, weight, cost, price, curve, six, today }: P
           <section className="calc-card" aria-labelledby="calc-fwd-h">
             <h2 id="calc-fwd-h">{c.forwardHeading}</h2>
             <p className="calc-note">{c.forwardNote}</p>
+            {rows.length > 0 && (
+              <>
+                <p className="calc-clears">{c.clears(clears.above, rows.length, clears.first)}</p>
+                <CurveVsCost
+                  rows={rows}
+                  cost={x.cost}
+                  price={x.price}
+                  n={n}
+                  labels={{
+                    today: c.chart.today,
+                    cost: c.chart.cost,
+                    summary: c.clears(clears.above, rows.length, clears.first),
+                  }}
+                />
+              </>
+            )}
             {rows.length ? (
               <div className="calc-table">
                 <table>
