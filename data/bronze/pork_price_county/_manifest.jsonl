@@ -9,3 +9,4 @@
 {"fetched_at": "2026-10-25T08:32:43.601141+00:00", "snapshot_id": "64b9555ecb42bde877a4f39339749d694f8642996402a3e8ec3af2d9cec7fd4f", "source": "moa_weekly:market:全国猪肉平均价格", "bytes": 65526, "new_content": false}
 {"fetched_at": "2026-10-26T08:30:07.224263+00:00", "snapshot_id": "64b9555ecb42bde877a4f39339749d694f8642996402a3e8ec3af2d9cec7fd4f", "source": "moa_weekly:market:全国猪肉平均价格", "bytes": 65526, "new_content": false}
 {"fetched_at": "2026-10-27T08:34:01.035329+00:00", "snapshot_id": "91dc865b2f1603392265c0e2f0d090c298aa4d8110e8a89a788c8d335d6523d9", "source": "moa_weekly:market:全国猪肉平均价格", "bytes": 65320, "new_content": true}
+{"fetched_at": "2026-10-28T08:30:08.013039+00:00", "snapshot_id": "24f75c0dbaf8e08ebe96e23e8efc05c8347eaad9c5139c4043468c93733290fa", "source": "moa_weekly:market:全国猪肉平均价格", "bytes": 65323, "new_content": true}
