@@ -7,3 +7,4 @@
 {"fetched_at": "2026-10-24T05:12:09.422493+00:00", "snapshot_id": "8774f2e958f8d3cbb9c3b8da11b28840dc328086e9f69d7c112e0b577c583c9e", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 101703, "new_content": true}
 {"fetched_at": "2026-10-25T05:28:57.301602+00:00", "snapshot_id": "8774f2e958f8d3cbb9c3b8da11b28840dc328086e9f69d7c112e0b577c583c9e", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 101703, "new_content": false}
 {"fetched_at": "2026-10-26T05:33:50.970345+00:00", "snapshot_id": "8774f2e958f8d3cbb9c3b8da11b28840dc328086e9f69d7c112e0b577c583c9e", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 101703, "new_content": false}
+{"fetched_at": "2026-10-28T06:26:05.919114+00:00", "snapshot_id": "1095d5079654b9f1b9577f4591372918140c583de74dc40f1c53fe8912b397b0", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 103397, "new_content": true}
