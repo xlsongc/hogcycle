@@ -9,7 +9,7 @@ export const site: Pick<Dict, "more" | "foot" | "datasets"> = {
   },
 
   foot: {
-    about: "用公开数据把中国猪周期按因果链排开。每个数字都注明来源、描述的时期和公开的日期。",
+    about: "中国猪周期一手数据，每个数字都注明来源和发布日期。",
     disclaimer: "数据按来源公布的原样提供，不构成投资建议。",
     pages: "页面",
     data: "数据",
@@ -25,15 +25,16 @@ export const site: Pick<Dict, "more" | "foot" | "datasets"> = {
 
   datasets: {
     heading: "数据与接口",
-    sub: "本站每个序列都能下载：CSV 用表格打开，JSON 给程序读。每天自动更新，免费使用。",
+    sub: "每个序列都有 CSV 和 JSON，每天更新，免费使用。",
     endpointsHeading: "接口",
-    endpointsNote: "都是静态文件，不需要密钥，除托管方本身外没有调用限制。下面每个地址都长期不变。",
+    endpointsNote: "静态文件，地址长期不变，不需要密钥。",
     endpoints: [
       ["data/index.json", "全部序列：名称、单位、频率、最新值和各自文件的链接。"],
       ["data/series/<id>.csv", "一个序列的全部读数，可以直接用表格打开。"],
       ["data/series/<id>.json", "同样的行，JSON 格式。"],
       ["feed.xml", "新发布的数据，Atom 订阅格式，可用阅读器订阅。"],
       ["week.xml", "猪市周报的 Atom 订阅，每过完一周新增一条。"],
+      ["data/futures/lh_contracts.csv", "大商所生猪期货 LH2109 以来每个合约的逐日结算价，每个合约每个交易日一行（结算价没变的那天没有行）。"],
     ],
     columnsHeading: "各列的含义",
     columns: [
@@ -45,7 +46,7 @@ export const site: Pick<Dict, "more" | "foot" | "datasets"> = {
     ],
     example: "示例",
     seriesHeading: "全部序列",
-    seriesNote: "按在因果链中的位置分组。每个序列的来源见它自己的页面。",
+    seriesNote: "按因果链分组，来源见各序列页面。",
     cols: { name: "序列", unit: "单位", freq: "频率", latest: "最新", files: "文件" },
     freq: {
       daily: "日度",

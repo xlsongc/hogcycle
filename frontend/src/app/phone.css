@@ -160,7 +160,7 @@
     font-size: var(--text-xs);
   }
 
-  .readings-wrap {
+  .overview .readings-wrap {
     overflow-x: visible;
   }
 

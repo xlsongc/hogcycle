@@ -17,8 +17,8 @@ series:
       en: National Bureau of Statistics quarterly survey, in the five-ministry monthly release
     url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
     about:
-      zh: 正在生产仔猪的母猪头数。生物学把它和 10–12 个月后的生猪出栏钉在一起，是猪周期里唯一真正的先行指标。季末数来自统计局调查；2025 年底起只公开季末数。
-      en: The number of sows actively producing piglets. Biology ties it to hog supply 10–12 months later, which makes it the cycle's one real leading indicator. Quarter-end figures come from the statistics bureau's survey; since late 2025 only those are published.
+      zh: 正在生产仔猪的母猪头数，决定 10–12 个月后的生猪供给。2025 年底起只公开季末数。
+      en: Sows actively producing piglets; they set hog supply 10–12 months later. Since late 2025 only quarter-end figures are published.
 
   hog_inventory:
     publisher:
@@ -26,8 +26,8 @@ series:
       en: National Bureau of Statistics quarterly survey, in the five-ministry monthly release
     url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
     about:
-      zh: 季末存栏的全部生猪。它把十个月前的母猪决策和眼下的压栏行为混在一起，所以不是先行指标。
-      en: All hogs on hand at quarter end. It mixes sow decisions from ten months earlier with farmers holding hogs back now, so it does not lead.
+      zh: 季末存栏的全部生猪，含压栏，不是先行指标。
+      en: All hogs on hand at quarter end, including hogs held back; not a leading indicator.
 
   slaughter:
     publisher:
@@ -62,8 +62,8 @@ series:
       en: MARA 500-county market survey, in the five-ministry monthly release
     url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
     about:
-      zh: 与周度仔猪价格同一套调查的月均值。粒度不同就是另一个指标，所以单独成格。
-      en: The monthly mean of the same survey as the weekly piglet price. A different granularity is a different indicator, so it has its own panel.
+      zh: 与周度仔猪价格同一套调查的月均值。
+      en: The monthly average from the same survey as the weekly piglet price.
 
   sow_binary_price:
     publisher:
@@ -161,8 +161,8 @@ series:
       en: Estimated here, from the hog, fattening-feed and piglet prices in MARA's weekly 500-county report, calibrated on the joint release's scale-farm cost and profit (2021-12 to 2025-08)
     url: https://xmsyj.moa.gov.cn/jcyj/
     about:
-      zh: 估算值，不是官方数。官方的规模养殖每头净利润在 2025 年 8 月那期之后停发；这里用仍在公布的周度价格把它接下去。成本 = 常数 + 系数 × 13 周前的饲料价 + 系数 × 13 周前的仔猪价，收入 = 校准系数 × 当周生猪价，系数用两者重叠的月份拟合，每次导出重新拟合。上线前做过样本外检验：用前 24、28 或 32 个月拟合、预测其余月份，误差约 45–51 元/头（官方值的波动约 ±388），相关 0.93–0.98，盈亏方向 94–100% 一致。
-      en: An estimate, not an official figure. The official scale-farm profit per hog stopped after the 2025-08 edition; this carries it forward from weekly prices that are still published. Cost = a constant + a coefficient × the feed price 13 weeks earlier + a coefficient × the piglet price 13 weeks earlier; revenue = a calibrated factor × this week's hog price. The coefficients are fitted on the months both exist, again at every export. Tested out of sample before it went up — fitted on the first 24, 28 or 32 months and predicting the rest — it was off by about 45–51 CNY per hog on a series that swings ±388, correlated 0.93–0.98, and called profit or loss right in 94–100% of months.
+      zh: 估算值。官方规模养殖每头净利润 2025 年 8 月后停发，这里用每周的生猪、饲料和仔猪价格接着估算，以 2021-12 至 2025-08 的官方月度数校准；样本外误差约 45–51 元/头，盈亏方向 94–100% 一致。
+      en: An estimate. The official scale-farm profit per hog stopped after 2025-08; this continues it from weekly hog, feed and piglet prices, calibrated on the official months 2021-12 to 2025-08. Out of sample it missed by about 45–51 CNY per hog and had the sign right 94–100% of the time.
 
   breakeven_price_est:
     publisher:
@@ -170,8 +170,8 @@ series:
       en: Estimated here, by the same model as the estimated net profit per hog
     url: https://xmsyj.moa.gov.cn/jcyj/
     about:
-      zh: 估算的成本 ÷ 校准系数：500 县生猪价要到多少，规模养殖场才不赚不亏。和 500 县生猪价同一口径，可以在对比页上与它画在同一条轴上；价格在它下面就是亏损。估算值，不是官方数，方法与误差见每头净利润估算。
-      en: Estimated cost over the calibrated factor, the 500-county hog price at which a scale farm neither earns nor loses. It is on the 500-county price's caliber, so it can share an axis with that price on the compare page; a price below it is a loss. An estimate, not an official figure; the method and its error are on the estimated profit's page.
+      zh: 估算值：500 县生猪价到多少，规模养殖场不赚不亏。与 500 县生猪价同一口径；方法见每头净利润估算。
+      en: "An estimate: the 500-county hog price at which a scale farm breaks even. Same caliber as that price; method under the profit-per-hog estimate."
 
   lh_futures_main:
     publisher:
@@ -179,8 +179,8 @@ series:
       en: Dalian Commodity Exchange live hog futures, via Sina Finance's copy (the exchange's own endpoint refuses this project)
     url: https://www.dce.com.cn/
     about:
-      zh: 持仓最多的那个合约每天的结算价，接成一条线。它是市场用钱下注的预期，不是测量，所以不上图表墙。换主力合约时线会跳，那是换了交割月。元/吨，交割标准品口径，和现货的元/公斤不是一回事。
-      en: The settle of whichever contract has the most open interest each day, joined into one line. It is an expectation the market puts money behind, not a measurement, so it stays off the wall. The line jumps when the main contract rolls to a new delivery month. CNY per tonne of the delivery grade, not the same caliber as spot prices in CNY per kg.
+      zh: 持仓最多的合约每天的结算价，连成一条线；换主力合约时会跳。元/吨，交割标准品口径。
+      en: The daily settle of the most-held contract, joined into one line; it jumps when the main contract rolls. CNY per tonne of the delivery grade.
 
   lh_futures_curve:
     publisher:
@@ -188,8 +188,8 @@ series:
       en: Dalian Commodity Exchange live hog futures, via Sina Finance's copy, read one contract at a time
     url: https://www.dce.com.cn/
     about:
-      zh: 每个在挂合约的最新结算价，按交割月排开：市场此刻给未来每个月的猪定的价。它是市场的预期，不是本项目的预测。每个交易日都重新定价，本仓库记下每个合约从上市到交割的每一天，最早到 2021 年的 LH2109，所以也能看出市场以往的定价离合约最后的结算价有多远。元/吨。
-      en: The latest settle of every listed contract, laid out by delivery month — what the market prices hogs at for each coming month, right now. The market's expectation, not this project's forecast. Re-priced every trading day; this warehouse keeps every contract's every day from listing to delivery, back to LH2109 in 2021, so it can also show how far the market's prices have been from where its contracts finished. CNY per tonne.
+      zh: 大商所生猪期货每个在挂合约的最新结算价，按交割月排列。2021 年 LH2109 以来每个合约的逐日结算价都有记录。元/吨。
+      en: The latest settle of every listed 大商所 live-hog contract, by delivery month. Every contract's daily settles are kept since LH2109 in 2021. CNY per tonne.
 
   hog_price_ndrc:
     publisher:
@@ -224,8 +224,8 @@ series:
       en: Computed here, as the difference of two of the statistics bureau's year-to-date totals
     url: https://www.moa.gov.cn/ztzl/szcpxx/jdsj/
     about:
-      zh: 一个季度出栏的生猪头数。一季度就是印出的数；之后每季是到本季末的累计减到上季末的累计。两个累计数都印过才算，缺一个就留空。这是 10–12 个月前能繁母猪落到供给上的那一端。
-      en: Hogs marketed in one quarter. The first quarter is the printed figure; each later quarter is the total to its end less the total to the end of the one before, computed only when both were printed. It is where the sow herd of 10–12 months earlier arrives as supply.
+      zh: 一个季度出栏的生猪头数：本季末累计减上季末累计（一季度即累计数）。
+      en: "Hogs marketed in one quarter: the year-to-date total at its end minus the one at the quarter before (Q1 is printed directly)."
 
   pork_output_quarter:
     publisher:
@@ -339,8 +339,8 @@ series:
     publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}
     url: null
     about:
-      zh: 牧原股份的后复权日收盘价。股价是对周期的索取权，不是周期的一环，只出现在对比页。
-      en: Muyuan Foods' back-adjusted daily close. A share price is a claim on the cycle rather than a link in it, so it appears only in Compare.
+      zh: 牧原股份的后复权日收盘价，只出现在对比页。
+      en: Muyuan Foods, daily close, back-adjusted. In Compare only.
 
   eq_wens:
     publisher: {zh: 深圳证券交易所日线，后复权（经 akshare / 新浪财经）, en: Shenzhen Stock Exchange daily close, back-adjusted (via akshare / Sina Finance)}

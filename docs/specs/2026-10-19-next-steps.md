@@ -57,6 +57,23 @@ Later on 10-20 the site went past the phase-2 plan, on the owner's ask
 estimate (ADR-0034), the futures market as its own tier (ADR-0035), units,
 seasons and a lag scan on the pages, and Atom feeds and a JSON index.
 
+## Direction, agreed with the owner on 10-29
+
+- The readers worth building for are analysts, researchers, journalists and
+  readers outside China, not farms: the owner is not in the trade, and a
+  github.io site is hard to reach from the mainland (no Google, Baidu barely
+  indexes it). No more tools for an imagined farmer.
+- The site's place is China's official hog data, free, in both languages,
+  sourced and clean, with release dates and the futures record. Breadth and
+  speed belong to Mysteel, 卓创 and Wind; do not compete there.
+- Judged not worth building: listed companies' monthly sales (新华财经 and
+  财联社 summarise them the day they come out, Wind has them, and 牧原 files
+  in English in Hong Kong); a 补栏 calculator; the sow backtest as a page
+  (item 4 below: 55 editions never revised, quarterly only since late 2025,
+  about three cycles of history). At most a one-line fact on the sow page.
+- Copy: say what a number is and when; never what it is not (ADR-0041).
+- Until Search Console shows who comes, prefer upkeep over new features.
+
 ## Tomorrow, in order
 
 1. **Done 10-24: the futures from GitHub.** The 01:00 UTC collect (it
@@ -102,6 +119,9 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    (`xlsongc.github.io`). E-mail is the owner's call, because it is
    outward-facing; `week.xml` is what a mailing tool would read. Small one
    left: the English price strip truncates long names.
+   **10-29:** the futures page is one contract at a time, every contract's
+   daily settles are downloadable, and the copy site-wide was cut to what
+   the numbers are (ADR-0041).
 7. **A small one: a cycle start from the chart.** Today a start is typed as
    a month. Clicking a reading on the series chart to add it would be
    faster, but drag already zooms and a tap already reads, so it needs a

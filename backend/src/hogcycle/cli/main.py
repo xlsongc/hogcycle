@@ -14,6 +14,8 @@ from ..collectors.moa import MoaAdapter
 from ..collectors.moa_weekly import MoaWeeklyAdapter
 from ..collectors.usda_psd import UsdaPsdAdapter
 from ..export.contract import DEFAULT_OUT, SCHEMA_PATH, write_contract
+from ..export.contracts_csv import DEFAULT_PATH as CONTRACTS_CSV
+from ..export.contracts_csv import write_contracts_csv
 from ..export.feeds import write_feeds, write_index, write_series_json
 from ..export.series_csv import DEFAULT_DIR as CSV_DIR
 from ..export.series_csv import write_series_csv
@@ -288,6 +290,9 @@ def main(argv: list[str] | None = None) -> int:
         csvs = write_series_csv(
             registry, silver, CSV_DIR, moment=moment or dt.datetime.now(dt.UTC)
         )
+        settles = write_contracts_csv(
+            registry, silver, CONTRACTS_CSV, moment=moment or dt.datetime.now(dt.UTC)
+        )
         # The feeds and the index describe today; an as-of export answers
         # another day's question and leaves them as they are.
         if moment is None:
@@ -299,7 +304,8 @@ def main(argv: list[str] | None = None) -> int:
         pts = sum(len(p["points"]) for p in payload["panels"])
         print(
             f"wrote {path} — {len(payload['panels'])} panel(s), {pts} points, "
-            f"{Path(path).stat().st_size / 1024:.1f} KB; {csvs} series CSV(s) in {CSV_DIR}"
+            f"{Path(path).stat().st_size / 1024:.1f} KB; {csvs} series CSV(s) in "
+            f"{CSV_DIR}; {settles} contract settle(s) in {CONTRACTS_CSV}"
         )
         return 0
 

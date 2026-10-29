@@ -11,6 +11,14 @@ const data = contract;
 
 export const dynamicParams = false;
 
+/** The main continuous price's latest settle: the contract it is, the
+ *  curve's page opens on. */
+function mainSettle() {
+  const main = data.panels.find((p) => p.id === "lh_futures_main");
+  const last = main?.points.filter((p) => p.v != null).at(-1);
+  return last ? { d: last.d, v: last.v as number } : undefined;
+}
+
 export function generateStaticParams() {
   return data.panels.map((p) => ({ id: p.id }));
 }
@@ -44,6 +52,7 @@ export default async function Page({ params }: Params) {
       end={data.window.end ?? data.generated_at.slice(0, 10)}
       today={data.generated_at.slice(0, 10)}
       market={data.market?.series === id ? data.market : undefined}
+      main={data.market?.series === id ? mainSettle() : undefined}
       locale="en"
     />
   );

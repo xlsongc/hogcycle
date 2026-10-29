@@ -8,6 +8,7 @@ import datetime as dt
 from pathlib import Path
 
 from hogcycle.contracts.schema import Observation
+from hogcycle.export.contracts_csv import contract_code, write_contracts_csv
 from hogcycle.gold.market import (
     build_market,
     delivered,
@@ -131,3 +132,30 @@ def test_the_market_block_is_built_from_what_silver_holds(tmp_path):
         ("2026-11-30", False),
     ]
     assert market["track_record"]["horizons"][0]["mean_pct"] == 10.0
+
+
+def test_every_contract_day_is_one_row_named_as_the_exchange_names_it(tmp_path):
+    registry = load_registry(CONFIG)
+    silver = SilverStore(tmp_path / "silver")
+    out = tmp_path / "futures" / "lh_contracts.csv"
+    assert write_contracts_csv(registry, silver, out, moment=NOW) == 0
+    assert not out.exists(), "no curve held, no file"
+    fetched = dt.datetime(2026, 10, 20, tzinfo=UTC)
+
+    def settle(delivery, day, value):
+        return Observation("lh_futures_curve", delivery, value, "CNY/tonne", "monthly",
+                           "s", "t", fetched, day)
+
+    silver.append_changes([
+        settle(SEP, D(2026, 9, 23), 10100.0),
+        settle(SEP, D(2026, 9, 24), 10300.0),
+        settle(D(2027, 1, 31), D(2026, 10, 20), 9850.0),
+    ])
+    assert write_contracts_csv(registry, silver, out, moment=NOW) == 3
+    assert out.read_text("utf-8").splitlines() == [
+        "contract,delivery_month,date,settle,unit",
+        "LH2609,2026-09,2026-09-23,10100.0,CNY/tonne",
+        "LH2609,2026-09,2026-09-24,10300.0,CNY/tonne",
+        "LH2701,2027-01,2026-10-20,9850.0,CNY/tonne",
+    ]
+    assert contract_code(D(2030, 11, 30)) == "LH3011"

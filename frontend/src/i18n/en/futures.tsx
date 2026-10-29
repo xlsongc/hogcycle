@@ -1,20 +1,42 @@
-/** The futures curve's history and the market's track record (docs/adr/0036). */
+/** One contract at a time, and the market's track record (docs/adr/0036, 0041). */
 
 export const futures = {
   futures: {
-    historyHeading: "How the market priced each delivery month",
-    historyNote:
-      "Every contract since the first, LH2109, by the last settle of each week, from listing to delivery. A line ends where its contract finished. The contracts still trading are drawn in colour. Point at a week to read the whole curve as it stood then.",
     contract: (delivery: string) => `LH${delivery.slice(2, 4)}${delivery.slice(5, 7)}`,
+    contractHeading: "Contracts",
+    deliveredPick: "Delivered…",
+    liveSum: (code: string, last: string, on: string, week: string | null, sinceFirst: string) =>
+      `${code}: ${last} on ${on}${week ? `, ${week} on the week` : ""}, ${sinceFirst} since its first week.`,
+    doneSum: (
+      code: string,
+      final: string,
+      on: string,
+      far: { months: number; v: string; pct: string } | undefined
+    ) =>
+      `${code} finished at ${final} on ${on}.${far ? ` ${far.months} months before delivery it was ${far.v}, ${far.pct} against that.` : ""}`,
+    whole: "All contracts since 2021",
+    closeIn: (code: string) => `Back to ${code}`,
+    finalLine: (v: string) => `Last settle ${v}`,
+    contractLabel: (code: string) => `${code}: settle by week, among the other contracts`,
+    weeksCaption: (code: string) => `${code}: the last settle of each week`,
+    allWeeks: (n: number) => `All ${n} weeks`,
+    download: "Every contract, every day (CSV)",
+    curveTable: "Settle by delivery month",
+
     trackHeading: "How far off the market has been",
     trackNote: (n: number, first: string) =>
-      `Every delivered contract (${n}, the first delivering in ${first}): its settle 1, 3, 6 and 9 months before its delivery month began, against where it finished. Arithmetic on settles, not a model. It says how wide the market's misses have been, not where the next one will land.`,
+      `${n} delivered contracts since ${first}: the settle 1, 3, 6 and 9 months before delivery, against the last settle.`,
     cols: {
       ahead: "Ahead",
       n: "Contracts",
       meanAbs: "Mean miss",
       mean: "Mean, signed",
       worst: "Largest",
+      week: "Week of",
+      settle: "Settle",
+      onWeek: "Week",
+      vsFirst: "vs first week",
+      vsFinal: "vs last settle",
     },
     months: (m: number) => `${m} mo`,
     signedNote: "Signed: above zero, the market priced higher than the contract finished.",
@@ -25,7 +47,6 @@ export const futures = {
     caption: "Each delivered contract's settle months ahead, and its miss against its last settle",
     chartLabel: (n: number) =>
       `Live hog futures: ${n} contracts, each by week from listing to delivery`,
-    asOfHidden:
-      "The track record describes today's history, so it is hidden while the page stands on a past day.",
+    asOfHidden: "Not shown for a past day.",
   },
 };

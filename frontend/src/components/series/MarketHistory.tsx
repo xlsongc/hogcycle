@@ -1,17 +1,15 @@
 "use client";
 
 /**
- * The futures curve's own page, below its chart: every contract's life, and
- * how far off the market has been (docs/adr/0036). Both computed by gold;
- * the page draws them.
+ * How far off the market has been (docs/adr/0036): every delivered
+ * contract's settle months ahead against its last, computed by gold.
  *
- * Standing on a past day, the chart stops at that day. The track record
- * describes today's history, so like the other computed facts it is hidden.
+ * It describes today's history, so like the other computed facts it is
+ * hidden when the page stands on a past day.
  */
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Market } from "@/types/generated/wall";
-import { CurveHistoryChart } from "@/charts/CurveHistoryChart";
 import { fmt } from "@/charts/base/theme";
 import { unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
@@ -23,33 +21,11 @@ const pct = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v).toF
 export function MarketHistory({ market, unit, day, locale }: Props) {
   const t = dict(locale).futures;
   const [all, setAll] = useState(false);
-  const history = useMemo(
-    () =>
-      day
-        ? market.history
-            .map((h) => ({ ...h, settles: h.settles.filter((s) => s.d <= day) }))
-            .filter((h) => h.settles.length > 0)
-        : market.history,
-    [market.history, day]
-  );
   const { horizons, deliveries } = market.track_record;
   const months = horizons.map((h) => h.months);
 
   return (
     <>
-      <section aria-labelledby="curve-history-h">
-        <h2 className="section" id="curve-history-h">
-          {t.historyHeading}
-        </h2>
-        <p className="section-note">{t.historyNote}</p>
-        <div className="overlay-card">
-          <div className="overlay-head">
-            <span className="panel-unit">{unitOf(unit, locale)}</span>
-          </div>
-          <CurveHistoryChart history={history} unit={unit} locale={locale} />
-        </div>
-      </section>
-
       {horizons.length > 0 && (
         <section aria-labelledby="track-h">
           <h2 className="section" id="track-h">

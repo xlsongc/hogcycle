@@ -181,3 +181,20 @@ table.series-table thead th {
 #cycles-h + .section-note {
   max-width: 66ch;
 }
+
+/* One futures contract (docs/adr/0041): its picker, its line in a
+   sentence, and its weeks under the chart. */
+.contract-pick select.on {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.contract-sum {
+  margin: 4px 0 12px;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.contract-weeks {
+  margin-top: 12px;
+}

@@ -8,32 +8,24 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     tickerLabel: "最新价格",
     feed: "订阅（Atom）",
     api: "数据下载与接口",
-    futuresHeading: "期货市场给未来的定价",
-    futuresNote: (date: string) =>
-      `市场今天为未来各月交割的生猪出的价（${date} 结算）。这是真金白银下注的预期，不是本站的预测。`,
-    futuresMethod:
-      "大商所生猪期货每个在挂合约的最新结算价，按交割月排开，读自新浪的镜像。单位是交割标准品的元/吨，和上面的现货价格不是同一口径。柱子从零开始画，长短可以直接比较。",
+    futuresHeading: "期货曲线",
+    futuresNote: (date: string) => `大商所生猪期货 ${date} 结算价，按交割月。`,
     futuresCaption: "生猪期货：各交割月的最新结算价",
     futuresMonth: "交割月",
     futuresSettle: "结算价",
-    futuresMore: "全部合约，以及 2021 年以来的主力连续",
-    futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
-      `这类定价以往偏离多少：交割前 3 个月，合约结算价与它最后的结算价平均相差 ${three}%；交割前 6 个月相差 ${six}%，带方向平均${sixSigned >= 0 ? "高出" : "低于"} ${Math.abs(sixSigned)}%（2021 年以来 ${n} 个已交割合约）。只是过去，而且只有几轮周期。`,
+    futuresWeek: "较上周",
+    futuresMore: "单个合约与以往偏离",
+    futuresSpread: (nearM: string, nearV: string, farM: string, farV: string, pct: number) =>
+      `${farM} 合约 ${farV}，比 ${nearM}（${nearV}）${pct >= 0 ? "高" : "低"} ${Math.abs(pct)}%。`,
+    futuresTrack: (six: number, signed: number, n: number) =>
+      `以往交割前 6 个月的价格，与最终结算价平均相差 ${six}%，平均${signed >= 0 ? "偏高" : "偏低"} ${Math.abs(signed)}%（2021 年以来 ${n} 个合约）。`,
     thesisHeading: "产能领先价格",
-    thesisNote: "把能繁母猪存栏前移到它变成商品猪所需的时间，放在它领先的猪价上方。",
-    thesisMethod: (
-      <>
-        <p>这个滞后由生物学钉死在 10–12 个月（妊娠 114 天 + 育肥约 6 个月），所以位移量不是拟合出来的参数。</p>
-        <p>
-          两格共用一条时间轴、各自一套纵轴：<b>不是双轴图</b>。今天之后的那段前移曲线，是已经存在的产能被画在生物学让它上市的位置 —— 这是对齐，<b>不是预测</b>。
-        </p>
-      </>
-    ),
+    thesisNote: "能繁母猪存栏按所选月数前移，放在猪价上方对照。",
+    thesisMethod: <p>滞后由生物学决定：妊娠 114 天，加上约 6 个月育肥，共 10–12 个月。</p>,
     lead: "前移",
     leadOption: (n: number) => (n ? `${n} 个月` : "不前移"),
     shifted: (n: number) => (n ? `（前移 ${n} 个月）` : ""),
     today: "今天",
-    changesNote: "管道按固定定义算出的事实：阈值上下的连续期数、多年极值、停更与逾期。没有一条是阶段判定。",
     groups: {
       runs: "阈值",
       extremes: "多年极值",
@@ -50,9 +42,8 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     nothing: "按这些定义，暂无可报告的事实。",
 
     heading: "猪周期现在在哪",
-    lede: "三个读数按因果顺序排列：能繁母猪决定 10–12 个月后的生猪供给，猪价是这批供给落地的地方，养殖利润决定养殖户还愿不愿意补栏。每个数字都注明它描述的时期和公开的日期。",
+    lede: "能繁母猪决定 10–12 个月后的供给，猪价是供给落地的地方，养殖利润决定补不补栏。",
     stamp: (asOf: string) => `数据截至 ${asOf}`,
-    lastRelease: (date: string) => `最近一次发布 ${date}`,
     role: {
       capacity: "领先猪价 10–12 个月",
       price: "供给落地的地方",
@@ -77,18 +68,17 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     alignRelease: "它公开的那天",
     alignNote: (median: number) => (
       <>
-        按发布日放置时，每个读数出现在读者第一次能用上它的位置。发布比时期结束中位晚 <b className="num">{median}</b> 天，这段时间是从生物学领先期里扣掉的。
-        2021-12 以前的读数没有发布日期，这一视图里不画，也不去猜。
+        按发布日放置：发布比时期结束中位晚 <b className="num">{median}</b> 天。2021-12 以前的读数没有发布日期，不画。
       </>
     ),
     feedHeading: "最近发布",
-    feedNote: "周度与月度发布，按公开日期从新到旧。",
+    feedNote: "按发布日期，新的在前。",
     factsHeading: "值得留意",
   },
 
   readings: {
     heading: "全部读数",
-    note: "因果链图表墙上的每一条序列。点名称打开它在图表墙上的那一格。",
+    note: "图表墙上的全部序列。",
     name: "序列",
     value: "最新值",
     yoy: "同比",
@@ -102,8 +92,7 @@ export const overview: Pick<Dict, "overview" | "readings"> = {
     noPositionTitle: "历史太短，不计分位",
     live: "更新中",
     overdue: "逾期",
-    overdueTitle: (period: string, by: string) =>
-      `${period}的数尚未发布，已晚于有记录以来的每一次发布（${by}）。还不算停更。`,
+    overdueTitle: (period: string, by: string) => `${period}已晚于有记录以来的每一次发布（${by}）。`,
     movingBaseline: "调控基准为移动值，故不计缺口",
   },
 };

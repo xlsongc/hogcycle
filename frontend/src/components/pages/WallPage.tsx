@@ -29,10 +29,7 @@ export function WallPage({ data, locale }: { data: WallContract; locale: Locale 
             <p>{w.howTo}</p>
           </div>
         </details>
-        <Glossary
-          ids={["sowHerd", "normalHolding", "caliber", "hogCornRatio", "releaseVsPeriod", "hollowMarkers"]}
-          locale={locale}
-        />
+        <Glossary ids={["sowHerd", "normalHolding", "hogCornRatio"]} locale={locale} />
       </header>
 
       <WallView

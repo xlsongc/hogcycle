@@ -95,7 +95,7 @@ export function Highlights({ readings, panels, locale, index }: Props) {
 
   return (
     <section className="highlights" aria-labelledby="highlights-h">
-      <SectionHead id="highlights-h" index={index} title={o.factsHeading} note={o.changesNote} locale={locale} />
+      <SectionHead id="highlights-h" index={index} title={o.factsHeading} locale={locale} />
       {shown.length ? (
         <div className="fact-groups">
           {shown.map((g) => (

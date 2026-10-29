@@ -7,8 +7,7 @@ export const site = {
   },
 
   foot: {
-    about:
-      "China's hog cycle from public sources, laid out as a causal chain. Every number names its source, the period it describes and the day it became public.",
+    about: "China's hog cycle from primary sources. Each number names its source and release date.",
     disclaimer: "Data as published by its sources. Nothing here is investment advice.",
     pages: "Pages",
     data: "Data",
@@ -24,15 +23,16 @@ export const site = {
 
   datasets: {
     heading: "Data and API",
-    sub: "Every series on this site can be downloaded: CSV for a spreadsheet, JSON for a program. Updated by the daily run, free to use.",
+    sub: "Every series as CSV and JSON. Updated daily, free to use.",
     endpointsHeading: "Endpoints",
-    endpointsNote: "Static files, so there is no key and no rate limit beyond the host's. Each address below is stable.",
+    endpointsNote: "Static files at stable addresses; no key.",
     endpoints: [
       ["data/index.json", "Every series: name, unit, frequency, latest value and links to its files."],
       ["data/series/<id>.csv", "One series, every reading. Open it straight in a spreadsheet."],
       ["data/series/<id>.json", "The same rows as JSON."],
       ["feed.xml", "New releases as an Atom feed, for a feed reader."],
       ["week.xml", "The weekly digest as an Atom feed: one entry per finished week."],
+      ["data/futures/lh_contracts.csv", "Every 大商所 live-hog contract since LH2109, one row per contract and trading day (a day whose settle did not move has no row)."],
     ] as [string, string][],
     columnsHeading: "What the columns mean",
     columns: [
@@ -44,7 +44,7 @@ export const site = {
     ] as [string, string][],
     example: "Example",
     seriesHeading: "Every series",
-    seriesNote: "Grouped by where each sits in the chain. The source of each is on its own page.",
+    seriesNote: "Grouped along the chain; each source is on the series' page.",
     cols: { name: "Series", unit: "Unit", freq: "Frequency", latest: "Latest", files: "Files" },
     freq: {
       daily: "daily",

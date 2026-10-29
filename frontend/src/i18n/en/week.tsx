@@ -5,11 +5,9 @@ export const week = {
     kicker: (year: number, n: number) => `Weekly · ${year}, week ${n}`,
     title: (range: string) => `The hog market, ${range}`,
     metaTitle: (year: number, n: number) => `Week ${n}, ${year}`,
-    metaDescription:
-      "What China's hog prices, futures and official releases did this week, from public sources, as this site knew it at the week's end.",
+    metaDescription: "China's hog prices, futures and official releases this week.",
     open: (cut: string) => `Through ${cut}. The week is not over, so this issue still changes.`,
-    closed: (end: string) =>
-      `As this site knew it at the end of ${end}. A value revised later does not rewrite it.`,
+    closed: (end: string) => `As of the end of ${end}.`,
     headlinePart: (name: string, value: string, delta: string | null, pct: string | null) =>
       delta == null
         ? `${name} ${value}`
@@ -30,26 +28,15 @@ export const week = {
       failed: "This browser would not copy. Select the text below:",
     },
     method: (
-      <>
-        <p>
-          Each issue is the difference between two snapshots of this site: every series as it
-          could be known at the end of the week, and as it could be known at the end of the week
-          before. A value counts from the day its publisher released it; where the source gives no
-          date, from the day this site learned it. This is the rule the wall&apos;s as-of control
-          uses.
-        </p>
-        <p>
-          So a past issue reads as it stood then. A figure revised the week after does not change
-          it, and a series this site had not yet collected is missing rather than filled in from
-          today. Every number is arithmetic on published values: nothing here says what a move
-          means.
-        </p>
-      </>
+      <p>
+        Each issue compares what had been published by the end of the week with what had been
+        published a week earlier. A later revision does not change a past issue.
+      </p>
     ),
 
     moves: {
       title: "Prices this week",
-      note: "The latest reading of every daily and weekly series against the latest a week earlier.",
+      note: "Daily and weekly series against a week earlier.",
     },
     cols: {
       series: "Series",
@@ -71,7 +58,7 @@ export const week = {
     curve: {
       title: "The futures curve",
       note: (on: string) =>
-        `Each listed contract's settle on ${on}, against a week earlier. CNY per tonne of the delivery grade, the market's price, not ours.`,
+        `Settles of ${on} against a week earlier, CNY per tonne.`,
       contract: "Contract",
       settle: "Settle",
       change: "On the week",
@@ -79,7 +66,7 @@ export const week = {
 
     released: {
       title: "Released this week",
-      note: "Monthly, quarterly and annual figures that came out, each beside the period before.",
+      note: "Monthly, quarterly and annual figures out this week.",
       none: "Nothing monthly, quarterly or annual came out this week.",
       published: (d: string) => `released ${d}`,
       learned: (d: string) => `learned ${d}; the source gives no date`,
@@ -91,7 +78,7 @@ export const week = {
 
     upcoming: {
       title: "Due next",
-      note: "What the release calendar expects within a week, read off each series' past releases. An expectation, never a date.",
+      note: "Expected from past release dates.",
       none: "Nothing is expected in the coming week.",
       usual: (d: string) => `usually by ${d}`,
       by: (d: string) => `latest on record ${d}`,
@@ -100,12 +87,12 @@ export const week = {
 
     equities: {
       title: "Listed producers",
-      note: "Share prices, close to close. A claim on the cycle, not a measurement of it.",
+      note: "Close to close.",
     },
 
     archive: {
       title: "Every issue",
-      note: "One page per week since collection began on 2026-09-06, each at a stable link. The figure beside a week is its spot hog price's move.",
+      note: "Weekly since 2026-09-06. The figure is that week's spot hog price move.",
       current: "in progress",
     },
   },

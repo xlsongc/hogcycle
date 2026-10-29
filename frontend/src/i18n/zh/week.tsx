@@ -7,11 +7,11 @@ export const week: Pick<Dict, "week"> = {
     kicker: (year: number, n: number) => `猪市周报 · ${year} 年第 ${n} 周`,
     title: (range: string) => `本周猪市：${range}`,
     metaTitle: (year: number, n: number) => `${year} 年第 ${n} 周猪市周报`,
-    metaDescription: "本周中国生猪价格、期货和官方数据发布的变化，全部来自公开来源，按本站在周末时所知的数据整理。",
+    metaDescription: "本周中国生猪价格、期货和官方数据发布。",
     // The days arrive as "10月24日", so no space sits between them and the
     // Chinese around them.
     open: (cut: string) => `数据截至${cut}。本周尚未结束，本期内容还会更新。`,
-    closed: (end: string) => `本期为${end}结束时本站所知的数据。之后的修订不会改写本期。`,
+    closed: (end: string) => `数据截至${end}。`,
     headlinePart: (name: string, value: string, delta: string | null, pct: string | null) =>
       delta == null
         ? `${name} ${value}`
@@ -32,19 +32,12 @@ export const week: Pick<Dict, "week"> = {
       failed: "这个浏览器不允许自动复制，请手动选择下面的文字：",
     },
     method: (
-      <>
-        <p>
-          每一期都是本站两个时点所知数据的差：本周末时能知道的每个序列，减去上周末时能知道的。数值从发布方发布的那天算起；来源没有注明日期的，从本站获取的那天算起。这和图表墙上"站在某天"用的是同一条规则。
-        </p>
-        <p>
-          所以往期内容就是当时的样子：之后才修订的数字不会改写它，当时本站还没开始收录的序列就是空着，不会用今天的数据补上。所有数字都只是对已发布数值的算术，不判断涨跌意味着什么。
-        </p>
-      </>
+      <p>每一期对比本周末之前已发布的数据和上周末之前已发布的数据。之后的修订不改写往期。</p>
     ),
 
     moves: {
       title: "本周价格",
-      note: "每个日度和周度序列的最新读数，对比一周前的最新读数。",
+      note: "日度和周度序列，对比一周前。",
     },
     cols: {
       series: "序列",
@@ -65,7 +58,7 @@ export const week: Pick<Dict, "week"> = {
 
     curve: {
       title: "期货曲线",
-      note: (on: string) => `各在市合约${on}的结算价，对比一周前。单位为元/吨（交割标准品），是市场的价格，不是本站的预测。`,
+      note: (on: string) => `各合约${on}结算价，对比一周前，元/吨。`,
       contract: "合约",
       settle: "结算价",
       change: "较上周",
@@ -73,7 +66,7 @@ export const week: Pick<Dict, "week"> = {
 
     released: {
       title: "本周发布",
-      note: "本周发布的月度、季度和年度数据，每条附上一期的数值。",
+      note: "本周发布的月度、季度和年度数据。",
       none: "本周没有月度、季度或年度数据发布。",
       published: (d: string) => `${d}发布`,
       learned: (d: string) => `${d}获取，来源未注明发布日期`,
@@ -85,7 +78,7 @@ export const week: Pick<Dict, "week"> = {
 
     upcoming: {
       title: "下周预计发布",
-      note: "发布日历根据各序列过去的发布时间，预计一周内会出的数据。这是预期，不是确定的日期。",
+      note: "根据以往发布时间推算。",
       none: "未来一周没有预计发布的数据。",
       usual: (d: string) => `通常${d}前`,
       by: (d: string) => `最晚纪录${d}`,
@@ -94,12 +87,12 @@ export const week: Pick<Dict, "week"> = {
 
     equities: {
       title: "上市猪企",
-      note: "股价，按收盘价计。股价是对周期的押注，不是对周期的测量。",
+      note: "按收盘价。",
     },
 
     archive: {
       title: "往期周报",
-      note: "自 2026-09-06 开始采集以来，每周一期，链接固定不变。每期右侧是当周生猪现货价格的涨跌。",
+      note: "2026-09-06 起每周一期。右侧是当周生猪现货价格涨跌。",
       current: "进行中",
     },
   },

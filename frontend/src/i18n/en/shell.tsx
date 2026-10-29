@@ -3,8 +3,7 @@
 export const shell = {
   meta: {
     title: "The Hog Cycle Wall",
-    description:
-      "The causal chain of China's hog cycle on one shared time axis, laid out for a human to judge — not judged for them.",
+    description: "China's hog cycle from primary sources: prices, breeding sows, futures and margins, in English and Chinese.",
     card: "hogcycle: China's hog cycle from primary sources, with a weekly digest",
     pages: {
       overview: "Overview",
@@ -51,7 +50,7 @@ export const shell = {
   },
 
   health: {
-    reached: (when: string) => `sources last reached ${when} UTC`,
+    reached: (when: string) => `last collected ${when} UTC`,
     overdue: "a collector is overdue: newer releases may be missing",
     never: "never",
   },
@@ -59,32 +58,27 @@ export const shell = {
   asOf: {
     label: "As of",
     clear: "Back to today",
-    hint: "Pick a past day to see only what was knowable then. A value counts from the day its publisher released it; where the source gives no date, from the day this warehouse learned it, never from an assumed lag.",
+    hint: "Show only what had been published by a past day.",
     banner: (day: string) => (
       <>
-        Standing on <b className="num">{day}</b>: only what was knowable that day is shown.
-        Runs, extremes, positions and year-on-year describe today&apos;s series, so they are
-        hidden here.
+        Showing <b className="num">{day}</b>: only what had been published by then.
       </>
     ),
     latest: "Latest knowable reading",
     released: (date: string) => `published ${date}`,
-    learned: (date: string) =>
-      `release date not stated by the source; this warehouse learned it on ${date}`,
+    learned: (date: string) => `collected ${date} (release date not stated)`,
     nothing: (day: string) => `Nothing of this series was knowable on ${day}.`,
     firstPublished: (date: string) => `Its earliest release held here is ${date}.`,
-    firstLearned: (date: string) =>
-      `The source does not date its releases, and this warehouse first learned it on ${date}. A release date is never assumed, so before that it is not shown.`,
+    firstLearned: (date: string) => `First collected ${date}; the source gives no release dates.`,
     marker: "as of",
     panelNone: (first: { date: string; basis: "published" | "learned" } | null) =>
       first == null
         ? "not knowable on this day"
         : first.basis === "published"
         ? `not knowable on this day: first released ${first.date}`
-        : `not knowable on this day: release dates not stated, first learned ${first.date}`,
+        : `not knowable on this day: first collected ${first.date}`,
     startsAt: (month: string) => `knowable periods start ${month}`,
     knownFrom: "Known from",
-    overviewLink: "See the wall as it stood on a past day",
   },
 
   window: {

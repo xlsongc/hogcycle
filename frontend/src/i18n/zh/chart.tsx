@@ -10,7 +10,7 @@ export const chart: Pick<Dict, "chart" | "tier" | "granularity"> = {
       lag >= 0 ? `${date} 发布 · 晚 ${lag} 天` : `${date} 发布 · 提前 ${-lag} 天`,
     startsAt: (month: string) => `数据始于 ${month}`,
     datedFrom: (month: string) => `发布日期始于 ${month}`,
-    undated: "源头不写发布日期，这个视图里没有它的位置",
+    undated: "源头未注明发布日期，按发布日放置时不画",
     caliberFrom: (month: string) => `新口径始于 ${month}`,
     cadence: {
       D: "日度",
@@ -28,12 +28,12 @@ export const chart: Pick<Dict, "chart" | "tier" | "granularity"> = {
       A: "年度读数",
     },
     tierNote: {
-      capacity: "产能：领先价格 10–12 个月",
-      margin: "利润：决定产能变化能否持续",
-      price: "价格：被预测的结果，不是驱动因素",
-      noise: "噪音：短期扰动，影响股价，不改变周期",
-      equity: "股票：对周期的索取权，不是周期的一环",
-      market: "市场：期货市场给未来某个月定的价，不是测量",
+      capacity: "产能：领先猪价 10–12 个月",
+      margin: "利润",
+      price: "价格",
+      noise: "其他",
+      equity: "股票",
+      market: "期货",
     },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}，单位 ${unit}，共 ${n} 个观测点`,

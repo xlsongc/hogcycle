@@ -155,7 +155,6 @@ export function Cycles({ panel, locale }: Props) {
               <span className="panel-unit">
                 {indexed ? t.indexAxis : unitOf(panel.unit, locale)}
               </span>
-              <span className="hint">{t.computed}</span>
             </div>
             <CycleChart
               cycles={cycles}

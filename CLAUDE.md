@@ -246,3 +246,4 @@ so you do not have to re-derive them.
 | 0038 | Tools a reader uses: the margin calculator (`/calc/`) and the data page (`/datasets/`) |
 | 0039 | The weekly digest (`/week/`, `week.xml`): each week is the difference between what was knowable at two Sundays |
 | 0040 | A link carries its page: canonical, hreflang and card on every page (`lib/site.ts`), a sitemap, a bilingual 404, an issue copied as text; the calculator keeps the farm's numbers in the browser and draws the curve against the cost |
+| 0041 | One futures contract at a time (picker, its line among the others, its weeks; every contract's daily settles in `data/futures/lh_contracts.csv`); the market tier's page facts; the copy says what the numbers are, not what they are not |

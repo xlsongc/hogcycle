@@ -11,6 +11,7 @@
 
 import Link from "next/link";
 import type { Market, Panel, Reading } from "@/types/generated/wall";
+import type { Settle } from "@/lib/futures";
 import { fmt } from "@/charts/base/theme";
 import { SeriesBody } from "@/components/series/SeriesBody";
 import { nameOf, pathOf, seriesPath, type Locale } from "@/i18n/locale";
@@ -22,7 +23,7 @@ import type { TermId } from "@/i18n/en/terms";
 /** The terms a series' own page should explain, beyond the release dates
  *  every dated series has. */
 const TERMS_OF: Record<string, TermId[]> = {
-  sow_inventory: ["sowHerd", "normalHolding", "hollowMarkers"],
+  sow_inventory: ["normalHolding"],
   hog_corn_ratio: ["hogCornRatio"],
   hog_corn_ratio_county: ["hogCornRatio"],
 };
@@ -42,6 +43,8 @@ type Props = {
   today: string;
   /** The futures curve's history and track record, when this is that curve. */
   market?: Market;
+  /** The main continuous price's latest settle, on the curve's page. */
+  main?: Settle;
   locale: Locale;
 };
 
@@ -54,6 +57,7 @@ export function SeriesPage({
   end,
   today,
   market,
+  main,
   locale,
 }: Props) {
   const t = dict(locale);
@@ -61,11 +65,7 @@ export function SeriesPage({
   const zh = locale === "zh";
   const name = nameOf(panel, locale);
   const about = panel.about;
-  const termIds: TermId[] = [
-    ...(TERMS_OF[panel.id] ?? []),
-    ...(panel.caliber ? (["caliber"] as const) : []),
-    ...(panel.release_lag ? (["releaseVsPeriod"] as const) : []),
-  ];
+  const termIds: TermId[] = TERMS_OF[panel.id] ?? [];
 
   return (
     <main className="wrap series" style={tierVars(panel.tier)}>
@@ -90,13 +90,9 @@ export function SeriesPage({
             )}
           </p>
         )}
-        {panel.tier === "equity" ? (
-          <p className="muted">{s.equity}</p>
-        ) : panel.tier === "market" ? (
-          <p className="muted">{s.market}</p>
-        ) : panel.forecast ? (
+        {panel.tier !== "market" && panel.tier !== "equity" && panel.forecast ? (
           <p className="muted">{s.forecast}</p>
-        ) : panel.in_wall === false ? (
+        ) : panel.tier !== "market" && panel.tier !== "equity" && panel.in_wall === false ? (
           <p className="muted">{s.retired}</p>
         ) : null}
         {earlier && (
@@ -126,6 +122,7 @@ export function SeriesPage({
         today={today}
         locale={locale}
         market={market}
+        main={main}
       >
         <div className="ov-two">
           <section aria-labelledby="release-h">
@@ -133,7 +130,9 @@ export function SeriesPage({
               {s.releaseHeading}
             </h2>
             <p className="section-note">
-              {panel.forecast
+              {panel.tier === "market"
+                ? s.releaseSettle
+                : panel.forecast
                 ? s.releaseForecast
                 : panel.release_lag
                 ? s.releaseBody(
@@ -145,6 +144,7 @@ export function SeriesPage({
             </p>
           </section>
 
+          {panel.tier !== "market" && (
           <section aria-labelledby="revisions-h">
             <h2 className="section" id="revisions-h">
               {s.revisionsHeading}
@@ -179,6 +179,7 @@ export function SeriesPage({
               <p className="section-note">{s.revisionsNone}</p>
             )}
           </section>
+          )}
         </div>
       </SeriesBody>
     </main>

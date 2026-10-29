@@ -22,7 +22,6 @@ import Link from "next/link";
 import { pathOf, staticPath, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { HealthStamp } from "@/components/shell/HealthStamp";
-import { Glossary } from "@/components/Glossary";
 import { FuturesCurve } from "@/components/overview/FuturesCurve";
 import { SectionHead } from "@/components/shell/SectionHead";
 import { Ticker } from "@/components/overview/Ticker";
@@ -68,11 +67,6 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
     const outlook = ahead && ahead.obs_date > reading.obs_date ? ahead : undefined;
     return [{ role, reading, panel: panelOf(id) as Panel, outlook }];
   });
-  const lastRelease = cycle
-    .map((r) => r.published_on)
-    .filter((p): p is string => p != null)
-    .sort()
-    .pop();
 
   return (
     <main className="wrap overview">
@@ -84,17 +78,11 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
             <span className="live-dot" aria-hidden="true" />
             <span className="num">{o.stamp(asOf)}</span>
           </li>
-          {lastRelease && <li className="num">{o.lastRelease(lastRelease)}</li>}
           {data.health && (
             <li>
               <HealthStamp health={data.health} locale={locale} />
             </li>
           )}
-          {/* The overview stays on today; standing on a past day is the
-              wall's job (docs/adr/0025). */}
-          <li>
-            <Link href={pathOf(locale, "wall")}>{t.asOf.overviewLink}</Link>
-          </li>
           <li>
             <a href={staticPath(locale === "zh" ? "/zh/feed.xml" : "/feed.xml")}>{o.feed}</a>
           </li>
@@ -102,7 +90,6 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
             <Link href={pathOf(locale, "datasets")}>{o.api}</Link>
           </li>
         </ul>
-        <Glossary ids={["sowHerd", "normalHolding", "releaseVsPeriod", "caliber"]} locale={locale} />
       </header>
 
       {week && (
@@ -136,6 +123,7 @@ export function OverviewPage({ data, locale }: { data: WallContract; locale: Loc
       {futures && (
         <FuturesCurve
           curve={futures}
+          history={data.market?.history}
           track={data.market?.track_record}
           today={end}
           locale={locale}

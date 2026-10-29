@@ -116,6 +116,7 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
           </>
         )}
       </div>
+      {!panel.forecast && (
       <div className="bar">
         <span className="filter-label">{t.units.label}</span>
         {UNITS.map((u) => (
@@ -123,8 +124,8 @@ export function SeriesChart({ panel, start, end, asOf = null, locale }: Props) {
             {t.units[u]}
           </button>
         ))}
-        {units !== "level" && <span className="hint">{t.units.note}</span>}
       </div>
+      )}
       <div className="wall">
         <PanelChart
           panel={drawn}

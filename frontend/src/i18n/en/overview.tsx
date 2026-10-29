@@ -8,39 +8,25 @@ export const overview = {
     thesisHeading: "Capacity leads price",
     feed: "Subscribe (Atom)",
     api: "Downloads and API",
-    futuresHeading: "What the futures market prices ahead",
-    futuresNote: (date: string) =>
-      `What the market pays today for hogs delivered in each coming month (settles of ${date}). An expectation with money behind it, not this site's forecast.`,
-    futuresMethod:
-      "The latest settle of every listed Dalian live-hog contract, by delivery month, from Sina's copy of the exchange's prices. Per tonne of the delivery grade, a different caliber from the spot prices above. Bars start at zero, so their lengths compare honestly.",
+    futuresHeading: "Futures curve",
+    futuresNote: (date: string) => `大商所 live hog settles of ${date}, by delivery month.`,
     futuresCaption: "Live hog futures: the latest settle by delivery month",
-    futuresMonth: "Delivery month",
+    futuresMonth: "Delivery",
     futuresSettle: "Settle",
-    futuresMore: "every contract, and the main contract since 2021",
-    futuresTrack: (three: number, six: number, sixSigned: number, n: number) =>
-      `How far off such prices have been: three months before delivery, a contract's settle sat ${three}% from where it finished, on average; six months before, ${six}%, and ${Math.abs(sixSigned)}% ${sixSigned >= 0 ? "above" : "below"} it on the signed average (${n} delivered contracts since 2021). The past only, and few cycles of it.`,
-    thesisNote:
-      "Breeding sows, shifted forward by the time biology takes to turn them into market hogs, drawn above the hog price they lead.",
+    futuresWeek: "On the week",
+    futuresMore: "each contract, and how far off the market has been",
+    futuresSpread: (nearM: string, nearV: string, farM: string, farV: string, pct: number) =>
+      `${farM} settles at ${farV}, ${Math.abs(pct)}% ${pct >= 0 ? "above" : "below"} ${nearM} (${nearV}).`,
+    futuresTrack: (six: number, signed: number, n: number) =>
+      `Six months before delivery, settles have missed the final price by ${six}% on average, ${Math.abs(signed)}% ${signed >= 0 ? "too high" : "too low"} signed (${n} contracts since 2021).`,
+    thesisNote: "Breeding sows shifted forward by the lead you pick, above the hog price.",
     thesisMethod: (
-      <>
-        <p>
-          Biology fixes the lag at 10–12 months — 114 days&rsquo; gestation plus
-          about six months to finish — so the shift is not a fitted parameter.
-        </p>
-        <p>
-          Two panels on one time axis, each on its own scale: <b>not a dual
-          axis</b>. Past today the shifted line is capacity that already exists,
-          drawn where biology puts it on the market. It is an alignment,{" "}
-          <b>not a forecast</b>.
-        </p>
-      </>
+      <p>Biology sets the lag at 10–12 months: 114 days&rsquo; gestation plus about six months to finish.</p>
     ),
     lead: "Lead",
     leadOption: (n: number) => (n ? `+${n} mo` : "None"),
     shifted: (n: number) => (n ? ` · shifted +${n} mo` : ""),
     today: "today",
-    changesNote:
-      "Facts with fixed definitions, computed in the pipeline: runs against a threshold, multi-year extremes, series that stopped. None of them is a call on the phase.",
     groups: {
       runs: "Thresholds",
       extremes: "Multi-year extremes",
@@ -57,9 +43,8 @@ export const overview = {
     nothing: "Nothing to report under these definitions.",
 
     heading: "Where the hog cycle stands",
-    lede: "Three readings in causal order. Breeding sows fix hog supply 10–12 months out, the hog price is where that supply lands, and farm margins decide whether the herd is rebuilt. Each number says which period it describes and when it became public.",
+    lede: "Breeding sows set hog supply 10–12 months out, the hog price is where it lands, and margins decide whether farms restock.",
     stamp: (asOf: string) => `Data as of ${asOf}`,
-    lastRelease: (date: string) => `latest release ${date}`,
     role: {
       capacity: "leads price by 10–12 months",
       price: "where supply lands",
@@ -87,21 +72,18 @@ export const overview = {
     alignRelease: "the day it was published",
     alignNote: (median: number) => (
       <>
-        Placed at its publication date, each reading appears where a reader could
-        first have used it. A release comes a median of{" "}
-        <b className="num">{median}</b> days after the period ends, and that time
-        is spent out of the biological lead. Readings from before 2021-12 carry
-        no publication date and are left out of this view, not guessed at.
+        By publication date: a median of <b className="num">{median}</b> days after the period.
+        Readings before 2021-12 carry no date and are not shown.
       </>
     ),
     feedHeading: "Latest releases",
-    feedNote: "Weekly and monthly prints, newest publication first.",
+    feedNote: "Newest publication first.",
     factsHeading: "Worth noting",
   },
 
   readings: {
     heading: "All readings",
-    note: "Every series on the causal wall. Select a name to open its panel.",
+    note: "Every series on the wall.",
     name: "Series",
     value: "Latest",
     yoy: "YoY",
@@ -115,8 +97,7 @@ export const overview = {
     noPositionTitle: "Too little history for a percentile",
     live: "live",
     overdue: "overdue",
-    overdueTitle: (period: string, by: string) =>
-      `The value for ${period} is not out, and it is later than any release on record (${by}). Not stale yet.`,
+    overdueTitle: (period: string, by: string) => `${period} is later than any release on record (${by}).`,
     movingBaseline: "the target baseline moves, so no gap is computed",
   },
 };

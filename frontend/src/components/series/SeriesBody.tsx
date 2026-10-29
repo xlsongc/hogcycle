@@ -20,6 +20,8 @@ import { AsOfControl } from "@/components/AsOfControl";
 import { Cycles } from "@/components/series/Cycles";
 import { Seasons } from "@/components/series/Seasons";
 import { MarketHistory } from "@/components/series/MarketHistory";
+import { Contract } from "@/components/series/Contract";
+import type { Settle } from "@/lib/futures";
 import { pathOf, staticPath, unitOf, type Locale } from "@/i18n/locale";
 import { dict } from "@/i18n/dict";
 import { firstKnowable, knownOn, panelOn, type Known } from "@/lib/asOf";
@@ -39,10 +41,12 @@ type Props = {
   locale: Locale;
   /** The futures curve's history and track record, on that curve's page only. */
   market?: Market;
+  /** The main continuous price's latest settle, on the curve's page. */
+  main?: Settle;
   children: ReactNode;
 };
 
-export function SeriesBody({ panel, reading, start, end, today, locale, market, children }: Props) {
+export function SeriesBody({ panel, reading, start, end, today, locale, market, main, children }: Props) {
   const t = dict(locale);
   const [day, setDay] = useAsOf();
   const known = day ? knownOn(panel, day) : null;
@@ -61,12 +65,15 @@ export function SeriesBody({ panel, reading, start, end, today, locale, market, 
         <AsOfControl day={day} onDay={setDay} min={first.date} max={today} locale={locale} />
       )}
 
-      {known ? (
+      {market ? (
+        <Contract market={market} unit={panel.unit} main={main} day={day} locale={locale} />
+      ) : known ? (
         <AsOfLatest panel={panel} known={known} day={day as string} locale={locale} />
       ) : (
         reading && <TodayLatest reading={reading} locale={locale} />
       )}
 
+      {!market && (
       <section aria-labelledby="history-h">
         <h2 className="section" id="history-h">
           {t.series.chartHeading}
@@ -95,6 +102,7 @@ export function SeriesBody({ panel, reading, start, end, today, locale, market, 
           )}
         </p>
       </section>
+      )}
 
       <Seasons panel={shown} locale={locale} />
 
@@ -106,7 +114,7 @@ export function SeriesBody({ panel, reading, start, end, today, locale, market, 
 
       <section aria-labelledby="recent-h">
         <h2 className="section" id="recent-h">
-          {t.series.recentHeading}
+          {market ? t.futures.curveTable : t.series.recentHeading}
         </h2>
         <div className={all ? "readings-wrap table-wrap" : "readings-wrap"}>
           <table className="series-table">
@@ -135,7 +143,6 @@ export function SeriesBody({ panel, reading, start, end, today, locale, market, 
             <button aria-pressed={all} onClick={() => setAll((v) => !v)}>
               {all ? t.series.showRecent : t.series.showAll(readings.length)}
             </button>
-            {all && <span className="hint">{t.series.allNote}</span>}
           </div>
         )}
       </section>

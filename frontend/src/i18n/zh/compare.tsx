@@ -5,30 +5,17 @@ import type { Dict } from "../en";
 export const compare: Pick<Dict, "compare" | "picker" | "overlay" | "lagScan"> = {
   compare: {
     heading: "对比",
-    sub: (
-      <>
-        任选序列压在一条时间轴上。单位一致时画原值；单位混杂时全部指数化到窗口起点，因为把不同量纲塞进两条纵轴会凭空造出数据里没有的相关性。股票只出现在这里 ——
-        股价是对周期的索取权，不是周期的一环。
-      </>
-    ),
+    sub: <>任选序列放在一条时间轴上。单位不同时，全部按窗口起点指数化。</>,
     lag: "位移",
     noLag: "不位移",
     forward: "前移",
     months: (n: number) => `${n} 个月`,
-    lagNote: (
-      <>
-        把某条序列整体前移，检验领先关系。能繁母猪前移 10–12 个月压到猪价上 ——
-        生物学把这个滞后钉死了（妊娠 114 天 + 育肥 6 个月），所以对齐得上不是巧合。这也是判断「产能信号<i>当时</i>能不能叫出拐点」的第一张图。
-      </>
-    ),
-    share: "这个视图记在地址栏里 —— 复制网址即可分享。",
+    lagNote: <>把序列整体前移，看领先关系，比如能繁母猪前移 10–12 个月对照猪价。</>,
+    share: "复制网址即可分享这个视图。",
     tableCaption: "图上序列的月度表，各用自己的单位：每月取最后一个观测值，只含窗口内，已计入位移。",
-    tableNote: (rows: number) =>
-      `原值、各用自己的单位，按数值描述的月份排列（计入位移）· 每月取最后一个观测值 · 共 ${rows} 行`,
-    undated: (names: string[]) =>
-      `未画出：${names.join("、")}。它们的源头不写发布日期，本页从不猜测日期。`,
-    signed: (names: string[]) =>
-      `未画出：${names.join("、")}。${names.length > 1 ? "它们" : "它"}会跌到零以下，以首值为 100 的指数没有意义；和同单位的序列一起选，就能看到。`,
+    tableNote: (rows: number) => `各用自己的单位，每月取最后一个读数，已计入位移 · 共 ${rows} 行`,
+    undated: (names: string[]) => `按发布日放置时未画出（源头无发布日期）：${names.join("、")}。`,
+    signed: (names: string[]) => `指数化时未画出（会跌到零以下）：${names.join("、")}。和同单位的序列一起选即可。`,
   },
 
   lagScan: {
@@ -41,14 +28,13 @@ export const compare: Pick<Dict, "compare" | "picker" | "overlay" | "lagScan"> =
     hereNone: (k: number) => `前移 ${k} 个月时，重叠的月份太少，算不出相关系数。`,
     best: (k: number, r: string, n: number) => `最强在 ${k} 个月：${r}，基于 ${n} 个月。`,
     note: (basis: "yoy" | "level") =>
-      `从 0 到 24 个月逐个位移算皮尔逊相关系数，用月末值${basis === "yoy" ? "，每月都和一年前同月比，去掉趋势和季节" : "；两条都有趋势的原值，不管谁领先都会相关"}。由你的浏览器计算。历史只有大约三轮周期：这描述的是过去，不保证下一轮。`,
+      `0 到 24 个月逐个位移的相关系数，用月末值${basis === "yoy" ? "的同比" : ""}。历史只有大约三轮周期。`,
     tooFew: "任何位移下重叠的月份都不够（至少 24 个），算不出相关系数。",
     label: (lead: string, target: string) => `${lead} 前移 0 到 24 个月后与 ${target} 的相关系数`,
   },
 
   picker: {
-    atCapTitle: (max: number) =>
-      `最多同时叠放 ${max} 条 —— 再多就得生成新色相，而生成的色相在色觉缺陷下与已有色无法区分`,
+    atCapTitle: (max: number) => `最多同时叠放 ${max} 条`,
     selected: (n: number, max: number) => `已选 ${n}/${max}`,
     atCap: " · 已达上限",
     chosen: "已选",
@@ -63,8 +49,7 @@ export const compare: Pick<Dict, "compare" | "picker" | "overlay" | "lagScan"> =
     shifted: (months: number) => ` (前移${months}月)`,
     indexedNote: (log: boolean) => (
       <>
-        所选序列单位不一致，已全部指数化到窗口起点 —— 比较的是相对涨跌，不是水平
-        {log ? "。跨度超过 10 倍，已切换对数轴，使等百分比涨幅占等高" : ""}
+        单位不同：已按窗口起点指数化{log ? "，对数轴" : ""}
       </>
     ),
     label: (n: number, indexed: boolean) =>

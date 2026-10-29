@@ -8,7 +8,7 @@ export const chart = {
       lag >= 0 ? `published ${date} · +${lag}d` : `published ${date} · ${-lag}d ahead`,
     startsAt: (month: string) => `data from ${month}`,
     datedFrom: (month: string) => `dated releases from ${month}`,
-    undated: "the source does not date its releases, so it has no place in this view",
+    undated: "no release dates, so not drawn by release date",
     caliberFrom: (month: string) => `new caliber from ${month}`,
     cadence: {
       D: "daily",
@@ -26,12 +26,12 @@ export const chart = {
       A: "annual reading",
     },
     tierNote: {
-      capacity: "Capacity: leads price by 10–12 months",
-      margin: "Margin: decides whether a capacity move persists",
-      price: "Price: the outcome, not a driver",
-      noise: "Noise: short-run disturbance that moves equities, not the cycle",
-      equity: "Equity: a claim on the cycle, not a link in it",
-      market: "Market: what the futures market prices a coming month at, not a measurement",
+      capacity: "Capacity: leads the hog price by 10–12 months",
+      margin: "Margin",
+      price: "Price",
+      noise: "Other",
+      equity: "Equities",
+      market: "Futures",
     },
     panelLabel: (name: string, unit: string, n: number) =>
       `${name}, unit ${unit}, ${n} observations`,

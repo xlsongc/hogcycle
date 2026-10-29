@@ -7,76 +7,62 @@ export const series = {
     back: "All readings",
     publisher: "Published by",
     sourcePage: "Source page",
-    noUrl: "No public page: collected through an API.",
-    retired: "This caliber is closed upstream. The page keeps its history.",
+    noUrl: "Collected through an API; no public page.",
+    retired: "Discontinued upstream; history only.",
     caliberEarlier: (from: string | null, link: ReactNode) => (
       <>
-        {from ? `A new caliber from ${from}. ` : ""}The caliber before it is a
-        separate series: {link}.
+        {from ? `New caliber from ${from}. ` : ""}Before it: {link}.
       </>
     ),
     caliberLater: (until: string | null, link: ReactNode) => (
       <>
-        {until ? `This caliber ends ${until}. ` : ""}The caliber after it is a
-        separate series: {link}.
+        {until ? `This caliber ends ${until}. ` : ""}After it: {link}.
       </>
     ),
-    equity: "A share price is a claim on the cycle, not a link in it, so it is not on the wall.",
-    market:
-      "A futures price is the market's expectation with money behind it, not a measurement and not this project's forecast, so it is not on the wall.",
-    forecast:
-      "This is USDA's estimate and forecast, not a measurement, so it is kept off the wall.",
-    releaseForecast:
-      "A forecast is published before the period it describes ends, and revised as that period approaches. USDA sets China's numbers each April and October.",
+    forecast: "USDA's estimate and forecast.",
+    releaseForecast: "USDA revises its China numbers each April and October.",
+    releaseSettle: "大商所 publishes settles after each trading day's close.",
     ahead: (date: string, days: number) => `published ${date}, ${days} days before the period ends`,
     latest: "Latest reading",
     chartHeading: "History",
-    releaseHeading: "When it becomes public",
+    releaseHeading: "Release",
     releaseBody: (median: number, max: number, n: number) => (
       <>
-        A value appears a median of <b className="num">{median}</b> days after its period
-        ends, and <b className="num">{max}</b> at the longest, over{" "}
-        <b className="num">{n}</b> dated releases. A backtest has to wait that long too.
+        Published a median of <b className="num">{median}</b> days after the period ends,{" "}
+        <b className="num">{max}</b> at most ({n} releases).
       </>
     ),
     releaseNext: (period: string, usual: string, by: string) => (
       <>
-        Next: {period}. Usually out by <b className="num">{usual}</b>; after{" "}
-        <b className="num">{by}</b> it would be later than any release on record. An
-        expectation read off past releases, never a release date.
+        Next: {period}, usually by <b className="num">{usual}</b>; late after{" "}
+        <b className="num">{by}</b>.
       </>
     ),
-    releaseNone:
-      "The source does not date its releases, so when each value became public is not known. Do not assume it was the day the period ended.",
+    releaseNone: "The source does not date its releases.",
     revisionsHeading: "Revisions",
-    revisionsNote:
-      "Each value a period has had, in the order this warehouse learned them. Nothing is overwritten.",
-    revisionsNone:
-      "No value has changed since it was first recorded. A revision would appear here as a second release of the same period.",
+    revisionsNote: "Every value each period has had, oldest first.",
+    revisionsNone: "Never revised.",
     cols: {
       period: "Period",
       value: "Value",
       change: "Change",
       released: "Published",
-      learned: "Learned",
+      learned: "Collected",
     },
     unknown: "not stated",
     recentHeading: "Recent readings",
     download: "Download CSV",
-    downloadNote: "Full resolution and full depth; the chart thins daily data.",
-    onWall: "See it on the causal-chain wall",
-    inCompare: "Compare it with other series",
-    showAll: (n: number) => `Show all ${n} readings`,
-    showRecent: "Show the latest 12",
-    allNote: "Every reading at full resolution, newest first.",
+    downloadNote: "every reading, full history",
+    onWall: "On the wall",
+    inCompare: "Compare with other series",
+    showAll: (n: number) => `All ${n} readings`,
+    showRecent: "Latest 12",
   },
 
   cycles: {
     heading: "Cycles side by side",
-    intro:
-      "Name the month each cycle starts (a trough, a peak, any turn you want to compare) and each is redrawn from that month, indexed to 100 at its start. The page never picks a start for you: finding the turn is reading the cycle, and that is yours.",
-    signedNote:
-      "This series goes to zero or below, so an index of it would mean nothing: cycles are laid over in its own units.",
+    intro: "Enter the month each cycle starts; each is redrawn from there, indexed to 100.",
+    signedNote: "This series crosses zero, so cycles are laid over in its own units.",
     add: "Start a cycle at",
     addButton: "Add",
     horizon: "Show",
@@ -84,13 +70,11 @@ export const series = {
     monthsIn: (m: number) => (m === 0 ? "at the start" : `${m} months in`),
     legend: (month: string) => `from ${month}`,
     remove: (month: string) => `Remove the cycle from ${month}`,
-    none: (months: string[]) =>
-      `No reading in ${months.join(", ")}, so no cycle starts there. A start is never moved to a neighbouring month.`,
+    none: (months: string[]) => `No reading in ${months.join(", ")}.`,
     bad: "A start is a month, written YYYY-MM.",
     atCap: (max: number) => `At most ${max} cycles at once.`,
-    empty: "No cycle picked yet. Add a start month above.",
+    empty: "Add a start month above, e.g. a trough.",
     indexAxis: "Index (each cycle's start = 100)",
-    computed: "computed in your browser from the readings shown",
     showTable: "Table view",
     hideTable: "Hide table",
     monthCol: "Since start",
@@ -102,7 +86,7 @@ export const series = {
 
   seasons: {
     heading: "Season by season",
-    note: "Each of the last six calendar years over one January to December axis, this year drawn heavier. Hog prices have a season, so a move reads differently in March than in November. The readings only: no average of past years is drawn.",
+    note: "The last six years, January to December; this year is the heavy line.",
     month: (m: number) =>
       ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m - 1] ?? "",
     label: (years: number[]) => `Season by season, one line per year: ${years.join(", ")}`,
@@ -114,13 +98,12 @@ export const series = {
     yoy: "Change from a year ago",
     yoypct: "% from a year ago",
     pct: "% from the reading before",
-    note: "computed in your browser; a year ago is the reading nearest 365 days earlier, within 45 days, as on the cards",
   },
 
   span: {
     heading: "In this window",
-    hint: "Pick a window, or drag across the chart, to see its change, high and low.",
-    note: (n: number) => `${n} readings · computed in your browser from the points shown`,
+    hint: "Drag across the chart to zoom.",
+    note: (n: number) => `${n} readings`,
     first: "From",
     last: "To",
     change: "Change",
