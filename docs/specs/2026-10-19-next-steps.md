@@ -95,7 +95,9 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    a joint release (W44, around 10-26 to 10-30) reads right, with
    `released` filled and nothing due twice. Findability and the
    calculator's memory and breakeven chart are done (ADR-0040). What is left
-   there is the owner's: submitting `sitemap.xml` to a search console needs
+   there is the owner's (10-29: the owner is verifying Google Search
+   Console with `public/google02f7f67127813c61.html`; keep that file):
+   submitting `sitemap.xml` to a search console needs
    their account, and a root `robots.txt` would need a user-site repository
    (`xlsongc.github.io`). E-mail is the owner's call, because it is
    outward-facing; `week.xml` is what a mailing tool would read. Small one

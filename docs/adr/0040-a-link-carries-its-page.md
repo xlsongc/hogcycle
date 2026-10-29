@@ -37,7 +37,9 @@ contract clears the reader's cost had to be read off row by row.
 - **No robots.txt.** Crawlers read it only at the host's root, which belongs
   to the account's user site (`xlsongc.github.io`, which does not exist). The
   sitemap is found when someone submits it to a search console, which is the
-  owner's account to open.
+  owner's account to open. The owner opened Google Search Console on 10-29;
+  `public/google02f7f67127813c61.html` is its ownership file and must stay,
+  or the property stops being verified.
 - **A 404 page in both languages** (`app/global-not-found.tsx`, behind
   Next's `globalNotFound` flag), since one page answers every wrong address
   and cannot know the reader's language. It offers the overview, this week's
