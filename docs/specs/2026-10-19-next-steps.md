@@ -64,9 +64,9 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
    `lh_futures_main` and `lh_futures_curve` both `ok`, and the local run no
    longer lists them.
 2. **Decisions for the owner, both written up.**
-   - 猪粮比价: [the options](2026-10-21-hog-corn-ratio-decision.md). The
-     recommendation is A, retire it. Due before 12-17, when the warning
-     starts.
+   - 猪粮比价: [the options](2026-10-21-hog-corn-ratio-decision.md).
+     **The owner said on 10-29: keep it for now, and look for a replacement
+     source when the warning starts on 12-17.** No change before then.
    - How the site could earn money: [making it pay](2026-10-21-making-it-pay.md).
      Nothing outward-facing has been started.
    - Visitor analytics: **the owner said not for now (10-24).** Do not add a
@@ -112,7 +112,9 @@ seasons and a lag scan on the pages, and Atom feeds and a JSON index.
   The joint release's monthly 猪粮比价 stopped with the 202508 edition (the
   drift check found it), so there is still no machine-readable primary.
   Decide: retire (ADR-0018's default) or renew with a reason. Never
-  auto-retire.
+  auto-retire. **10-29: the owner chose to wait.** At 12-17, search for a
+  readable primary; found, renew with it (B); not found, ask the owner
+  about A again before 12-31.
 
 ## Later (P3)
 

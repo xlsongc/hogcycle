@@ -67,3 +67,13 @@ exists to avoid. Not recommended without a new source in hand.
 "A" or "B (with the new source)". With A, the change is one config block
 and a line in this file; it can land any day before 12-17 so the warning
 never fires.
+
+## The owner's answer (2026-10-29)
+
+**Neither yet: keep it as it is and look for a replacement source nearer
+the time.** Nothing changes now; the acknowledgement still runs to 12-31.
+When `status` and the `ack-lapsing` issue start warning on 12-17, look
+again for a readable primary for the weekly ratio (发改委 text releases on
+中国价格信息网 or 发改委's own site, or another official channel carrying the
+same figure). With one in hand, that is B with the new source; without one,
+put A to the owner again before 12-31.
