@@ -10,3 +10,4 @@
 {"fetched_at": "2026-10-28T06:26:05.919114+00:00", "snapshot_id": "1095d5079654b9f1b9577f4591372918140c583de74dc40f1c53fe8912b397b0", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 103397, "new_content": true}
 {"fetched_at": "2026-10-29T06:37:01.846045+00:00", "snapshot_id": "a420c1b4aa7203aefaa6f548168b0257f33f82ea43db4af51b56d0a0893686ab", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 104243, "new_content": true}
 {"fetched_at": "2026-10-30T06:37:07.339209+00:00", "snapshot_id": "395463b961f839c551104498e60ab961d8ee53c16be6d2c0c24962419a418d94", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 105086, "new_content": true}
+{"fetched_at": "2026-10-31T06:26:27.458887+00:00", "snapshot_id": "cba1e5fb43a186767839de1933e042e1dba6c84c105ac92e0352ee1f0cc576fa", "source": "futures_curve:LH:[1, 3, 5, 7, 9, 11]:settle", "bytes": 105930, "new_content": true}
