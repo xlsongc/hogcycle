@@ -59,3 +59,4 @@
 {"fetched_at": "2026-11-01T08:30:05.937746+00:00", "snapshot_id": "9eaf094b6eb1cd3a6143df215605cbde758ebc8a4cfdcefdbb88d53403489c64", "source": "akshare:futures_hog_core:外三元", "bytes": 14583, "new_content": true}
 {"fetched_at": "2026-11-02T08:39:40.737799+00:00", "snapshot_id": "426db5871f38632b25d6638febc9b3dfa09501a474866cdb58eca53830aebbea", "source": "akshare:futures_hog_core:外三元", "bytes": 14582, "new_content": true}
 {"fetched_at": "2026-11-03T08:31:42.845300+00:00", "snapshot_id": "173440f4b442f96a69855bf9d3e364507668349ff927efd14b23e0447b828d81", "source": "akshare:futures_hog_core:外三元", "bytes": 14581, "new_content": true}
+{"fetched_at": "2026-11-04T08:31:19.735201+00:00", "snapshot_id": "173440f4b442f96a69855bf9d3e364507668349ff927efd14b23e0447b828d81", "source": "akshare:futures_hog_core:外三元", "bytes": 14581, "new_content": false}

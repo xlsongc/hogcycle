@@ -59,3 +59,4 @@
 {"fetched_at": "2026-11-01T08:30:05.937746+00:00", "snapshot_id": "e2dc416b114f62f6bc361c2cb9f3ab94dcfa228f1f8938dd305b6014ad3e769f", "source": "akshare:futures_hog_cost:玉米", "bytes": 14356, "new_content": true}
 {"fetched_at": "2026-11-02T08:39:40.737799+00:00", "snapshot_id": "811fcf00c88297748db0fd66b535e7e27950c93c9bbcb77b097c02707916f3ca", "source": "akshare:futures_hog_cost:玉米", "bytes": 14356, "new_content": true}
 {"fetched_at": "2026-11-03T08:31:42.845300+00:00", "snapshot_id": "8f8e7b572a51bb995676fd3fc6485aba26484e44d5887de2c15ab2767adabaa0", "source": "akshare:futures_hog_cost:玉米", "bytes": 14356, "new_content": true}
+{"fetched_at": "2026-11-04T08:31:19.735201+00:00", "snapshot_id": "8f8e7b572a51bb995676fd3fc6485aba26484e44d5887de2c15ab2767adabaa0", "source": "akshare:futures_hog_cost:玉米", "bytes": 14356, "new_content": false}
