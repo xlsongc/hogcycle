@@ -23,3 +23,4 @@
 {"fetched_at": "2026-11-11T07:20:40.325237+00:00", "snapshot_id": "91a238cddca2de99ee8a37a8192a3a3cdc08c85f17b474008078e62f3e6d0f38", "source": "akshare:futures_zh_daily_sina:LH0:settle", "bytes": 202393, "new_content": true}
 {"fetched_at": "2026-11-12T07:51:09.793630+00:00", "snapshot_id": "28ad8ed1cd84f1106cd08bdd12b932893e78dde9899edd274ce31a491ebf40e5", "source": "akshare:futures_zh_daily_sina:LH0:settle", "bytes": 202533, "new_content": true}
 {"fetched_at": "2026-11-13T07:27:56.027919+00:00", "snapshot_id": "f451c02e06ba581b0dc5cbbfff0f213fa23e994a4712047a04a2f610d54f4f3a", "source": "akshare:futures_zh_daily_sina:LH0:settle", "bytes": 202672, "new_content": true}
+{"fetched_at": "2026-11-14T07:09:28.362579+00:00", "snapshot_id": "3315d7d02b7d44645bb440bd61866947d1212eca05c2fe79d8c2588f2718fba0", "source": "akshare:futures_zh_daily_sina:LH0:settle", "bytes": 202812, "new_content": true}
